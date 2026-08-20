@@ -47,6 +47,14 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
 - Vercel の function region は東京 `hnd1`（`vercel.json`）
 - 連番・動画・モデルは1年 immutable キャッシュ（`vercel.json`）
 
+### 踏んだ落とし穴（この土台を作る時点で1つ）
+
+- **`next.config.ts` の `turbopack.root` は消さないこと。**
+  `~/package-lock.json` が存在するため、指定しないと Turbopack がホームディレクトリを
+  プロジェクトの根と誤認し、**`public/` の素材が全部404になる**。
+  症状は「トップページは出るのに画像だけ出ない」。設定を変えたのに直らないときは、
+  古い `next dev` のプロセスが残って応答していないか `pkill -f "next dev"` で確認する
+
 ---
 
 ## 4. 移植の順序（推奨）
@@ -101,3 +109,13 @@ npm run build    # 本番ビルド
 - 管理画面のスクリーンショット（Figmaから）
 - OGP画像・favicon・メタ情報
 - **未解決の不具合**：洋輔さんの PROFILE をタップするとトップへ戻る（移植元で再現できず、切り分け待ち）
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
