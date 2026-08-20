@@ -114,7 +114,9 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 
 /* ===== 映像を抜けたあとの紙のセクション =====
    世界観：紙 #F3F1EC ／ 墨 ／ アクセントはオリーブ1点（映像のオリーブの木から採色）。
-   モーションの語彙は「線が引かれる」「静かに現れる」の2つだけ。増やさないこと */
+   モーションの語彙は「静かに現れる」だけ。増やさないこと。
+   ただしプロダクト2節（.pv）は例外で、各サービスのトンマナに切り替えてある
+   （components/after/products.css）。あちらに紙のトークンは通していない */
 /* 色はすべてトークン経由。data-ink の節が画面中央に来ると #after に .inked が付き、
    紙 → 墨 に反転する（inkSync）。個々の要素に直接色を書かないこと */
 #after{position:relative;z-index:3;
@@ -235,32 +237,10 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
  transition:color .9s ease,border-color .25s ease,background .25s ease}
 .linkbtn.onpaper:hover{background:var(--bd-soft);border-color:var(--tx)}
 
-/* 図解。中身のSVGはイラレ書き出しに差し替える前提。
-   fill無しのストローク＝線として引かれる／文字と塗り＝あとから現れる。
-   薄く沈めたい一群は <g data-dim> に入れる（最後に18%へ落ちる） */
-.fig{background:var(--cream);border:1px solid var(--ln);border-radius:3px;
- padding:clamp(18px,3.4vw,36px)}
-.fig svg{display:block;width:100%;height:auto}
-/* セレクタの詳細度に注意。`.fig svg` は 0,1,1 なので、
-   `.fig-sp` だけ（0,1,0）では display を打ち消せない */
-.fig svg.fig-sp{display:none}
-.fg{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.fg.thin{stroke-width:1.05}
-.fg.acc{stroke:var(--olive)}
-.fg-lab{font-size:12.5px;letter-spacing:.13em;fill:var(--sub);font-weight:500}
-.fg-lab.jp{font-size:13.5px;letter-spacing:.05em;font-weight:400}
-.fg-lab.acc{fill:var(--olive)}
-.fg-lab.ink{fill:var(--ink)}
-.fg-num{font-size:34px;letter-spacing:.02em;fill:var(--ink);font-weight:500;
- font-variant-numeric:tabular-nums}
-.fg-sm{font-size:11px;letter-spacing:.04em;fill:var(--sub)}
-/* SP用の図は表示が約0.71倍に縮むぶん、文字と線をあらかじめ太らせておく */
-.fig-sp .fg{stroke-width:2}
-.fig-sp .fg.thin{stroke-width:1.5}
-.fig-sp .fg-lab{font-size:17px}
-.fig-sp .fg-lab.jp{font-size:17px}
-.fig-sp .fg-num{font-size:44px}
-.fig-sp .fg-sm{font-size:14px}
+/* 図解（.fig / .fg）のCSSは 2026-08-20 に撤去しました。
+   プロダクト2節は各サービスのトンマナに切り替え、実物の画面と
+   イラストで見せる形にしたためです（components/after/products.css）。
+   線引きの図解が再び要るときは、この時点のコミットから戻せます。 */
 
 /* ---- フッター ---- */
 #foot{border-top:1px solid var(--ln);margin-top:clamp(90px,12vw,150px);
@@ -272,7 +252,5 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 
 
 @media (max-width:760px){
-  .fig svg.fig-pc{display:none}
-  .fig svg.fig-sp{display:block}
   .fd-grid{grid-template-columns:minmax(0,340px);gap:44px}
 }

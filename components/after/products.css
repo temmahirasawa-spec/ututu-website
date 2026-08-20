@@ -1,0 +1,160 @@
+/* プロダクト紹介の2節。
+   **ここだけ紙のトンマナから外れます。**映像セクションで概要は伝えているので、
+   この2節は「それぞれのサービスの世界」に切り替えて見せる、という判断です。
+   色も文字も、公式LPから採ったものをそのまま使っています。
+
+   したがって #after の紙⇄墨の反転（--pg / --tx …）は**通しません**。
+   反転する節（data-ink）とは別物なので、ここに data-ink を付けないこと。
+
+   採色元
+     GOOD ORDER  … https://good-order-lp.vercel.app
+     GOOD REVIEW … https://goodloop-official.vercel.app （LP上の名は GOOD LOOP）*/
+
+/* 左右いっぱいに敷く。#after は overflow-x:clip なのではみ出しは刈られる
+   （写真の帯と同じ手）。中身だけ 1100 で中央に置く */
+.pv {
+  margin: clamp(72px, 10vw, 130px) calc(50% - 50vw) 0;
+  padding: clamp(56px, 7vw, 96px) clamp(24px, 5vw, 48px) clamp(48px, 6vw, 80px);
+  position: relative;
+  overflow: hidden;
+}
+.pv-in { max-width: 1100px; margin: 0 auto; }
+
+/* ---- GOOD ORDER：白地にウォームブロブ、琥珀のアクセント ---- */
+.pv-order {
+  --ink: #1A1A1A; --acc: #FAC03D; --deep: #996B00;
+  --mut: #646464; --line: #E8E2D6; --tint: #FCF7EE; --pale: #FBEEC5;
+  background: linear-gradient(180deg, #fff 0%, var(--tint) 100%);
+  color: var(--ink);
+}
+/* ---- GOOD REVIEW：白地にミント、緑のアクセント（星は琥珀） ---- */
+.pv-review {
+  --ink: #233029; --acc: #34CA9B; --deep: #1F8C6B;
+  --mut: #5B6660; --line: #E3EBE7; --tint: #F3FCF9; --pale: #DFF3EC;
+  --star: #FFC32B;
+  background: linear-gradient(180deg, #fff 0%, var(--tint) 100%);
+  color: var(--ink);
+}
+
+/* ===== 見出しまわり ===== */
+.pv-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.pv-copy { min-width: 0; }
+.pv-eyebrow {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 18px;
+  font-size: 11.5px; letter-spacing: .16em; font-weight: 600; color: var(--deep);
+}
+.pv-eyebrow svg { width: 15px; height: 15px; flex: none; }
+.pv h4 {
+  font-family: var(--jp-title); font-weight: 700; margin: 0 0 20px;
+  font-size: clamp(27px, 3.4vw, 42px); line-height: 1.5; letter-spacing: .04em; color: var(--ink);
+}
+/* 見出しの後半に手描き風の下線を引く。LPのヒーローと同じ扱い */
+.pv h4 em { font-style: normal; position: relative; white-space: nowrap; }
+.pv h4 em::after {
+  content: ""; position: absolute; left: -.06em; right: -.06em; bottom: .04em; height: .26em;
+  background: var(--acc); opacity: .45; border-radius: 99px; z-index: -1;
+}
+.pv-lead { margin: 0; font-size: 14.5px; line-height: 2.05; color: var(--mut); max-width: 34em; }
+.pv-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 28px 0 0; }
+/* 丸ボタン。LPと同じ形 */
+.pv-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; border-radius: 99px; background: var(--acc); color: var(--ink);
+  text-decoration: none; font-size: 13.5px; font-weight: 700; letter-spacing: .04em;
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--acc) 80%, transparent);
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.pv-review .pv-cta { color: #fff; }
+.pv-cta svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s ease; }
+.pv-cta:hover { transform: translateY(-1px); filter: brightness(1.04); }
+.pv-cta:hover svg { transform: translate(2px, -2px); }
+.pv-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* **nowrap を外さないこと。** 和文はどこでも折れるので、flex の中では
+   min-content が1文字ぶんになり、縦1列に潰れる。nowrap にすると
+   収まらないときは行ごと下へ落ちる */
+.pv-run { display: inline-flex; align-items: center; gap: 9px; margin: 0; font-size: 12px; color: var(--mut); letter-spacing: .03em; white-space: nowrap; }
+.pv-run i { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); flex: none; animation: pvlamp 2.6s ease-in-out infinite; }
+@keyframes pvlamp { 0%, 100% { opacity: .3 } 50% { opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .pv-run i { animation: none } }
+
+/* ===== 端末のモックアップ ===== */
+.pv-visual { position: relative; min-width: 0; display: flex; justify-content: center; }
+/* 背後のブロブ。LPのヒーローと同じ役どころ。
+   **必ず中央に留め、大きさに上限を付けること。**位置指定を省くと
+   静的位置から 108% 四方に広がり、下の特長カードに被る（実際に被った）*/
+.pv-visual { isolation: isolate; }
+.pv-blob {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  width: min(94%, 460px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--pale); opacity: .5; z-index: 0; pointer-events: none;
+}
+.pv-phones { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center; }
+.pv-phone {
+  background: #14161A; border-radius: 30px; padding: 5px;
+  box-shadow: 0 24px 48px -20px rgba(20, 22, 26, .38), 0 2px 6px rgba(20, 22, 26, .12);
+}
+.pv-phone img { display: block; width: 100%; height: auto; border-radius: 25px; }
+.pv-phone--front { width: clamp(190px, 21vw, 250px); position: relative; z-index: 2 }
+.pv-phone--back {
+  width: clamp(150px, 17vw, 200px); margin-right: -46px; margin-bottom: 34px;
+  opacity: .96; transform: rotate(-4deg); transform-origin: bottom right;
+}
+/* 端末に重ねる小さな札。LPのフロートチップと同じ */
+.pv-chip {
+  position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: 99px; background: #fff; color: var(--ink);
+  font-size: 11.5px; font-weight: 600; letter-spacing: .02em; white-space: nowrap;
+  box-shadow: 0 10px 24px -10px rgba(20, 22, 26, .3), 0 1px 3px rgba(20, 22, 26, .08);
+}
+.pv-chip svg { width: 15px; height: 15px; flex: none }
+.pv-chip--a { top: 12%; right: -4% }
+.pv-chip--b { bottom: 16%; left: -6% }
+
+/* イラスト（GOOD REVIEW） */
+.pv-illust { display: block; width: 100%; max-width: 560px; height: auto; position: relative; z-index: 1 }
+
+/* ===== 3つの特長 ===== */
+.pv-feats {
+  list-style: none; margin: clamp(44px, 6vw, 76px) 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 34px);
+}
+.pv-feat {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  padding: clamp(20px, 2.4vw, 28px);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.pv-feat:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -22px rgba(20, 22, 26, .45) }
+.pv-feat-no { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 11px; letter-spacing: .14em; font-weight: 700; color: var(--deep) }
+.pv-feat-no b { font-weight: 700; color: var(--acc) }
+/* 和文は文節で折る。対応していないブラウザは従来どおり */
+.pv h4, .pv-feat h5 { word-break: auto-phrase }
+.pv-feat h5 { margin: 0 0 10px; font-family: var(--jp-title); font-weight: 700; font-size: 16px; line-height: 1.65; letter-spacing: .04em; color: var(--ink) }
+.pv-feat p { margin: 0; font-size: 12.5px; line-height: 1.95; color: var(--mut) }
+/* 画面つきの特長（GOOD REVIEW） */
+.pv-feat--shot { padding-top: 0; overflow: hidden; display: flex; flex-direction: column }
+.pv-shot { margin: 0 calc(clamp(20px, 2.4vw, 28px) * -1) 18px; background: var(--tint); padding: 22px 0 0; text-align: center }
+.pv-shot img { display: block; width: 62%; margin: 0 auto -14%; height: auto; border-radius: 14px 14px 0 0; box-shadow: 0 -2px 18px -6px rgba(20, 22, 26, .18) }
+
+/* ===== 実測（GOOD REVIEW） ===== */
+.pv-proof {
+  margin: clamp(24px, 3vw, 34px) 0 0; padding: clamp(22px, 3vw, 30px) clamp(24px, 3.4vw, 36px);
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px clamp(24px, 4vw, 48px);
+}
+.pv-proof-l { display: flex; flex-direction: column; gap: 4px; min-width: 0 }
+.pv-proof-l b { font-size: 11px; letter-spacing: .14em; font-weight: 700; color: var(--deep) }
+.pv-proof-l span { font-size: 12.5px; color: var(--mut); line-height: 1.8 }
+.pv-rating { display: flex; align-items: center; gap: 14px; margin-left: auto; font-variant-numeric: tabular-nums }
+.pv-rating i { font-style: normal; color: var(--star); font-size: 15px; margin-right: 3px }
+.pv-rating .from { font-size: clamp(22px, 3vw, 30px); font-weight: 500; color: var(--mut) }
+.pv-rating .to { font-size: clamp(30px, 4.2vw, 44px); font-weight: 700; color: var(--ink); line-height: 1 }
+.pv-rating svg { width: 26px; height: 14px; flex: none; fill: none; stroke: var(--acc); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+
+@media (max-width: 900px) {
+  .pv-head { grid-template-columns: minmax(0, 1fr); gap: clamp(36px, 7vw, 56px) }
+  .pv-feats { grid-template-columns: minmax(0, 1fr) }
+  .pv-lead { max-width: none }
+  .pv-phone--front { width: min(250px, 54vw) }
+  .pv-phone--back { width: min(200px, 43vw) }
+  .pv-rating { margin-left: 0 }
+}

@@ -45,8 +45,10 @@ components/
     LoadArt.tsx           ローディングの線画（差し替えるのはここ）
     Mark.tsx              ロゴ。#brand と #loadMark で同じものを使う
   after/                  紙のセクション（#after）
-    After.tsx             マークアップ。図解のSVGもここ（サンプル。イラレ版待ち）
-    afterEffects.ts       現れる / 線を引く / 紙⇄墨の反転 / 帯の速さ / 3Dの遅延読み込み
+    After.tsx             マークアップ
+    Products.tsx          GOOD ORDER / GOOD REVIEW の2節。**紙ではなく各サービスのトンマナ**
+    products.css          同上のCSS
+    afterEffects.ts       現れる / 紙⇄墨の反転 / 帯の速さ / 3Dの遅延読み込み
     BioModal.tsx          プロフィール。本文は状態で持つ
     bios.ts               Founders の全文（本人支給の確定稿）
 lib/three/      three.js r185・GLTFLoader（自家ビルド版）と headViewer.js。npm ではなく同梱
@@ -136,48 +138,56 @@ npx serve ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU
 
 ---
 
-### プロダクト2節の文言と図解（2026-08-20）
+### プロダクト2節（2026-08-20 に作り直し）
 
-GOOD ORDER と GOOD REVIEW の節は、**公式LPの言い回しに合わせてあります。**
-コーポレート側で独自の言い方を足すと、LPへ飛んだ人が別のサービスだと感じます。
+**この2節だけ、紙のトンマナから外れます。**映像セクションで概要は伝えているので、
+ここからは「それぞれのサービスの世界」に切り替えて見せる、という判断です（本人）。
 
-| | 出どころ |
-|---|---|
-| GOOD ORDER の見出し | LPのヒーロー「いいデザインは、売上に効く。」 |
-| 同・図解の3点 | LPの SOLUTION 01〜03（NAVIGATION / OVERVIEW / RECOMMEND） |
-| 同・締めの流れ | LPの WHY IT WORKS「見つかる → 選ばれる → もう一品」 |
-| GOOD REVIEW の見出し | LPの SOLUTION「良い声は表へ、本音はお店へ。」 |
-| 同・図解 | LPの FEATURE 03「高い評価はGoogleへ、低い評価はお店へ」 |
-| 同・実測値 | LPの REAL STORE RESULT（FROMA ／ 導入2ヶ月で ★3.5→★4.2） |
+最初はSVGの線画で図解を作りましたが、**プレゼン資料のようで先進的に見えない**という
+指摘があり、実物の画面とブランドのイラストで組み直しました。線画の図解（`.fig` / `.fg`）は
+撤去済みです。戻したくなったら 2026-08-20 のコミットから拾えます。
 
-- **GOOD ORDER に数字は出さないこと。**LPでも客単価・注文点数は「測定中」です。
-  ここで先に断定すると食い違います
-- **★3.5→★4.2 はサンプルではありません。**丸めたり盛ったりしないこと
-- **★ を `.fg-num`（34/44px）に混ぜないこと。**★ は和文フォント側の字形なので、
-  Noto Sans JP の読み込み前は代替フォントの幅で描かれ、桁が跳ねて列がはみ出します。
-  ★は `.fg-lab` の大きさに逃がし、数字だけを大きく組んであります
-- 図解を直したら、**文字の重なりと枠外を実測で確かめること。**目視では気づけません
+| | GOOD ORDER | GOOD REVIEW |
+|---|---|---|
+| 採色元 | good-order-lp.vercel.app | goodloop-official.vercel.app |
+| 地 | 白→クリーム `#FCF7EE` | 白→ミント `#F3FCF9` |
+| アクセント | 琥珀 `#FAC03D` / 濃い `#996B00` | 緑 `#34CA9B` / 濃い `#1F8C6B`、星は `#FFC32B` |
+| 見出し | LPのヒーロー「いいデザインは、売上に効く。」 | LPのSOLUTION「良い声は表へ、本音はお店へ。」 |
+| 主役 | 実機の注文画面2枚＋フロートチップ | ブランドのイラスト＋実機の画面3枚 |
+| 3つの特長 | LPの SOLUTION 01〜03 | LPの FEATURE 01〜03 |
 
-```js
-// 開発者コンソールで。重なり・はみ出しがあれば出る
-document.querySelectorAll('[data-fig] svg').forEach(svg => {
-  if (!svg.getClientRects().length) return;              // 非表示のほうは測れない
-  const vb = svg.getAttribute('viewBox').split(' ').map(Number);
-  const ts = [...svg.querySelectorAll('text')].map(t => ({ s: t.textContent, b: t.getBBox() }));
-  ts.forEach(t => { if (t.b.x + t.b.width > vb[2] || t.b.y + t.b.height > vb[3]) console.warn('枠外', t.s); });
-  for (let i=0;i<ts.length;i++) for (let j=i+1;j<ts.length;j++) {
-    const a=ts[i].b, b=ts[j].b;
-    if (Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x) > 1 &&
-        Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y) > 1) console.warn('重なり', ts[i].s, ts[j].s);
-  }
-});
-```
+- 画像は `public/img/products/`（8点・約300KB）。**公式LPから落として webp に変換したもの**です。
+  LPの画面を差し替えたら、ここも作り直してください
+- **GOOD ORDER に数字は出さないこと。**LPでも客単価・注文点数は「測定中」です
+- **★3.5→★4.2 は FROMA の実測値**（LPの REAL STORE RESULT）。盛らないこと
+- **`.pv-run` の `white-space: nowrap` を外さないこと。**和文はどこでも折れるため、
+  flex の中では min-content が1文字ぶんになり、縦1列に潰れます（実際に潰れました）
+- **`.pv-blob` には必ず位置と上限を付けること。**位置指定を省くと静的位置から
+  108% 四方に広がり、下の特長カードに被ります（実際に被りました）
 
 **名前の食い違いに注意。**レビュー側は、コーポレートでは `GOOD REVIEW` ですが、
 公式LP・Figma・管理画面（`admin.goodloop.jp`）はすべて `GOOD LOOP` です。
 2026-08-20 時点では**コーポレート側は GOOD REVIEW のまま**という判断（本人）。
-なお `good-order.jp` と `good-review.jp` はまだDNSが引けず、
-`goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
+なお `good-order.jp` と `good-review.jp` はまだDNSが引けず（＝「公式サイトへ」は
+現状リンク切れ）、`goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
+
+### 見た目を確かめるときの近道
+
+ブラウザーのペインが隠れていると rAF も IntersectionObserver も止まるので、
+`.rv` が open せず真っ白に写ります。**ヘッドレスの Chrome で直接撮るのが速い**です。
+
+```bash
+npm run dev
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
+  --window-size=1280,2600 --virtual-time-budget=15000 \
+  --screenshot=/tmp/pv.png "http://localhost:3000/"
+```
+
+`.rv` を待たずに見たいときは、確認用のページを一時的に作って
+`.rv{opacity:1!important}` を当てるのが手っ取り早いです（作ったら消すこと）。
+なお**ヘッドレスは幅の狭い指定だと実機と違う折り返しになることがあります。**
+モバイルの確認は、幅を変えた実ブラウザで `document.documentElement.scrollWidth` を
+見るほうが確実です。
 
 ---
 
@@ -239,8 +249,6 @@ npm run build    # 本番ビルド
 
 ### 移植元から引き継いだもの
 
-- 図解のイラレ版2点（PC 900×430 / SP 480×560）
-  ※プロダクト2節の図解は 2026-08-20 に公式LPの内容で作り直し済み（下記）
 - **橋の節の数字がサンプルのまま**（直営4 / 導入3 / 3.9倍 / +18%）。
   GOOD REVIEW の図解には FROMA の実測（★3.5→★4.2）が入ったので、
   **同じページに実測とサンプルが混在している。**早めに揃えること
