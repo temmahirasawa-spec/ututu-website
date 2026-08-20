@@ -75,6 +75,16 @@ body.menu-open #menu{opacity:1;pointer-events:auto}
  letter-spacing:.02em;opacity:.92}
 #menu small{display:block;font-size:10px;letter-spacing:.2em;opacity:.45;margin-top:6px;font-weight:400}
 
+/* 下層ページは紙の地なので、ロゴとハンバーガーを墨に反転する（SiteHeader の .ink）。
+   KVでは白のまま。映像の上に置くので影も要る。
+   **メニューを開いているあいだは白に戻すこと。**幕（#menu）が墨なので、
+   反転したままだと閉じるための×が地に沈んで見えなくなる */
+#brand.ink path{fill:var(--ink)}
+#menuBtn.ink span{background:var(--ink);box-shadow:none}
+body.menu-open #brand.ink path{fill:#fff}
+body.menu-open #menuBtn.ink span{background:#fff}
+#brand.ink:focus-visible{outline-color:var(--ink)}
+
 /* ===== プロフィールのモーダル ===== */
 /* ---- プロフィールのモーダル。スマホは下からのシート、PCは中央のポップアップ。
    モーダルは墨ゾーン（締めの周辺）でしか開かないので、色は墨で固定 ---- */
