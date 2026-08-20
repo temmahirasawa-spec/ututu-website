@@ -11,13 +11,20 @@
      GOOD REVIEW … https://goodloop-official.vercel.app （LP上の名は GOOD LOOP）*/
 
 /* 左右いっぱいに敷く。#after は overflow-x:clip なのではみ出しは刈られる
-   （写真の帯と同じ手）。中身だけ 1100 で中央に置く */
+   （写真の帯と同じ手）。中身だけ 1100 で中央に置く。
+
+   **上下の余白はここだけで持つこと。**帯の前後に紙を挟むと、
+   紙 → クリーム → 紙 → ミント と地の色が細かく切り替わって崩れて見える。
+   2つの帯は隙間なく続けて置き、前後にだけ紙の間合いをとる */
 .pv {
-  margin: clamp(72px, 10vw, 130px) calc(50% - 50vw) 0;
-  padding: clamp(56px, 7vw, 96px) clamp(24px, 5vw, 48px) clamp(48px, 6vw, 80px);
+  margin: 0 calc(50% - 50vw);
+  padding: clamp(60px, 6.5vw, 92px) clamp(24px, 5vw, 48px);
   position: relative;
   overflow: hidden;
 }
+/* 帯のあとに来る紙の節は、自分で間合いをとる（.af-sec は下マージンしか持たないため、
+   ここが無いと Founders の見出しが帯にくっつく。実際に18pxまで詰まった）*/
+.pv + .af-sec { margin-top: clamp(96px, 13vw, 170px) }
 .pv-in { max-width: 1100px; margin: 0 auto; }
 
 /* ---- GOOD ORDER：白地にウォームブロブ、琥珀のアクセント ---- */
@@ -119,21 +126,38 @@
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 34px);
 }
 .pv-feat {
+  --pad: clamp(20px, 2.4vw, 28px);
   background: #fff; border: 1px solid var(--line); border-radius: 16px;
-  padding: clamp(20px, 2.4vw, 28px);
+  padding: var(--pad);
   transition: transform .3s ease, box-shadow .3s ease;
 }
 .pv-feat:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -22px rgba(20, 22, 26, .45) }
 .pv-feat-no { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 11px; letter-spacing: .14em; font-weight: 700; color: var(--deep) }
 .pv-feat-no b { font-weight: 700; color: var(--acc) }
-/* 和文は文節で折る。対応していないブラウザは従来どおり */
+/* 和文は文節で折り、行の長さも揃える。対応していないブラウザは従来どおり */
 .pv h4, .pv-feat h5 { word-break: auto-phrase }
+.pv-feat h5 { text-wrap: balance }
 .pv-feat h5 { margin: 0 0 10px; font-family: var(--jp-title); font-weight: 700; font-size: 16px; line-height: 1.65; letter-spacing: .04em; color: var(--ink) }
 .pv-feat p { margin: 0; font-size: 12.5px; line-height: 1.95; color: var(--mut) }
-/* 画面つきの特長（GOOD REVIEW） */
+/* 画面つきの特長（GOOD REVIEW）。
+   **画像は必ず .pv-shot の中で切ること。**マイナスマージンで下へ食い込ませると、
+   高さは縮むのに絵は縮まず、下のラベルに重なる（実際に30px重なった）。
+   高さを決めて overflow:hidden で切り、裾を地の色へ溶かす */
 .pv-feat--shot { padding-top: 0; overflow: hidden; display: flex; flex-direction: column }
-.pv-shot { margin: 0 calc(clamp(20px, 2.4vw, 28px) * -1) 18px; background: var(--tint); padding: 22px 0 0; text-align: center }
-.pv-shot img { display: block; width: 62%; margin: 0 auto -14%; height: auto; border-radius: 14px 14px 0 0; box-shadow: 0 -2px 18px -6px rgba(20, 22, 26, .18) }
+.pv-shot {
+  position: relative; margin: 0 calc(var(--pad) * -1) 20px;
+  height: clamp(214px, 23vw, 272px); overflow: hidden;
+  background: var(--tint); border-bottom: 1px solid var(--line);
+  display: flex; justify-content: center; align-items: flex-start; padding-top: 28px;
+}
+.pv-shot img {
+  display: block; width: 64%; max-width: 232px; height: auto;
+  border-radius: 14px 14px 0 0; box-shadow: 0 2px 20px -8px rgba(20, 22, 26, .28);
+}
+.pv-shot::after {
+  content: ""; position: absolute; inset: auto 0 0; height: 44px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--tint) 88%);
+}
 
 /* ===== 実測（GOOD REVIEW） ===== */
 .pv-proof {
@@ -157,4 +181,7 @@
   .pv-phone--front { width: min(250px, 54vw) }
   .pv-phone--back { width: min(200px, 43vw) }
   .pv-rating { margin-left: 0 }
+  /* カードが1列になるぶん横幅は余る。画面は細めにして、そのぶん長く見せる */
+  .pv-shot { height: clamp(250px, 64vw, 320px) }
+  .pv-shot img { width: 52%; max-width: 196px }
 }
