@@ -3,15 +3,21 @@
 株式会社UTUTU のコーポレートサイトを Next.js で作り直すリポジトリです。
 **トップページ（KV＋紙のセクション）の移植は済んでいます。**残りは下層ページです。
 
-移植元は Dropbox の静的版です。**そちらが唯一の正解**なので、迷ったら原本を見てください。
+動きの正解は静的版です。**迷ったら原本を見てください。**
 
 ```
-移植元: ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU_Website/
-本番  : https://ututu-website.vercel.app （移植が終わるまで、これが生きている本番）
+本番  : https://ututu-website.vercel.app （main に push すると自動デプロイ）
+GitHub: temmahirasawa-spec/ututu-website （Public）
 参照用: reference/legacy-index.html      （1,965行。CSSとJSが全部入っている原本のコピー）
         reference/legacy-head-viewer.js  （Founders の3Dアバター）
         reference/legacy-CLAUDE.md       （★必読。踏んだ地雷が全部書いてある）
+原本の作業コピー: ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU_Website/
 ```
+
+**2026-08-20、静的版のリポジトリをこれで上書きしました。**GitHub も Vercel も
+静的版のものを使い回しています。Dropbox の `UTUTU_Website/` はそのまま残して
+ありますが、**remote はこちらに置き換わっているので、あそこで pull しないこと**
+（まったく別のものが落ちてきます）。
 
 ---
 
