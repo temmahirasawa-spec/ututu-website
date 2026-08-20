@@ -4,6 +4,10 @@
 
 /* ===== 映像レイヤー ===== */
 #stage{position:fixed;inset:0;z-index:0;overflow:hidden;background:#EDEBE6}
+/* 映像を抜けたら合成そのものを落とす。#after（不透明・z-index:3）が
+   画面を覆い切ったところで .kv-idle が付く（heroEngine の syncChrome）。
+   描画を止めるだけだと、全画面の canvas と動画は合成され続ける */
+body.kv-idle #stage{visibility:hidden}
 #seq{position:absolute;inset:0;width:100%;height:100%;display:block}
 #scrim{position:absolute;inset:0;pointer-events:none;transition:opacity .5s;
  background:linear-gradient(90deg,rgba(12,14,18,.58) 0%,rgba(12,14,18,.30) 34%,rgba(12,14,18,0) 62%)}

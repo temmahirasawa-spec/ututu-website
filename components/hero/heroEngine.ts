@@ -346,6 +346,7 @@ export function startHero(): () => void {
   on(window, 'scroll', () => {
     readScroll();
     syncChrome();
+    if (parked && !heroHidden()) wake();
     if (!SNAP) return;
     if (tweening) return;
     const n = nearestChapter();
@@ -466,7 +467,7 @@ export function startHero(): () => void {
       evs.forEach((ev) => window.removeEventListener(ev, go));
     };
     evs.forEach((ev) => on(window, ev, go, { passive: true }));
-    every(() => { tryPlay(vOrder); tryPlay(vReview); }, 1500);
+    every(() => { if (kvIdle) return; tryPlay(vOrder); tryPlay(vReview); }, 1500);
   })();
 
   /* ============================================================
@@ -687,11 +688,38 @@ export function startHero(): () => void {
   }
 
   const inHero = () => scrollY < heroMax() - 2;
+  /* 映像が #after に完全に隠れたか。
+     #track のすぐ後ろに #after が続くので、#after の上端は必ず
+     heroMax + innerHeight にある。つまり heroMax を過ぎた時点で、
+     画面に写っているのは #after だけになる（縦横どの幅でも一致を確認済み）。
+     inHero() の 2px の余裕とは用途が違うので、判定を分けてある */
+  const heroHidden = () => scrollY >= heroMax();
+  let kvIdle = false;
+
   /* 映像区間にいるかどうかで、標準のスクロールバーと送りUIの出し入れを決める */
   function syncChrome() {
     const v = inHero();
     document.documentElement.classList.toggle('hide-sb', v);
     document.body.classList.toggle('past-hero', !v);
+
+    /* 隠れているあいだ、KVは丸ごと止める。
+       止めないと、見えていないのに canvas への描き込みとコピーの濃度計算が
+       毎フレーム走り、動画も loop で回り続ける。
+       実測：紙のセクションにいるあいだ rAF が毎秒60回 → 0回（戻ると60回に復帰）。
+       #stage を visibility:hidden にするのは合成を落とさせるため（CSSは hero.css）。
+
+       **これは無駄を削っただけで、体感が変わったとまでは言えない。**
+       ヘッドレス（GPUなし・dev ビルド）で往復させたコマ間隔は
+       修正前後とも中央値 27.9ms / 32ms超が約半分で、差は出ていない。
+       実機で詰まるようなら、原因は別にある */
+    const idle = heroHidden();
+    if (idle === kvIdle) return;
+    kvIdle = idle;
+    document.body.classList.toggle('kv-idle', idle);
+    /* 動画は隠れても復号と合成が続くので、ここで止める。
+       戻ってきたときの再生は tryPlay 側に任せる。区間ごとの細かい
+       出し入れとは違い、ここまで来ていれば操作済みで自動再生は通る */
+    if (idle) { vOrder.pause(); vReview.pause(); }
   }
   /* スマホでは指のスクロールを完全に止め、ボタン操作だけにする */
   function lockScroll(isOn: boolean) {
@@ -704,6 +732,10 @@ export function startHero(): () => void {
     if (SNAP) { buildChapters(); chapIdx = nearestChapter(); markDots(); }
     syncChrome();
     lockScroll(SNAP && inHero());
+    /* 画面の大きさが変わると heroMax も動く。止めたまま映像が顔を出すと
+       古いコマのまま固まるので、隠れていないなら必ず起こす
+       （resize では scroll が飛ばないため、ここで面倒を見るしかない）*/
+    if (!heroHidden()) wake();
   }
 
   /* ============================================================
@@ -795,15 +827,33 @@ export function startHero(): () => void {
      ループ
      ============================================================ */
   let last = performance.now();
+  let parked = false;
+  /* 隠れているあいだは回さない。止めたことを覚えておいて、scroll から起こす。
+     起こすときはコマを送らず、その場のスクロール位置へ直に合わせること。
+     補間したまま再開すると、絵があとから追いかけてきて尾を引く */
+  function wake() {
+    if (dead || !parked) return;
+    parked = false;
+    last = performance.now();
+    cur = target;
+    frame(tick);
+  }
+
   function tick(now: number) {
     if (dead) return;
-    const dt = Math.min((now - last) / 1000, 0.05);
+
+    /* 隠れたら、この回で畳み切ってから止める。**先に return しないこと。**
+       コピーの濃度は毎フレーム少しずつ寄せる作りなので、途中で抜けると
+       SKIP と SCROLL の案内が出たまま固まる（実際に出たままになった）。
+       dt に COPY_FADE_SEC を渡すと寄せ幅がちょうど 1 になり、1回で寄せ切れる */
+    const hide = heroHidden() && !tweening;
+    const dt = hide ? COPY_FADE_SEC : Math.min((now - last) / 1000, 0.05);
     last = now;
 
     /* 送り中は補間しない。ここで指数の追従を挟むと、スクロールが止まったあとも
        しばらく絵が動き続け、着地に尾が残る。送りの動き自体が等速なので、
        そのまま写せばよい。指の操作で進む場合だけ、揺れを均すために補間する */
-    if (tweening) cur = target;
+    if (tweening || hide) cur = target;
     else cur += (target - cur) * (1 - Math.exp(-9 * dt));
 
     const idx = fileOf(resolve(Math.round(cur)).real); // 置いてあるファイルの番号
@@ -813,6 +863,7 @@ export function startHero(): () => void {
     // コピーの濃度は小数のまま渡す。丸めるとフェードが段になる
     updateOverlays(cur, dt);
 
+    if (hide) { parked = true; return; }
     frame(tick);
   }
 
