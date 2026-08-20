@@ -1,0 +1,176 @@
+/* KV（映像区間）のCSS。原本 reference/legacy-index.html の <style> から
+   そのまま切り出したもの。四隅・間合いはすべて実機の実測値です。
+   トークンと共通部品は app/globals.css にあります。 */
+
+/* ===== 映像レイヤー ===== */
+#stage{position:fixed;inset:0;z-index:0;overflow:hidden;background:#EDEBE6}
+#seq{position:absolute;inset:0;width:100%;height:100%;display:block}
+#scrim{position:absolute;inset:0;pointer-events:none;transition:opacity .5s;
+ background:linear-gradient(90deg,rgba(12,14,18,.58) 0%,rgba(12,14,18,.30) 34%,rgba(12,14,18,0) 62%)}
+#white{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ===== 画面に貼り込むUI ===== */
+#screenWrap{position:absolute;inset:0;pointer-events:none}
+.slot{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;
+ overflow:hidden;border-radius:44px;opacity:0;transition:opacity .35s ease}
+.slot.on{opacity:1}
+#vidOrder video,#vidReview video{width:390px;height:844px;object-fit:cover;display:block}
+#tint{mix-blend-mode:multiply;
+ background:linear-gradient(160deg,#E6E0D4 0%,#F7F3EC 55%,#D8D0C4 100%)}
+#sheen{mix-blend-mode:screen;
+ background:linear-gradient(150deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.04) 28%,
+  rgba(255,255,255,0) 48%,rgba(255,255,255,.08) 74%,rgba(255,255,255,.20) 100%)}
+/* 動画が読めない環境用のUI（通常は非表示） */
+.fallback{display:none;position:absolute;inset:0;width:390px;height:844px;background:#fff;color:#14161A}
+.slot.usefb .fallback{display:block}
+.slot.usefb video{display:none}
+.fb-top{background:#1B2A4A;color:#fff;padding:34px 26px 22px}
+.fb-top b{display:block;font-size:27px;letter-spacing:.03em}
+.fb-top span{font-size:16px;opacity:.6}
+.fb-item{display:flex;gap:16px;align-items:center;padding:20px 26px;border-bottom:1px solid rgba(20,22,26,.08)}
+.fb-th{width:62px;height:62px;border-radius:16px;background:#EFEBE3;flex:none}
+.fb-item span{font-size:19px;line-height:1.45}
+.fb-item em{font-style:normal;display:block;font-size:19px;color:#C2603F;font-weight:700;margin-top:4px}
+.fb-cta{margin:26px;background:#1B2A4A;color:#fff;border-radius:40px;text-align:center;padding:22px;font-size:19px;font-weight:700}
+.fb-bottom{position:absolute;left:0;right:0;bottom:8px}
+.fb-mark{text-align:center;font-size:13px;letter-spacing:.22em;color:#9AA0A8;font-weight:700;padding:52px 0 26px}
+.fb-thumb{width:96px;height:96px;border-radius:24px;margin:0 auto 20px;background:linear-gradient(140deg,#E7D3B8,#C99A63)}
+.fb-h2{text-align:center;font-size:22px;line-height:1.5;font-weight:700;margin-bottom:26px}
+.fb-stars{text-align:center;font-size:38px;color:#F0A429;letter-spacing:8px}
+
+/* ===== スクロールとコピー ===== */
+#track{position:relative;z-index:1;pointer-events:none}
+.beat{height:100vh;height:100svh}
+#copyLayer{position:fixed;inset:0;z-index:2;pointer-events:none}
+.copy{position:absolute;left:clamp(24px,5vw,80px);top:50%;max-width:min(620px,86vw);
+ transform:translateY(calc(-50% + var(--dy,0px)));
+ color:var(--onfilm);opacity:0;will-change:opacity,transform}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.72;margin:0 0 14px;font-weight:600}
+.copy h2{font-family:var(--jp-title);font-weight:700;
+ font-size:clamp(25px,4vw,40px);line-height:1.62;letter-spacing:.09em;margin:0 0 14px;
+ text-shadow:0 2px 34px rgba(0,0,0,.4)}
+.copy p{font-size:14px;line-height:2.05;margin:0;opacity:.88;max-width:40em;
+ text-shadow:0 1px 20px rgba(0,0,0,.35)}
+/* 和文タイトルの下に置く英語。Barlow。
+   `.copy p` より詳細度を上げないと打ち消されるので `.copy` を前に付ける */
+.copy .entitle{font-size:clamp(11px,1.05vw,13px);line-height:1.5;letter-spacing:.15em;
+ font-weight:500;margin:0 0 20px;opacity:.62;max-width:none;
+ text-shadow:0 1px 16px rgba(0,0,0,.4)}
+.rule{width:34px;height:1px;background:currentColor;opacity:.5;margin:0 0 18px}
+
+/* ===== スクロールの案内 ===== */
+#scrollHint{position:fixed;z-index:5;left:50%;bottom:30px;transform:translateX(-50%);
+ color:rgba(255,255,255,.8);font-size:10px;letter-spacing:.22em;display:flex;
+ flex-direction:column;align-items:center;gap:9px;transition:opacity .5s;pointer-events:none}
+#scrollHint i{display:block;width:1px;height:34px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));
+ animation:sh 1.9s ease-in-out infinite}
+@keyframes sh{0%{transform:scaleY(.2);transform-origin:top;opacity:0}
+ 40%{transform:scaleY(1);transform-origin:top;opacity:1}
+ 60%{transform:scaleY(1);transform-origin:bottom;opacity:1}
+ 100%{transform:scaleY(.2);transform-origin:bottom;opacity:0}}
+
+/* ===== スマホ用の章送り ===== */
+#dots{position:fixed;z-index:6;right:14px;top:50%;transform:translateY(-50%);
+ display:none;flex-direction:column;gap:12px;pointer-events:auto}
+#dots button{width:26px;height:26px;border:0;background:transparent;padding:0;cursor:pointer;
+ display:grid;place-items:center}
+#dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.42);
+ transition:all .35s ease;box-shadow:0 0 6px rgba(0,0,0,.35)}
+#dots button.on i{background:#fff;width:7px;height:22px;border-radius:99px}
+#navBar{position:fixed;z-index:6;left:0;right:0;bottom:0;display:none;
+ flex-direction:column;align-items:stretch;gap:0;padding:0}
+#backBtn{border:0;background:transparent;color:rgba(255,255,255,.72);
+ font:500 11px/1 inherit;letter-spacing:.16em;cursor:pointer;padding:14px 0 16px;
+ display:flex;align-items:center;justify-content:center;gap:9px;
+ text-shadow:0 1px 12px rgba(0,0,0,.5);transition:opacity .3s ease}
+#backBtn i{display:block;width:6px;height:6px;border-right:1.5px solid currentColor;
+ border-bottom:1.5px solid currentColor;transform:rotate(-135deg) translate(-1px,-1px)}
+#nextBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;
+ padding:24px 0 calc(24px + env(safe-area-inset-bottom));border-radius:0;
+ border:0;border-top:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ color:#fff;font:600 13px/1 inherit;letter-spacing:.2em;cursor:pointer;
+ transition:opacity .35s ease, background .25s ease}
+#nextBtn:active{background:rgba(255,255,255,.26)}
+#backBtn:active{opacity:.5}
+#dots button:active i{background:#fff}
+#nextBtn i{display:block;width:7px;height:7px;border-right:1.5px solid #fff;
+ border-bottom:1.5px solid #fff;transform:rotate(45deg) translate(-1px,-1px);
+ animation:nb 1.8s ease-in-out infinite}
+@keyframes nb{0%,100%{transform:rotate(45deg) translate(-2px,-2px)}
+ 50%{transform:rotate(45deg) translate(1px,1px)}}
+body.snap #dots{display:flex}
+body.snap #navBar{display:flex}
+/* スマホでは送りボタンが案内なので、SCROLL の表示は出さない */
+body.snap #scrollHint{display:none}
+#navBar,#dots{transition:opacity .35s ease}
+/* 映像を抜けたら送りUIは引っ込める */
+body.snap.past-hero #dots,body.snap.past-hero #navBar{opacity:0;pointer-events:none}
+body.menu-open #dots,body.menu-open #navBar{opacity:0;pointer-events:none}
+/* PC用のスクロール位置。映像区間のどこまで来たかを右側の縦棒で示す。
+   スマホは章送りのドットがあるので出さない */
+#prog{position:fixed;z-index:5;right:28px;top:50%;transform:translateY(-50%);
+ width:5px;height:min(360px,46vh);border-radius:3px;pointer-events:none;
+ background:rgba(255,255,255,.22);transition:opacity .5s}
+#prog i{display:block;width:100%;height:0;border-radius:3px;background:#fff;
+ box-shadow:0 0 14px rgba(255,255,255,.5)}
+body.snap #prog{display:none}
+
+/* ===== 映像を飛ばす ===== */
+#skip{position:fixed;z-index:5;bottom:24px;right:26px;color:rgba(255,255,255,.75);font-size:10px;
+ letter-spacing:.16em;text-decoration:none;border:1px solid rgba(255,255,255,.3);
+ padding:8px 15px;border-radius:99px;transition:opacity .4s}
+
+/* ローディング。読み込みの進み具合で線を引いていく。
+   絵を差し替えるときは #loadArt の中身を入れ替えるだけでよい。
+   条件は CLAUDE.md の「ローディングの線画」を参照 */
+#load{position:fixed;inset:0;z-index:9;background:var(--cream);
+ color:var(--sub);transition:opacity .7s}
+/* 線画は画面いっぱいに、映像と同じ切り取り方（cover）で置く。
+   こうすると、明けたときに1コマ目とそのまま重なる */
+#loadArt{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* ロゴは読み込み後の #brand と同じ大きさ・同じ位置に置く */
+#loadMark{position:absolute;left:50%;top:calc(var(--markY) - var(--markBox)/2);
+ transform:translateX(-50%);line-height:0}
+#loadMark svg{display:block;height:var(--markBox);width:auto}
+#loadMark path{fill:var(--ink)}
+/* イラレは line / polyline / polygon も吐くので、まとめて指定する。
+   **vector-effect:non-scaling-stroke は使わないこと。**
+   これを付けると stroke-dasharray / stroke-dashoffset まで画面座標で
+   解釈され、getTotalLength()（元の座標系）との単位が食い違います。
+   PCでは絵が1.4倍に拡大されるため、線が7割ほどしか引かれずに終わりました。
+   線幅は元の座標系（1 ＝ 表示倍率ぶんの太さ）で指定します */
+#loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,
+#loadArt circle,#loadArt ellipse,#loadArt rect{
+ fill:none;stroke:var(--ink);stroke-width:1;
+ stroke-linecap:round;stroke-linejoin:round}
+#load .pct{position:absolute;left:0;right:0;bottom:36px;margin:0;text-align:center;
+ font-size:14px;letter-spacing:.22em;font-weight:500;
+ font-variant-numeric:tabular-nums;opacity:.7}
+
+
+@media (max-width:760px){
+  /* スマホでは端末UIが下half に来るため、コピーは上に置く */
+  /* 冒頭以外は、端末UIとの間合いを取るため少し下げる */
+  .copy{top:calc(9.5vh + 40px);bottom:auto;transform:translateY(var(--dy,0px));max-width:none;
+    left:22px;right:22px;padding-right:6px}
+  /* 1枚目と2枚目は端末UIが絡まないので、天地左右の中央に置く（.mid）*/
+  .copy.mid{top:50%;transform:translateY(calc(-50% + var(--dy,0px)));text-align:center;
+    left:0;right:0;padding-left:26px;padding-right:26px}
+  body.snap .copy.mid{padding-right:26px}
+  .copy.mid .rule{margin-left:auto;margin-right:auto}
+  .copy.mid p{margin-left:auto;margin-right:auto;max-width:22em}
+  .copy h2{font-size:clamp(21px,5.6vw,27px);line-height:1.7;letter-spacing:.07em;margin:0 0 8px}
+  .copy p{font-size:13px;line-height:1.95;max-width:none}
+  .copy .entitle{font-size:10.5px;letter-spacing:.13em;margin:0 0 15px}
+  /* スマホは絵が小さいぶん線が強く出るので細くする */
+  #loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,
+  #loadArt circle,#loadArt ellipse,#loadArt rect{stroke-width:.68}
+  body.snap .copy{padding-right:34px}
+  body.snap #skip{display:none}
+  .eyebrow{margin:0 0 10px}
+  .rule{margin:0 0 14px}
+  #scrim{background:linear-gradient(180deg,rgba(12,14,18,.74) 0%,rgba(12,14,18,.52) 34%,
+    rgba(12,14,18,.12) 58%,rgba(12,14,18,.34) 100%)}
+  #skip{display:none}
+}

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 移植元の原本。配信もビルドもしないので見なくてよい
+    "reference/**",
+    // three.js と GLTFLoader は自家ビルドの配布物。整形も型付けもしない
+    "lib/three/*.min.js",
   ]),
 ]);
 

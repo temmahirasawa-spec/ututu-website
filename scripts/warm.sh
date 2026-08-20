@@ -9,8 +9,10 @@
 #   sh scripts/warm.sh https://xxx.vercel.app  … プレビュー
 set -e
 BASE=${1:-https://ututu-website.vercel.app}
-VER=$(sed -n "s/.*ver: '\([^']*\)'.*/\1/p" "$(dirname "$0")/../index.html" | head -1)
-FILES=$(sed -n 's/.*files: \([0-9]*\).*/\1/p' "$(dirname "$0")/../index.html" | head -1)
+# 版番号と枚数は heroConfig.ts が唯一の出どころ。ここに書き写さないこと
+CFG="$(dirname "$0")/../components/hero/heroConfig.ts"
+VER=$(sed -n "s/.*ver: '\([^']*\)'.*/\1/p" "$CFG" | head -1)
+FILES=$(sed -n 's/.*files: \([0-9]*\).*/\1/p' "$CFG" | head -1)
 echo "温めます: $BASE (v=$VER / ${FILES}枚)"
 seq 1 "$FILES" | awk -v b="$BASE" -v v="$VER" '{
   printf "%s/frames/f_%04d.webp?v=%s\n",      b, $1, v

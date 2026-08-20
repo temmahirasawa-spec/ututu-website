@@ -1,11 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["hnd1"],
+  "framework": "nextjs",
+  "regions": [
+    "hnd1"
+  ],
   "headers": [
     {
-      "source": "/(frames|frames_p|frames_lo|clips|models)/(.*)",
+      "source": "/(frames|frames_p|frames_lo|frames_lo_p|clips|models)/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]

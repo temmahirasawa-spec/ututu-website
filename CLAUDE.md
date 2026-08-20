@@ -1,7 +1,7 @@
 # UTUTU コーポレートサイト（Next.js 版）
 
 株式会社UTUTU のコーポレートサイトを Next.js で作り直すリポジトリです。
-**まだ土台だけ**で、中身はこれから移植します。
+**トップページ（KV＋紙のセクション）の移植は済んでいます。**残りは下層ページです。
 
 移植元は Dropbox の静的版です。**そちらが唯一の正解**なので、迷ったら原本を見てください。
 
@@ -26,16 +26,38 @@ KVのコマ送り、ホモグラフィによるUI合成、読み込みキュー�
 ## 2. 構成
 
 ```
-app/            ルーティングとページ
-components/     UIの部品（KV、アバターなど）
-lib/three/      three.js r185 と GLTFLoader（自家ビルド版）。npm ではなく同梱
+app/
+  layout.tsx              フォント（next/font）とメタ情報
+  page.tsx                トップ ＝ <Hero /> ＋ <After />
+  globals.css             トークン・素の指定・ロゴ/メニュー・紙のセクション
+components/
+  hero/                   KV（映像区間）
+    Hero.tsx              マークアップ。useEffect で startHero() を起動し、戻り値で破棄
+    heroEngine.ts         コマ送り・ホモグラフィ・読み込みキュー・章送り・ロゴの遊び
+    heroConfig.ts         **数値はここだけ。**holds の四隅 / COPY_AT / CHAPTER_DUR / MARK
+    hero.css              KVのCSS（原本から行ごと切り出したもの）
+    LoadArt.tsx           ローディングの線画（差し替えるのはここ）
+    Mark.tsx              ロゴ。#brand と #loadMark で同じものを使う
+  after/                  紙のセクション（#after）
+    After.tsx             マークアップ。図解のSVGもここ（サンプル。イラレ版待ち）
+    afterEffects.ts       現れる / 線を引く / 紙⇄墨の反転 / 帯の速さ / 3Dの遅延読み込み
+    BioModal.tsx          プロフィール。本文は状態で持つ
+    bios.ts               Founders の全文（本人支給の確定稿）
+lib/three/      three.js r185・GLTFLoader（自家ビルド版）と headViewer.js。npm ではなく同梱
 public/         連番画像・動画・写真・3Dモデル。パスは /frames/f_0001.webp の形
 reference/      移植元の原本。配信しない（.vercelignore 済み）
 scripts/        エッジ温めスクリプトと Blender 用スクリプト
 ```
 
-素材は約27MB・888ファイル。`public/` 直下に置いてあるので、
+素材は約29MB・1,183ファイル。`public/` 直下に置いてあるので、
 `/frames/f_0001.webp` のように参照します。
+
+**連番は4種類あります。**片方の向きしか読まないので、実際に落ちるのは半分です。
+
+| | 中身 |
+|---|---|
+| `frames/` `frames_lo/` | 横位置（PC）の本番と先読み |
+| `frames_p/` `frames_lo_p/` | 縦位置（スマホ）の本番と先読み |
 
 ---
 
@@ -46,9 +68,27 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
 - **Next 16 / React 19 / TypeScript / App Router**（兄弟サイト GOOD_ORDER_LP と同じ）
 - Vercel の function region は東京 `hnd1`（`vercel.json`）
 - 連番・動画・モデルは1年 immutable キャッシュ（`vercel.json`）
+- **`vercel.json` の `"framework": "nextjs"` は消さないこと。**
+  このVercelプロジェクトは静的版から使い回していて、ダッシュボードの
+  Framework Preset が `Other`／出力先 `public` のまま残っている。
+  この1行が無いと**アプリではなく `public/` の連番がそのまま配信される**。
+  なお `vercel.json` にコメントは書けない（`"//"` のようなキーを足すと
+  スキーマ検証で落ちてデプロイが失敗する）
+- **フォントは `next/font`**（app/layout.tsx）。原本の `<link>` はやめ、変数で渡している。
+  `--jp-body` / `--jp-title` の中身が `var(--font-barlow)` などに変わっただけで、
+  **並び（欧文が先、和文が次）は原本のまま**。和文は容量が大きいので `preload:false`。
+  先に読ませるとKVの連番と帯域を取り合う
+- **エンジンは「起動して、破棄を返す」形**（`startHero()` / `startAfter()`）。
+  開発中はReactが effect を2回走らせるので、**畳み残すとループが二重に回る**。
+  登録したイベント・タイマー・rAF は全部戻り値で畳むこと
 
-### 踏んだ落とし穴（この土台を作る時点で1つ）
+### 踏んだ落とし穴
 
+- **`public/frames_lo_p/` を忘れないこと。**土台を作ったとき、この1つだけ
+  コピーが漏れていた。**縦位置の先読みが全部404になる**が、欠けたコマは
+  直前のコマで埋まる実装なので、PCで見るかぎり何も起きず気づけない。
+  `vercel.json` の `headers` のパターンにも入れること（入れ忘れると
+  縦位置だけキャッシュが効かない）
 - **`next.config.ts` の `turbopack.root` は消さないこと。**
   `~/package-lock.json` が存在するため、指定しないと Turbopack がホームディレクトリを
   プロジェクトの根と誤認し、**`public/` の素材が全部404になる**。
@@ -57,18 +97,36 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
 
 ---
 
-## 4. 移植の順序（推奨）
+## 4. 移植の進み具合
 
-1. **globals.css** … 原本の CSS をそのまま移す。まだ何も足さない
-2. **KV（`components/hero/`）** … いちばん重い。ここが通れば残りは楽
-   - `ScrollSequence` … canvas とコマ送り
-   - `ScreenComposite` … ホモグラフィによるUI合成
-   - `ChapterNav` … スマホの章送り
-   - `heroConfig.ts` … `CFG.holds` の座標 / `CHAPTER_DUR` / `COPY_AT` を集約。
-     **マジックナンバーを散らさない**
-3. **紙のセクション（`#after`）** … 反転・帯・図解・Founders
-4. **下層ページ** … GOOD ORDER / GOOD REVIEW / 会社概要 / お問い合わせ
-5. **メタ情報** … OGP画像・favicon（いまだに未着手）
+1. ~~**globals.css**~~ … 済。原本のCSSを**行ごと切り出して**2つに分けた。
+   打ち直していないので、実測値はそのまま残っている
+2. ~~**KV（`components/hero/`）**~~ … 済。canvas・ホモグラフィ・読み込みキュー・章送り
+3. ~~**紙のセクション（`#after`）**~~ … 済。反転・帯・図解・Founders・モーダル
+4. **下層ページ** … GOOD ORDER / GOOD REVIEW / 会社概要 / お問い合わせ　← いまここ
+5. **メタ情報** … OGP画像・favicon（未着手）
+
+分け方は原本の構成に合わせてあります。`ScrollSequence` / `ScreenComposite` /
+`ChapterNav` の3つに割るという当初案は採りませんでした。**3つは同じ状態
+（`cur` / `target` / `imgs` / 1本のrAF）を共有していて、切ると受け渡しの
+ためだけの配線が増えるからです。**代わりに「マークアップ＝React、
+動き＝1つのエンジン、数値＝config」で割ってあります。
+
+### 原本と一致しているか、数値で確かめる方法
+
+見た目を目で比べる必要はありません。**静的版を隣で動かして、
+同じスクロール位置での `matrix3d` を突き合わせれば一致は証明できます。**
+
+```bash
+npx serve ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU_Website -l 5054
+```
+
+同じ画面サイズにして、両方で同じ位置までスクロールし、
+`document.getElementById('tint').style.transform` を比べます。
+四隅・fit・ホモグラフィ・停止点の解決が全部そこに畳み込まれているので、
+**1文字でも違えばどこかがずれています。**
+移植した時点では、縦横それぞれ10点で完全一致していました
+（`scrollY` / 停止点の入り / `stage` のズーム / `scrim` / コピーの濃度 / 帯の秒数も同じ）。
 
 ---
 
@@ -77,12 +135,15 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
 原本で実際に事故った項目です。詳細は `reference/legacy-CLAUDE.md`。
 
 - **連番画像に `next/image` を使わない。**canvas に描くので素の `new Image()`
-- **同時4本の優先度付きキュー（`pump()`）を維持する。**
-  1,178枚を一斉にリクエストすると接続が埋まり、動画が永久に読み込まれない
-- **three.js は `ssr:false` の動的 import。**WebGL はサーバーで動かない。
-  Founders が近づいたときだけ読む構造も維持する（KVの速度に影響させない）
-- **JSとGLBのURLには版番号（`?v=`）を付ける。**
-  付けないと端末が古いものを掴み続ける。実際にそれで壊れた絵が出た
+- **同時8本の優先度付きキュー（`pump()`）を維持する。**
+  一斉にリクエストすると接続が埋まり、動画が永久に読み込まれない。
+  8本なのはHTTP/2で多重化されるから。24本にすると逆に半分の速度に落ちた
+- **three.js はブラウザでしか触らない。**WebGL はサーバーで動かないので、
+  `afterEffects.ts` の中（＝クライアント側）から動的 import している。
+  Founders が近づいたときだけ読む構造も維持すること（KVの速度に影響させない）
+- **GLBのURLには版番号（`?v=`）を付ける。**付けないと端末が古いものを掴み続け、
+  実際にそれで壊れた絵が出た。`lib/three/headViewer.js` の `VER` を上げること。
+  **JSのほうは要らなくなりました**（バンドラが内容ハッシュ付きの名前で出すため）
 - **編集モード `?edit=1` は残す。**停止点の座標調整は今後も発生する
 - **Vercelへは Git 経由でデプロイする。**CLI だと24時間5,000ファイル制限に当たる
 - 画面の向きが変わると素材そのものが変わる。読み込み済み画像を捨てて読み直す
@@ -99,9 +160,33 @@ npm run check    # lint と型チェック
 npm run build    # 本番ビルド
 ```
 
+コンソールに `UTUTU scroll sequence build ...` と
+`読み込み完了まで ○○ms` が出れば動いています。
+
+### 動きを確かめるときの注意
+
+**ブラウザーのペインが隠れていると、`requestAnimationFrame` も
+`IntersectionObserver` も止まります**（間引かれるのではなく、完全に止まります）。
+ローディングが数%から進まない、`.rv` がいつまでも現れない、というときは
+だいたいこれで、コードのせいではありません。ペインを表に出してください。
+
+どうしてもヘッドレスで確かめたいときは、rAF と `performance.now()` を
+まとめて差し替えて手でコマを送ります。**時計は片方だけ差し替えないこと。**
+章送りは `performance.now()` を基準に補間するので、rAF の時刻だけ偽物にすると
+`dt` が負になり、絵が逆走したりコピーの濃度が範囲外まで膨らんだりします
+（移植の検証中に実際に起きて、コードの不具合と1度取り違えました）。
+
 ---
 
-## 7. まだ残っている作業（移植元から引き継ぎ）
+## 7. まだ残っている作業
+
+### 下層ページ（これから）
+
+- GOOD ORDER / GOOD REVIEW / 会社概要 / お問い合わせ
+- メニューのリンク先URL（いまは `good-order.jp` などの仮）
+- フッターの「（準備中）」を、できたページへ差し替える
+
+### 移植元から引き継いだもの
 
 - 図解のイラレ版2点（PC 900×430 / SP 480×560）
 - 実測の数字（いまは全部サンプル：+18% / 12→47 / 直営4 / 導入3 / 3.9倍）
