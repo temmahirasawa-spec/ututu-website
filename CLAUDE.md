@@ -136,6 +136,51 @@ npx serve ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU
 
 ---
 
+### プロダクト2節の文言と図解（2026-08-20）
+
+GOOD ORDER と GOOD REVIEW の節は、**公式LPの言い回しに合わせてあります。**
+コーポレート側で独自の言い方を足すと、LPへ飛んだ人が別のサービスだと感じます。
+
+| | 出どころ |
+|---|---|
+| GOOD ORDER の見出し | LPのヒーロー「いいデザインは、売上に効く。」 |
+| 同・図解の3点 | LPの SOLUTION 01〜03（NAVIGATION / OVERVIEW / RECOMMEND） |
+| 同・締めの流れ | LPの WHY IT WORKS「見つかる → 選ばれる → もう一品」 |
+| GOOD REVIEW の見出し | LPの SOLUTION「良い声は表へ、本音はお店へ。」 |
+| 同・図解 | LPの FEATURE 03「高い評価はGoogleへ、低い評価はお店へ」 |
+| 同・実測値 | LPの REAL STORE RESULT（FROMA ／ 導入2ヶ月で ★3.5→★4.2） |
+
+- **GOOD ORDER に数字は出さないこと。**LPでも客単価・注文点数は「測定中」です。
+  ここで先に断定すると食い違います
+- **★3.5→★4.2 はサンプルではありません。**丸めたり盛ったりしないこと
+- **★ を `.fg-num`（34/44px）に混ぜないこと。**★ は和文フォント側の字形なので、
+  Noto Sans JP の読み込み前は代替フォントの幅で描かれ、桁が跳ねて列がはみ出します。
+  ★は `.fg-lab` の大きさに逃がし、数字だけを大きく組んであります
+- 図解を直したら、**文字の重なりと枠外を実測で確かめること。**目視では気づけません
+
+```js
+// 開発者コンソールで。重なり・はみ出しがあれば出る
+document.querySelectorAll('[data-fig] svg').forEach(svg => {
+  if (!svg.getClientRects().length) return;              // 非表示のほうは測れない
+  const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+  const ts = [...svg.querySelectorAll('text')].map(t => ({ s: t.textContent, b: t.getBBox() }));
+  ts.forEach(t => { if (t.b.x + t.b.width > vb[2] || t.b.y + t.b.height > vb[3]) console.warn('枠外', t.s); });
+  for (let i=0;i<ts.length;i++) for (let j=i+1;j<ts.length;j++) {
+    const a=ts[i].b, b=ts[j].b;
+    if (Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x) > 1 &&
+        Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y) > 1) console.warn('重なり', ts[i].s, ts[j].s);
+  }
+});
+```
+
+**名前の食い違いに注意。**レビュー側は、コーポレートでは `GOOD REVIEW` ですが、
+公式LP・Figma・管理画面（`admin.goodloop.jp`）はすべて `GOOD LOOP` です。
+2026-08-20 時点では**コーポレート側は GOOD REVIEW のまま**という判断（本人）。
+なお `good-order.jp` と `good-review.jp` はまだDNSが引けず、
+`goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
+
+---
+
 ## 5. 移植で絶対に外さないこと
 
 原本で実際に事故った項目です。詳細は `reference/legacy-CLAUDE.md`。
@@ -195,7 +240,10 @@ npm run build    # 本番ビルド
 ### 移植元から引き継いだもの
 
 - 図解のイラレ版2点（PC 900×430 / SP 480×560）
-- 実測の数字（いまは全部サンプル：+18% / 12→47 / 直営4 / 導入3 / 3.9倍）
+  ※プロダクト2節の図解は 2026-08-20 に公式LPの内容で作り直し済み（下記）
+- **橋の節の数字がサンプルのまま**（直営4 / 導入3 / 3.9倍 / +18%）。
+  GOOD REVIEW の図解には FROMA の実測（★3.5→★4.2）が入ったので、
+  **同じページに実測とサンプルが混在している。**早めに揃えること
 - 洋輔さんの Avaturn アバター（`public/models/yosuke.glb` に置くだけで有効）
 - 管理画面のスクリーンショット（Figmaから）
 - OGP画像・favicon・メタ情報

@@ -33,6 +33,10 @@ export const metadata: Metadata = {
   title: 'UTUTU — 店舗に、いい一日を。',
   description:
     '飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。私たちは自分たちでも店を営んでいて、毎日の営業のなかで使い、残ったものだけをかたちにしています。',
+  /* まだ検索には出さない。公開してよくなったらこの2行を外す。
+     **robots.txt で拒否しないこと。**クロールを止めると noindex 自体を読めず、
+     外部リンク経由で逆に登録されてしまう。読ませたうえで noindex を伝える */
+  robots: { index: false, follow: false },
 };
 
 /* viewport-fit=cover。#nextBtn が safe-area-inset-bottom を使うため必須 */
