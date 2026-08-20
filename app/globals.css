@@ -10,6 +10,23 @@
  --jp-title:var(--font-barlow),var(--font-zen-kaku),"Hiragino Sans",sans-serif}
 *{box-sizing:border-box}html,body{margin:0}
 html{scroll-behavior:auto}
+/* Chrome の「スクロールアンカリング」を切る。
+   画面より上の中身の高さが変わると、Chrome は見た目を保とうとして
+   scrollY のほうを黙って動かす。**この機能があるのは Chrome だけで、
+   Safari には無い。**そのため「Chromeでだけ位置が飛ぶ・戻される」が起きた。
+
+   このサイトでは和文（Noto Sans JP / Zen Kaku Gothic New）を preload せず
+   swap で当てている（KVの連番と帯域を取り合わせないための判断。app/layout.tsx）。
+   その和文が遅れて届くと #after の長い本文が一斉に組み直され、
+   画面より上の高さが変わる。そこで Chrome が補正に入る、という筋道。
+   和文を遅らせて再現したところ、scrollHeight の変化に合わせて
+   入力していないのに scrollY が動くのを確認した。
+
+   切ると、Chrome も Safari と同じく「文字は組み直るが、スクロール位置は
+   動かない」ようになる。このサイトは KV をまるごと scrollY から起こしている
+   ので、ブラウザーに位置を触られないほうが都合がよい。
+   （無限スクロールのように上へ中身を足す作りは無いため、失うものは無い）*/
+html{overflow-anchor:none}
 /* 映像区間のあいだは、OS標準のスクロールバーを消して独自の縦棒（#prog）だけにする。
    クラスは <html> に付ける。スクロールバーは根の要素のものなので、
    body のクラスからは指定できない */
