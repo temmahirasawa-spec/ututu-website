@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UTUTU — 店舗に、いい一日を。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3F1EC;--ink:#14161A;--sub:#7A7F87;--onfilm:#fff;--cream:#F7F3E8;
+ --olive:#6E7D57;--line:rgba(20,22,26,.14);
+ --jp-body:"Barlow","Noto Sans JP","Hiragino Sans",sans-serif;
+ --jp-title:"Barlow","Zen Kaku Gothic New","Hiragino Sans",sans-serif}
+*{box-sizing:border-box}html,body{margin:0}
+html{scroll-behavior:auto}
+/* 映像区間のあいだは、OS標準のスクロールバーを消して独自の縦棒（#prog）だけにする。
+   クラスは <html> に付ける。スクロールバーは根の要素のものなので、
+   body のクラスからは指定できない */
+html.hide-sb{scrollbar-width:none;-ms-overflow-style:none}
+html.hide-sb::-webkit-scrollbar{width:0;height:0;display:none}
+body{background:var(--paper);color:var(--ink);
+ /* 欧文は Barlow。和文グリフを持たないので、日本語は次の和文に落ちる。
+    本文は Noto Sans JP Regular、見出しは Zen Kaku Gothic New Bold 700（--jp-title）*/
+ font-family:var(--jp-body);
+ -webkit-font-smoothing:antialiased}
+
+/* ===== 映像レイヤー ===== */
+#stage{position:fixed;inset:0;z-index:0;overflow:hidden;background:#EDEBE6}
+#seq{position:absolute;inset:0;width:100%;height:100%;display:block}
+#scrim{position:absolute;inset:0;pointer-events:none;transition:opacity .5s;
+ background:linear-gradient(90deg,rgba(12,14,18,.58) 0%,rgba(12,14,18,.30) 34%,rgba(12,14,18,0) 62%)}
+#white{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ===== 画面に貼り込むUI ===== */
+#screenWrap{position:absolute;inset:0;pointer-events:none}
+.slot{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;
+ overflow:hidden;border-radius:44px;opacity:0;transition:opacity .35s ease}
+.slot.on{opacity:1}
+#vidOrder video,#vidReview video{width:390px;height:844px;object-fit:cover;display:block}
+#tint{mix-blend-mode:multiply;
+ background:linear-gradient(160deg,#E6E0D4 0%,#F7F3EC 55%,#D8D0C4 100%)}
+#sheen{mix-blend-mode:screen;
+ background:linear-gradient(150deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.04) 28%,
+  rgba(255,255,255,0) 48%,rgba(255,255,255,.08) 74%,rgba(255,255,255,.20) 100%)}
+/* 動画が読めない環境用のUI（通常は非表示） */
+.fallback{display:none;position:absolute;inset:0;width:390px;height:844px;background:#fff;color:#14161A}
+.slot.usefb .fallback{display:block}
+.slot.usefb video{display:none}
+.fb-top{background:#1B2A4A;color:#fff;padding:34px 26px 22px}
+.fb-top b{display:block;font-size:27px;letter-spacing:.03em}
+.fb-top span{font-size:16px;opacity:.6}
+.fb-item{display:flex;gap:16px;align-items:center;padding:20px 26px;border-bottom:1px solid rgba(20,22,26,.08)}
+.fb-th{width:62px;height:62px;border-radius:16px;background:#EFEBE3;flex:none}
+.fb-item span{font-size:19px;line-height:1.45}
+.fb-item em{font-style:normal;display:block;font-size:19px;color:#C2603F;font-weight:700;margin-top:4px}
+.fb-cta{margin:26px;background:#1B2A4A;color:#fff;border-radius:40px;text-align:center;padding:22px;font-size:19px;font-weight:700}
+.fb-bottom{position:absolute;left:0;right:0;bottom:8px}
+.fb-mark{text-align:center;font-size:13px;letter-spacing:.22em;color:#9AA0A8;font-weight:700;padding:52px 0 26px}
+.fb-thumb{width:96px;height:96px;border-radius:24px;margin:0 auto 20px;background:linear-gradient(140deg,#E7D3B8,#C99A63)}
+.fb-h2{text-align:center;font-size:22px;line-height:1.5;font-weight:700;margin-bottom:26px}
+.fb-stars{text-align:center;font-size:38px;color:#F0A429;letter-spacing:8px}
+
+/* ===== スクロールとコピー ===== */
+#track{position:relative;z-index:1;pointer-events:none}
+.beat{height:100vh;height:100svh}
+#copyLayer{position:fixed;inset:0;z-index:2;pointer-events:none}
+.copy{position:absolute;left:clamp(24px,5vw,80px);top:50%;max-width:min(620px,86vw);
+ transform:translateY(calc(-50% + var(--dy,0px)));
+ color:var(--onfilm);opacity:0;will-change:opacity,transform}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.72;margin:0 0 14px;font-weight:600}
+.copy h2{font-family:var(--jp-title);font-weight:700;
+ font-size:clamp(25px,4vw,40px);line-height:1.62;letter-spacing:.09em;margin:0 0 14px;
+ text-shadow:0 2px 34px rgba(0,0,0,.4)}
+.copy p{font-size:14px;line-height:2.05;margin:0;opacity:.88;max-width:40em;
+ text-shadow:0 1px 20px rgba(0,0,0,.35)}
+/* 和文タイトルの下に置く英語。Barlow。
+   `.copy p` より詳細度を上げないと打ち消されるので `.copy` を前に付ける */
+.copy .entitle{font-size:clamp(11px,1.05vw,13px);line-height:1.5;letter-spacing:.15em;
+ font-weight:500;margin:0 0 20px;opacity:.62;max-width:none;
+ text-shadow:0 1px 16px rgba(0,0,0,.4)}
+.rule{width:34px;height:1px;background:currentColor;opacity:.5;margin:0 0 18px}
+/* 背景・ふちは NEXT ボタン（#nextBtn）と同じ値に揃えてある */
+.linkbtn{display:inline-flex;align-items:center;gap:9px;margin-top:26px;pointer-events:auto;
+ padding:13px 22px;border:1px solid rgba(255,255,255,.28);border-radius:99px;
+ color:#fff;text-decoration:none;font-size:12.5px;letter-spacing:.06em;font-weight:600;
+ background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ transition:background .25s, border-color .25s}
+.linkbtn svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;
+ stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.linkbtn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5)}
+.linkbtn:hover svg{transform:translate(2px,-2px)}
+.linkbtn:active{background:rgba(255,255,255,.26)}
+
+/* ロゴとハンバーガーは同じ文字高（--markCap）で、同じ中心線（--markY）に置く。
+   正式ロゴは 1160×149 の中に高さ133の文字が入っているので、SVGの箱は 149/133 倍 */
+:root{--markCap:17px;--markBox:calc(var(--markCap) * 149 / 133);--markY:41px}
+/* ロゴに影は付けない。
+   なお **CSSの filter:drop-shadow は動くものに使ってはいけません。**
+   適用範囲が外接矩形の±10%に固定され、文字が動いてそこから出た部分が消えます。
+   必要になったら SVG の <filter filterUnits="userSpaceOnUse"> で範囲を明示すること */
+#brand{position:fixed;z-index:7;left:50%;
+ top:calc(var(--markY) - var(--markBox)/2);transform:translateX(-50%);
+ line-height:0}
+#brand svg{display:block;height:var(--markBox);width:auto}
+#brand path{fill:#fff}
+
+/* ロゴは押せる。先頭に戻る */
+#brand{border:0;padding:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#brand:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:6px}
+
+#menuBtn{position:fixed;z-index:7;right:22px;width:42px;height:42px;border:0;
+ top:calc(var(--markY) - 21px);   /* 42pxの中心を --markY に合わせる */
+ background:transparent;cursor:pointer;display:grid;place-items:center;gap:0}
+#menuBtn span{display:block;width:22px;height:1.5px;background:#fff;border-radius:2px;
+ transition:transform .35s ease, opacity .25s ease;box-shadow:0 1px 8px rgba(0,0,0,.4)}
+#menuBtn span{position:absolute}
+#menuBtn span:nth-child(1){transform:translateY(calc(var(--markCap)/-2 + .75px))}
+#menuBtn span:nth-child(2){transform:translateY(0)}
+#menuBtn span:nth-child(3){transform:translateY(calc(var(--markCap)/2 - .75px))}
+body.menu-open #menuBtn span:nth-child(1){transform:translateY(0) rotate(45deg)}
+body.menu-open #menuBtn span:nth-child(2){opacity:0}
+body.menu-open #menuBtn span:nth-child(3){transform:translateY(0) rotate(-45deg)}
+#menu{position:fixed;inset:0;z-index:6;background:rgba(14,16,20,.94);
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+ display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
+body.menu-open #menu{opacity:1;pointer-events:auto}
+#menu ul{list-style:none;margin:0;padding:0;text-align:center}
+#menu li{margin:0 0 26px}
+#menu a{color:#fff;text-decoration:none;font-size:clamp(22px,4vw,30px);font-weight:600;
+ letter-spacing:.02em;opacity:.92}
+#menu small{display:block;font-size:10px;letter-spacing:.2em;opacity:.45;margin-top:6px;font-weight:400}
+#scrollHint{position:fixed;z-index:5;left:50%;bottom:30px;transform:translateX(-50%);
+ color:rgba(255,255,255,.8);font-size:10px;letter-spacing:.22em;display:flex;
+ flex-direction:column;align-items:center;gap:9px;transition:opacity .5s;pointer-events:none}
+#scrollHint i{display:block;width:1px;height:34px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));
+ animation:sh 1.9s ease-in-out infinite}
+@keyframes sh{0%{transform:scaleY(.2);transform-origin:top;opacity:0}
+ 40%{transform:scaleY(1);transform-origin:top;opacity:1}
+ 60%{transform:scaleY(1);transform-origin:bottom;opacity:1}
+ 100%{transform:scaleY(.2);transform-origin:bottom;opacity:0}}
+/* ===== スマホ用の章送り ===== */
+#dots{position:fixed;z-index:6;right:14px;top:50%;transform:translateY(-50%);
+ display:none;flex-direction:column;gap:12px;pointer-events:auto}
+#dots button{width:26px;height:26px;border:0;background:transparent;padding:0;cursor:pointer;
+ display:grid;place-items:center}
+#dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.42);
+ transition:all .35s ease;box-shadow:0 0 6px rgba(0,0,0,.35)}
+#dots button.on i{background:#fff;width:7px;height:22px;border-radius:99px}
+#navBar{position:fixed;z-index:6;left:0;right:0;bottom:0;display:none;
+ flex-direction:column;align-items:stretch;gap:0;padding:0}
+#backBtn{border:0;background:transparent;color:rgba(255,255,255,.72);
+ font:500 11px/1 inherit;letter-spacing:.16em;cursor:pointer;padding:14px 0 16px;
+ display:flex;align-items:center;justify-content:center;gap:9px;
+ text-shadow:0 1px 12px rgba(0,0,0,.5);transition:opacity .3s ease}
+#backBtn i{display:block;width:6px;height:6px;border-right:1.5px solid currentColor;
+ border-bottom:1.5px solid currentColor;transform:rotate(-135deg) translate(-1px,-1px)}
+#nextBtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;
+ padding:24px 0 calc(24px + env(safe-area-inset-bottom));border-radius:0;
+ border:0;border-top:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ color:#fff;font:600 13px/1 inherit;letter-spacing:.2em;cursor:pointer;
+ transition:opacity .35s ease, background .25s ease}
+#nextBtn:active{background:rgba(255,255,255,.26)}
+#backBtn:active{opacity:.5}
+#dots button:active i{background:#fff}
+#nextBtn i{display:block;width:7px;height:7px;border-right:1.5px solid #fff;
+ border-bottom:1.5px solid #fff;transform:rotate(45deg) translate(-1px,-1px);
+ animation:nb 1.8s ease-in-out infinite}
+@keyframes nb{0%,100%{transform:rotate(45deg) translate(-2px,-2px)}
+ 50%{transform:rotate(45deg) translate(1px,1px)}}
+body.snap #dots{display:flex}
+body.snap #navBar{display:flex}
+/* スマホでは送りボタンが案内なので、SCROLL の表示は出さない */
+body.snap #scrollHint{display:none}
+#navBar,#dots{transition:opacity .35s ease}
+/* 映像を抜けたら送りUIは引っ込める */
+body.snap.past-hero #dots,body.snap.past-hero #navBar{opacity:0;pointer-events:none}
+body.menu-open #dots,body.menu-open #navBar{opacity:0;pointer-events:none}
+/* PC用のスクロール位置。映像区間のどこまで来たかを右側の縦棒で示す。
+   スマホは章送りのドットがあるので出さない */
+#prog{position:fixed;z-index:5;right:28px;top:50%;transform:translateY(-50%);
+ width:5px;height:min(360px,46vh);border-radius:3px;pointer-events:none;
+ background:rgba(255,255,255,.22);transition:opacity .5s}
+#prog i{display:block;width:100%;height:0;border-radius:3px;background:#fff;
+ box-shadow:0 0 14px rgba(255,255,255,.5)}
+body.snap #prog{display:none}
+/* ---- プロフィールのモーダル。スマホは下からのシート、PCは中央のポップアップ。
+   モーダルは墨ゾーン（締めの周辺）でしか開かないので、色は墨で固定 ---- */
+#bioVeil{position:fixed;inset:0;z-index:20;background:rgba(10,11,13,.6);
+ opacity:0;pointer-events:none;transition:opacity .35s ease}
+body.bio-open #bioVeil{opacity:1;pointer-events:auto}
+#bioModal{position:fixed;z-index:21;background:#17191D;color:#F3F1EC;
+ border:1px solid rgba(243,241,236,.16)}
+#bioModal .grip{width:38px;height:4px;border-radius:2px;background:#9AA0A8;
+ opacity:.5;margin:0 auto 22px}
+#bioClose{position:absolute;top:12px;right:12px;border:0;background:transparent;
+ color:#9AA0A8;font-size:16px;line-height:1;padding:8px 10px;cursor:pointer}
+#bioClose:hover{color:#F3F1EC}
+#bioClose:focus-visible{outline:2px solid #93A878;outline-offset:2px}
+.bm-role{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;color:#93A878}
+.bm-name{margin:0;font-family:var(--jp-title);font-weight:700;
+ font-size:clamp(23px,3vw,30px);letter-spacing:.1em}
+.bm-en{margin:4px 0 0;font-size:11.5px;letter-spacing:.2em;color:#9AA0A8;
+ text-transform:uppercase;font-weight:500}
+.bm-bio{margin:18px 0 0;font-size:13px;line-height:2.1;color:#C9CCD2;
+ text-align:justify;max-width:40em}
+@media (max-width:760px){
+  #bioModal{left:0;right:0;bottom:0;border-radius:14px 14px 0 0;max-height:78vh;
+   overflow:auto;padding:14px 24px calc(42px + env(safe-area-inset-bottom));
+   transform:translateY(103%);transition:transform .45s cubic-bezier(.32,.72,.28,1)}
+  body.bio-open #bioModal{transform:none}
+}
+@media (min-width:761px){
+  #bioModal .grip{display:none}
+  #bioModal{left:50%;top:50%;width:min(640px,92vw);max-height:80vh;overflow:auto;
+   border-radius:6px;padding:46px 50px;opacity:0;pointer-events:none;
+   transform:translate(-50%,-50%) scale(.97);
+   transition:opacity .3s ease,transform .3s ease}
+  body.bio-open #bioModal{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+}
+@media (prefers-reduced-motion:reduce){#bioModal,#bioVeil{transition:none}}
+#skip{position:fixed;z-index:5;bottom:24px;right:26px;color:rgba(255,255,255,.75);font-size:10px;
+ letter-spacing:.16em;text-decoration:none;border:1px solid rgba(255,255,255,.3);
+ padding:8px 15px;border-radius:99px;transition:opacity .4s}
+/* ローディング。読み込みの進み具合で線を引いていく。
+   絵を差し替えるときは #loadArt の中身を入れ替えるだけでよい。
+   条件は CLAUDE.md の「ローディングの線画」を参照 */
+#load{position:fixed;inset:0;z-index:9;background:var(--cream);
+ color:var(--sub);transition:opacity .7s}
+/* 線画は画面いっぱいに、映像と同じ切り取り方（cover）で置く。
+   こうすると、明けたときに1コマ目とそのまま重なる */
+#loadArt{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* ロゴは読み込み後の #brand と同じ大きさ・同じ位置に置く */
+#loadMark{position:absolute;left:50%;top:calc(var(--markY) - var(--markBox)/2);
+ transform:translateX(-50%);line-height:0}
+#loadMark svg{display:block;height:var(--markBox);width:auto}
+#loadMark path{fill:var(--ink)}
+/* イラレは line / polyline / polygon も吐くので、まとめて指定する。
+   **vector-effect:non-scaling-stroke は使わないこと。**
+   これを付けると stroke-dasharray / stroke-dashoffset まで画面座標で
+   解釈され、getTotalLength()（元の座標系）との単位が食い違います。
+   PCでは絵が1.4倍に拡大されるため、線が7割ほどしか引かれずに終わりました。
+   線幅は元の座標系（1 ＝ 表示倍率ぶんの太さ）で指定します */
+#loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,
+#loadArt circle,#loadArt ellipse,#loadArt rect{
+ fill:none;stroke:var(--ink);stroke-width:1;
+ stroke-linecap:round;stroke-linejoin:round}
+#load .pct{position:absolute;left:0;right:0;bottom:36px;margin:0;text-align:center;
+ font-size:14px;letter-spacing:.22em;font-weight:500;
+ font-variant-numeric:tabular-nums;opacity:.7}
+
+/* ===== 映像を抜けたあとの紙のセクション =====
+   世界観：紙 #F3F1EC ／ 墨 ／ アクセントはオリーブ1点（映像のオリーブの木から採色）。
+   モーションの語彙は「線が引かれる」「静かに現れる」の2つだけ。増やさないこと */
+/* 色はすべてトークン経由。data-ink の節が画面中央に来ると #after に .inked が付き、
+   紙 → 墨 に反転する（inkSync）。個々の要素に直接色を書かないこと */
+#after{position:relative;z-index:3;
+ --pg:#F3F1EC;--tx:#14161A;--mut:#7A7F87;--acc:#6E7D57;
+ --ln:rgba(20,22,26,.14);--bd:rgba(20,22,26,.32);--bd-soft:rgba(20,22,26,.05);
+ background:var(--pg);transition:background-color .9s ease;
+ padding:clamp(96px,13vw,170px) clamp(24px,5vw,40px) 0}
+#after.inked{--pg:#17191D;--tx:#F3F1EC;--mut:#9AA0A8;--acc:#93A878;
+ --ln:rgba(243,241,236,.16);--bd:rgba(243,241,236,.42);--bd-soft:rgba(243,241,236,.07)}
+#after .wrap{max-width:1040px;margin:0 auto}
+.af-sec{margin:0 0 clamp(96px,13vw,170px)}
+.sec-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+ color:var(--acc);margin:0 0 16px;font-weight:500}
+#after h3{font-family:var(--jp-title);font-weight:700;color:var(--tx);
+ font-size:clamp(23px,3.6vw,36px);letter-spacing:.08em;line-height:1.65;margin:0 0 18px}
+.lead{color:var(--mut);font-size:14.5px;line-height:2.05;margin:0;max-width:38em}
+
+/* 静かに現れる。JSが .in を付ける */
+.rv{opacity:0;transform:translateY(18px);
+ transition:opacity .9s cubic-bezier(.4,0,.25,1),transform .9s cubic-bezier(.4,0,.25,1),
+ color .9s ease,border-color .9s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+/* ---- 私たちがつくった店 ----
+   写真は左右いっぱいの帯にして、外観・内装・ブランディングをゆっくり流す。
+   語彙は3つ目になるが、この節だけに限定して使う（他では流さないこと） */
+#after{overflow-x:clip}   /* 帯の全幅はみ出しを刈る */
+.band{margin:clamp(34px,5vw,54px) calc(50% - 50vw) 0;
+ display:flex;flex-direction:column;gap:10px}
+/* 帯は同じ組を2つ並べ、-50% までの移動をループさせて切れ目なく流す。
+   組と組の間隔は .set の padding-right で作る（row に gap を書くと計算が狂う）。
+   ここの秒数は仮置きで、実際の速さは bandSpeed() が画素/秒で決め直す
+   （%基準のままだと、幅の細いモバイルでは同じ秒数でも半分の速さになる） */
+.band-row{display:flex;width:max-content;animation:drift 40s linear infinite}
+.band-row .set{display:flex;gap:10px;padding-right:10px}
+.band-row.rev{animation-duration:64s;animation-direction:reverse}
+.band-row img{height:clamp(150px,21vw,230px);width:auto;display:block;border-radius:2px}
+@keyframes drift{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.band-row{animation:none}}
+.stores{margin:clamp(22px,3.4vw,36px) 0 0;padding:0;list-style:none;
+ display:flex;flex-wrap:wrap;gap:12px 38px}
+.stores .nm{margin:0;font-size:14px;letter-spacing:.1em;font-weight:500;color:var(--tx)}
+.stores .tp{margin:3px 0 0;font-size:11.5px;color:var(--mut);letter-spacing:.05em}
+.stores .nm,.stores .tp{transition:color .9s ease}
+.stores li.soon{opacity:.55}
+
+/* ---- 店から道具への橋・締め。宣言は一回り大きく組む ---- */
+/* 締め（#next）は全体を中央揃えに */
+#next{text-align:center}
+#next .lead{margin-left:auto;margin-right:auto}
+.af-bridge{border-left:2px solid var(--acc);padding-left:clamp(20px,3.4vw,32px);
+ transition:border-color .9s ease}
+.af-stmt h3{font-size:clamp(26px,4.4vw,46px);line-height:1.55}
+/* 数字の帯。値はサンプル。実測値が来たら差し替える */
+.stats{margin:clamp(30px,4.6vw,46px) 0 0;display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 26px}
+.stat{border-left:1px solid var(--ln);padding-left:16px;transition:border-color .9s ease}
+.stat-n{display:block;font-size:clamp(30px,4vw,44px);font-weight:500;letter-spacing:.02em;
+ color:var(--tx);font-variant-numeric:tabular-nums;line-height:1.1;transition:color .9s ease}
+.stat-n i{font-style:normal;font-size:.52em;margin-left:2px}
+.stat-l{display:block;margin-top:9px;font-size:11.5px;color:var(--mut);
+ letter-spacing:.08em;transition:color .9s ease}
+/* ---- 二人（Founders）----
+   丸はローポリ3Dの受け皿（.fd-ph）。3Dができるまでは破線のプレースホルダ */
+.ava{width:56px;height:56px;border-radius:16px;border:1px dashed var(--mut);
+ display:grid;place-items:center;transition:border-color .9s ease}
+.ava svg{width:52%;height:52%;fill:none;stroke:var(--mut);stroke-width:2;
+ stroke-linecap:round;transition:stroke .9s ease}
+/* Founders は見出しも二人の中身もすべて中央揃え */
+#founders .sec-eyebrow,#founders h3{text-align:center}
+.fd-grid{margin:clamp(30px,4.6vw,48px) 0 0;display:grid;
+ grid-template-columns:repeat(2,minmax(0,340px));justify-content:center;
+ gap:clamp(30px,5vw,80px)}
+/* 全身を立たせるので縦長。生成待ちのプレースホルダも同じ枠 */
+.fd .ava{width:clamp(230px,26vw,270px);height:auto;aspect-ratio:5/8;margin-bottom:22px;
+ position:relative;overflow:hidden}
+/* 3Dが載ったら枠と丸マスクをやめる。丸で切ると回転中に頭が見切れる。
+   線の太さぶんのレイアウトは残すので border-color だけ透明に。
+   GLBが無いスロットは破線のまま＝まだ空いている目印になる */
+.fd-ph.live{border-color:transparent;overflow:visible}
+.fd-ph canvas{position:absolute;inset:0;width:100%;height:100%;display:block;
+ cursor:grab;touch-action:pan-y}
+.fd-ph canvas:active{cursor:grabbing}
+.fd-role{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;color:var(--acc);
+ transition:color .9s ease}
+/* セクション見出しと同じ大きさだと釣り合わないので一段階下げる */
+.fd-name{margin:0;font-family:var(--jp-title);font-weight:700;color:var(--tx);
+ font-size:clamp(20px,2.6vw,26px);letter-spacing:.1em;line-height:1.5;transition:color .9s ease}
+.fd-en{margin:4px 0 0;font-size:11.5px;letter-spacing:.2em;color:var(--mut);
+ text-transform:uppercase;font-weight:500;transition:color .9s ease}
+/* 一言の行数が2人で違っても、ボタンは下端で揃える（.fd を縦flexにして
+   ボタンを margin-top:auto で底に送る。グリッドの行は等しく伸びる） */
+.fd{display:flex;flex-direction:column;align-items:center;text-align:center}
+.fd-ex{margin:14px auto 22px;font-size:12.5px;line-height:2;color:var(--mut);
+ max-width:24em;transition:color .9s ease}
+.profile-btn{margin-top:auto;display:inline-flex;align-items:center;gap:8px;
+ padding:11px 22px;border:1px solid var(--bd);border-radius:99px;background:transparent;
+ color:var(--tx);font-size:11.5px;letter-spacing:.16em;font-weight:500;cursor:pointer;
+ text-transform:uppercase;transition:color .9s ease,border-color .25s ease,background .25s ease}
+.profile-btn:hover{border-color:var(--tx);background:var(--bd-soft)}
+.profile-btn:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.next-line{margin:clamp(26px,4vw,38px) 0 0;font-size:12px;letter-spacing:.2em;
+ color:var(--mut);font-weight:500;text-transform:uppercase;transition:color .9s ease}
+.next-line i{display:inline-block;width:8px;height:8px;border-radius:50%;
+ background:var(--acc);margin-right:12px;vertical-align:1px;
+ animation:lamp 2.8s ease-in-out infinite}
+@keyframes lamp{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.next-line i{animation:none}}
+
+/* ---- プロダクト ---- */
+.prod-head{display:flex;align-items:flex-end;justify-content:space-between;
+ gap:16px 24px;flex-wrap:wrap;margin:0 0 16px}
+.prod-head h3{margin:0}
+.prod .lead{margin-bottom:clamp(28px,4.4vw,42px)}
+.linkbtn.onpaper{color:var(--tx);border-color:var(--bd);background:transparent;
+ backdrop-filter:none;-webkit-backdrop-filter:none;
+ transition:color .9s ease,border-color .25s ease,background .25s ease}
+.linkbtn.onpaper:hover{background:var(--bd-soft);border-color:var(--tx)}
+
+/* 図解。中身のSVGはイラレ書き出しに差し替える前提。
+   fill無しのストローク＝線として引かれる／文字と塗り＝あとから現れる。
+   薄く沈めたい一群は <g data-dim> に入れる（最後に18%へ落ちる） */
+.fig{background:var(--cream);border:1px solid var(--ln);border-radius:3px;
+ padding:clamp(18px,3.4vw,36px)}
+.fig svg{display:block;width:100%;height:auto}
+/* セレクタの詳細度に注意。`.fig svg` は 0,1,1 なので、
+   `.fig-sp` だけ（0,1,0）では display を打ち消せない */
+.fig svg.fig-sp{display:none}
+.fg{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.fg.thin{stroke-width:1.05}
+.fg.acc{stroke:var(--olive)}
+.fg-lab{font-size:12.5px;letter-spacing:.13em;fill:var(--sub);font-weight:500}
+.fg-lab.jp{font-size:13.5px;letter-spacing:.05em;font-weight:400}
+.fg-lab.acc{fill:var(--olive)}
+.fg-lab.ink{fill:var(--ink)}
+.fg-num{font-size:34px;letter-spacing:.02em;fill:var(--ink);font-weight:500;
+ font-variant-numeric:tabular-nums}
+.fg-sm{font-size:11px;letter-spacing:.04em;fill:var(--sub)}
+/* SP用の図は表示が約0.71倍に縮むぶん、文字と線をあらかじめ太らせておく */
+.fig-sp .fg{stroke-width:2}
+.fig-sp .fg.thin{stroke-width:1.5}
+.fig-sp .fg-lab{font-size:17px}
+.fig-sp .fg-lab.jp{font-size:17px}
+.fig-sp .fg-num{font-size:44px}
+.fig-sp .fg-sm{font-size:14px}
+
+/* ---- フッター ---- */
+#foot{border-top:1px solid var(--ln);margin-top:clamp(90px,12vw,150px);
+ padding:26px 0 40px;display:flex;flex-wrap:wrap;gap:10px 26px;
+ align-items:baseline;justify-content:space-between;
+ font-size:11.5px;color:var(--mut);letter-spacing:.04em}
+#foot .pages{display:flex;gap:22px}
+#foot .soon{opacity:.6}
+
+@media (max-width:760px){
+  .fig svg.fig-pc{display:none}
+  .fig svg.fig-sp{display:block}
+  .fd-grid{grid-template-columns:minmax(0,340px);gap:44px}
+  /* スマホでは端末UIが下half に来るため、コピーは上に置く */
+  /* 冒頭以外は、端末UIとの間合いを取るため少し下げる */
+  .copy{top:calc(9.5vh + 40px);bottom:auto;transform:translateY(var(--dy,0px));max-width:none;
+    left:22px;right:22px;padding-right:6px}
+  /* 1枚目と2枚目は端末UIが絡まないので、天地左右の中央に置く（.mid）*/
+  .copy.mid{top:50%;transform:translateY(calc(-50% + var(--dy,0px)));text-align:center;
+    left:0;right:0;padding-left:26px;padding-right:26px}
+  body.snap .copy.mid{padding-right:26px}
+  .copy.mid .rule{margin-left:auto;margin-right:auto}
+  .copy.mid p{margin-left:auto;margin-right:auto;max-width:22em}
+  .copy h2{font-size:clamp(21px,5.6vw,27px);line-height:1.7;letter-spacing:.07em;margin:0 0 8px}
+  .copy p{font-size:13px;line-height:1.95;max-width:none}
+  .copy .entitle{font-size:10.5px;letter-spacing:.13em;margin:0 0 15px}
+  /* スマホは絵が小さいぶん線が強く出るので細くする */
+  #loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,
+  #loadArt circle,#loadArt ellipse,#loadArt rect{stroke-width:.68}
+  body.snap .copy{padding-right:34px}
+  body.snap #skip{display:none}
+  .eyebrow{margin:0 0 10px}
+  .rule{margin:0 0 14px}
+  #scrim{background:linear-gradient(180deg,rgba(12,14,18,.74) 0%,rgba(12,14,18,.52) 34%,
+    rgba(12,14,18,.12) 58%,rgba(12,14,18,.34) 100%)}
+  #skip{display:none}
+}
+</style></head><body>
+
+<div id="stage">
+  <canvas id="seq"></canvas>
+  <div id="scrim"></div>
+  <div id="screenWrap">
+    <div class="slot" id="vidOrder">
+      <video id="vOrder" muted loop autoplay playsinline preload="auto" disablepictureinpicture></video>
+      <div class="fallback" id="fbOrder">
+        <div class="fb-top"><b>GOOD ORDER</b><span>TABLE 03</span></div>
+        <div class="fb-item"><i class="fb-th"></i><span>本日のブレンド<em>¥520</em></span></div>
+        <div class="fb-item"><i class="fb-th"></i><span>キャロットケーキ<em>¥680</em></span></div>
+        <div class="fb-item"><i class="fb-th"></i><span>アボカドトースト<em>¥1,180</em></span></div>
+        <div class="fb-cta">注文を確定する　¥2,380</div>
+      </div>
+    </div>
+    <div class="slot" id="vidReview">
+      <video id="vReview" muted loop autoplay playsinline preload="auto" disablepictureinpicture></video>
+      <div class="fallback" id="fbReview">
+        <div class="fb-mark">GOOD REVIEW</div>
+        <div class="fb-thumb"></div>
+        <div class="fb-h2">今日の一杯は<br>いかがでしたか？</div>
+        <div class="fb-stars">★★★★★</div>
+        <div class="fb-cta fb-bottom">Googleに投稿する</div>
+      </div>
+    </div>
+    <div class="slot" id="tint"></div>
+    <div class="slot" id="sheen"></div>
+  </div>
+  <div id="white"></div>
+</div>
+
+<button id="brand" type="button" aria-label="はじめに戻る">
+  <!-- 正式ロゴ（public/images/logo.svg）を1文字ずつに分けたもの。
+       1文字＝2段の g。外側が位置、内側が左右反転。分けておかないと
+       「すべる」と「裏返す」を同じ文字に別々にかけられない。
+       影は付けない（CSSの filter は動きに追従せず欠けるため、そもそも使わない）-->
+  <svg viewBox="0 0 1160 149" aria-hidden="true">
+    <g transform="translate(8 8)" fill-rule="evenodd">
+      <g transform="translate(0,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+      <g transform="translate(248,0)"><g><path d="M0 0H152V22H87V133H65V22H0Z"/></g></g>
+      <g transform="translate(496,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+      <g transform="translate(744,0)"><g><path d="M0 0H152V22H87V133H65V22H0Z"/></g></g>
+      <g transform="translate(992,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+    </g>
+  </svg>
+</button>
+<button id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+<nav id="menu">
+  <ul>
+    <li><a href="#after">PRODUCTS<small>プロダクト</small></a></li>
+    <li><a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<small>モバイルオーダー</small></a></li>
+    <li><a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<small>レビューと満足度</small></a></li>
+    <li><a href="#after">CONTACT<small>お問い合わせ</small></a></li>
+  </ul>
+</nav>
+<div id="scrollHint"><span>SCROLL</span><i></i></div>
+<div id="prog" aria-hidden="true"><i></i></div>
+<div id="dots" aria-hidden="true"></div>
+<div id="navBar">
+  <button id="backBtn"><i></i><span>BACK</span></button>
+  <button id="nextBtn"><span>NEXT</span><i></i></button>
+</div>
+<a id="skip" href="#after">SKIP ↓</a>
+
+<div id="copyLayer">
+  <div class="copy mid"><p class="eyebrow">Ututu</p><div class="rule"></div>
+    <h2>店舗に、いい一日を。</h2>
+    <p class="entitle">GOOD TOOL, GREAT DAY!</p>
+    <p>飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。私たちは自分たちでも店を営んでいて、毎日の営業のなかで使い、要らなかった機能を削り、残ったものだけをかたちにする。現場が忙しいことを知っている人間が、つくっています。</p></div>
+  <div class="copy mid"><p class="eyebrow">Welcome</p><div class="rule"></div>
+    <h2>この店が、開発室です。</h2>
+    <p class="entitle">BUILT IN A REAL RESTAURANT</p>
+    <p>新しい機能は、まずこの店で使います。ピークタイムに耐えられるか、スタッフが覚えずに使えるか、お客様が迷わないか。ここで残らなかったものは、よそのお店にもお渡ししません。</p></div>
+  <div class="copy"><p class="eyebrow">Good Order</p><div class="rule"></div>
+    <h2>埋もれる一品を、なくす。</h2>
+    <p class="entitle">EVERY DISH GETS ITS TURN</p>
+    <p>スマホの縦長画面では、スクロールの下にあるメニューほど見られません。紙のメニューのように全体が見える設計にして、埋もれていた一品に出番をつくりました。席のまま注文でき、オペレーションはいまのままで構いません。</p>
+    <a class="linkbtn" href="https://good-order.jp" target="_blank" rel="noopener">公式サイトへ <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 9.5V13H3V3.5h3.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M13.5 2.5 7.5 8.5"/></svg></a></div>
+  <div class="copy"><p class="eyebrow">Good Review</p><div class="rule"></div>
+    <h2>ほめ言葉は外、苦言は内。</h2>
+    <p class="entitle">EVERY VOICE FINDS ITS PLACE</p>
+    <p>卓上のQRから、5段階の評価にひとつ答えるだけ。高い評価はAIの下書きでGoogleマップへ。低い評価は店内向けのアンケートに分かれ、公開の場には出ません。</p>
+    <a class="linkbtn" href="https://good-review.jp" target="_blank" rel="noopener">公式サイトへ <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 9.5V13H3V3.5h3.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M13.5 2.5 7.5 8.5"/></svg></a></div>
+</div>
+
+<!-- 映像区間の長さ。1枚 = 画面1つぶんのスクロール。
+     ここを増減すると、章と章の間のスクロール量がまとめて変わる -->
+<div id="track">
+  <section class="beat"></section>
+  <section class="beat"></section>
+  <section class="beat"></section>
+  <section class="beat"></section>
+</div>
+
+<section id="after"><div class="wrap">
+
+  <!-- A 受け：映像の余韻を引き取り、紙の世界に切り替える -->
+  <div class="af-sec">
+    <p class="sec-eyebrow rv">Ututu</p>
+    <h3 class="rv">店の中から、つくっています。</h3>
+    <p class="lead rv">私たちは、店をつくる会社であり、店のための道具をつくる会社です。ふたつは別の仕事ではありません。自分たちの店で毎日使うために道具をつくり、その道具が、また店を強くしています。</p>
+  </div>
+
+  <!-- B 私たちがつくった店：当事者性の証拠。業態の表記は要確認 -->
+  <div class="af-sec">
+    <p class="sec-eyebrow rv">Our Stores</p>
+    <h3 class="rv">私たちがつくった店。</h3>
+    <p class="lead rv">企画から内装、メニュー、日々の運営まで。ここに並ぶのは、私たちが立ち上げて、いまも動かしている店。写真には、いま仕込んでいる次の店も混ざっています。</p>
+    <div class="band rv">
+      <div class="band-row"><div class="set"><img src="img/brands/brunch-hero.webp" width="818" height="480" alt="YORKYS BRUNCH の店内" loading="lazy" decoding="async"><img src="img/brands/froma-signage.webp" width="480" height="480" alt="FROMA のサイン" loading="lazy" decoding="async"><img src="img/brands/creperie-store.webp" width="818" height="480" alt="YORKYS CREPERIE の店舗" loading="lazy" decoding="async"><img src="img/brands/bake-interior.webp" width="480" height="480" alt="PIECE OF BAKE の内装" loading="lazy" decoding="async"><img src="img/brands/mc-02.webp" width="480" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async"><img src="img/brands/froma-interior.webp" width="480" height="480" alt="FROMA の内装" loading="lazy" decoding="async"><img src="img/brands/brunch-cup.webp" width="480" height="480" alt="YORKYS BRUNCH のカップ" loading="lazy" decoding="async"></div><div class="set" aria-hidden="true"><img src="img/brands/brunch-hero.webp" width="818" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/froma-signage.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/creperie-store.webp" width="818" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/bake-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/mc-02.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/froma-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/brunch-cup.webp" width="480" height="480" alt="" loading="lazy" decoding="async"></div></div>
+      <div class="band-row rev"><div class="set"><img src="img/brands/creperie-products.webp" width="480" height="480" alt="YORKYS CREPERIE のクレープ" loading="lazy" decoding="async"><img src="img/brands/bake-glass.webp" width="480" height="480" alt="PIECE OF BAKE のガラス面" loading="lazy" decoding="async"><img src="img/brands/froma-kitchen.webp" width="818" height="480" alt="FROMA のキッチン" loading="lazy" decoding="async"><img src="img/brands/mc-04.webp" width="861" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async"><img src="img/brands/brunch-exterior.webp" width="480" height="480" alt="YORKYS BRUNCH の外観" loading="lazy" decoding="async"><img src="img/brands/creperie-counter.webp" width="975" height="480" alt="YORKYS CREPERIE のカウンター" loading="lazy" decoding="async"><img src="img/brands/bake-donuts.webp" width="480" height="480" alt="PIECE OF BAKE のドーナツ" loading="lazy" decoding="async"></div><div class="set" aria-hidden="true"><img src="img/brands/creperie-products.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/bake-glass.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/froma-kitchen.webp" width="818" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/mc-04.webp" width="861" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/brunch-exterior.webp" width="480" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/creperie-counter.webp" width="975" height="480" alt="" loading="lazy" decoding="async"><img src="img/brands/bake-donuts.webp" width="480" height="480" alt="" loading="lazy" decoding="async"></div></div>
+    </div>
+    <ul class="stores">
+      <li class="rv"><p class="nm">YORKYS BRUNCH</p><p class="tp">ブランチレストラン</p></li>
+      <li class="rv"><p class="nm">YORKYS CREPERIE</p><p class="tp">クレープリー</p></li>
+      <li class="rv"><p class="nm">FROMA</p><p class="tp">チーズブランド</p></li>
+      <li class="rv"><p class="nm">PIECE OF BAKE</p><p class="tp">ドーナツブランド</p></li>
+      <li class="rv soon"><p class="nm">AND NEXT</p><p class="tp">準備中の店がひとつ</p></li>
+    </ul>
+  </div>
+
+  <!-- 橋：店から道具へ -->
+  <div class="af-sec af-bridge af-stmt" data-ink>
+    <h3 class="rv">既製品は、現場に合いませんでした。</h3>
+    <p class="lead rv">だから自分たちでつくり、自分たちの店で毎日使っています。ピークタイムに耐えられなかった機能は、直すか、捨てる。ここから先に並ぶのは、その繰り返しを生き残ったものだけです。</p>
+    <!-- 数字はすべてサンプル。実測値が来たら差し替える -->
+    <div class="stats rv">
+      <div class="stat"><b class="stat-n">4</b><span class="stat-l">直営ブランド</span></div>
+      <div class="stat"><b class="stat-n">3</b><span class="stat-l">導入店舗</span></div>
+      <div class="stat"><b class="stat-n">3.9<i>倍</i></b><span class="stat-l">月のクチコミ件数</span></div>
+      <div class="stat"><b class="stat-n">+18<i>%</i></b><span class="stat-l">注文点数</span></div>
+    </div>
+  </div>
+
+  <!-- GOOD ORDER -->
+  <div class="af-sec prod">
+    <p class="sec-eyebrow rv">Good Order</p>
+    <div class="prod-head rv">
+      <h3>埋もれる一品を、なくす。</h3>
+      <a class="linkbtn onpaper" href="https://good-order.jp" target="_blank" rel="noopener">公式サイトへ <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 9.5V13H3V3.5h3.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M13.5 2.5 7.5 8.5"/></svg></a>
+    </div>
+    <p class="lead rv">スマホの縦長画面では、下にあるメニューほど見られません。紙のメニューのように全体が見える設計で、埋もれていた一品に出番をつくる。注文は席のまま、オペレーションはいまのままで。</p>
+    <div class="fig rv" data-fig>
+      <svg class="fig-pc" viewBox="0 0 900 430" role="img" aria-label="よくあるモバイルオーダーとGOOD ORDERの比較。従来は画面の下半分がほとんど見られないが、GOOD ORDERは全体が見える">
+        <rect class="fg" x="150" y="26" width="200" height="330" rx="16"/>
+        <path class="fg thin" d="M232 40 h36"/>
+        <rect class="fg thin" x="168" y="56" width="42" height="32" rx="3"/>
+        <path class="fg thin" d="M224 65 h96"/>
+        <path class="fg thin" d="M224 77 h60"/>
+        <text class="fg-sm" x="336" y="84" text-anchor="end">¥520</text>
+        <rect class="fg thin" x="168" y="106" width="42" height="32" rx="3"/>
+        <path class="fg thin" d="M224 115 h96"/>
+        <path class="fg thin" d="M224 127 h60"/>
+        <text class="fg-sm" x="336" y="134" text-anchor="end">¥680</text>
+        <rect class="fg thin" x="168" y="156" width="42" height="32" rx="3"/>
+        <path class="fg thin" d="M224 165 h96"/>
+        <path class="fg thin" d="M224 177 h60"/>
+        <text class="fg-sm" x="336" y="184" text-anchor="end">¥1,180</text>
+        <path class="fg acc thin" d="M150.0 212 h10.5"/>
+        <path class="fg acc thin" d="M171.1 212 h10.5"/>
+        <path class="fg acc thin" d="M192.1 212 h10.5"/>
+        <path class="fg acc thin" d="M213.2 212 h10.5"/>
+        <path class="fg acc thin" d="M234.2 212 h10.5"/>
+        <path class="fg acc thin" d="M255.3 212 h10.5"/>
+        <path class="fg acc thin" d="M276.3 212 h10.5"/>
+        <path class="fg acc thin" d="M297.4 212 h10.5"/>
+        <path class="fg acc thin" d="M318.4 212 h10.5"/>
+        <path class="fg acc thin" d="M339.5 212 h10.5"/>
+        <g data-dim>
+        <rect class="fg thin" x="168" y="226" width="42" height="30" rx="3"/>
+        <path class="fg thin" d="M224 235 h96"/>
+        <path class="fg thin" d="M224 247 h60"/>
+        <rect class="fg thin" x="168" y="274" width="42" height="30" rx="3"/>
+        <path class="fg thin" d="M224 283 h96"/>
+        <path class="fg thin" d="M224 295 h60"/>
+        <rect class="fg thin" x="168" y="322" width="42" height="30" rx="3"/>
+        <path class="fg thin" d="M224 331 h96"/>
+        <path class="fg thin" d="M224 343 h60"/>
+        </g>
+        <g transform="translate(150,387) scale(0.95)"><path class="fg" d="M0 0 C8 -9.5 26 -9.5 34 0 C26 9.5 8 9.5 0 0 Z"/><circle class="fg thin" cx="17" cy="0" r="4.5"/><path class="fg" d="M3 9 L31 -9"/></g>
+        <text class="fg-lab jp" x="196" y="392">よくあるモバイルオーダー</text>
+        <text class="fg-lab jp acc" x="196" y="416">ここから下は、ほとんど見られない</text>
+        <path class="fg acc" d="M392 176 H506 M506 176 l-11 -7 M506 176 l-11 7"/>
+        <path class="fg acc thin" d="M478 214 l4 11 M450 208 v12 M422 214 l-4 11"/>
+        <text class="fg-num" x="450" y="262" text-anchor="middle">+18%</text>
+        <text class="fg-lab" x="450" y="290" text-anchor="middle">ITEMS PER ORDER</text>
+        <text class="fg-lab jp" x="450" y="312" text-anchor="middle">注文点数の変化（自社店舗）</text>
+        <rect class="fg" x="550" y="26" width="200" height="330" rx="16"/>
+        <path class="fg thin" d="M632 40 h36"/>
+        <path class="fg acc" d="M566 56 h34 M612 56 h26 M650 56 h30 M692 56 h22"/>
+        <path class="fg acc thin" d="M566 64 h34"/>
+        <rect class="fg thin" x="566" y="80" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 89 h96"/>
+        <path class="fg thin" d="M618 101 h58"/>
+        <text class="fg-sm" x="736" y="102" text-anchor="end">¥520</text>
+        <rect class="fg thin" x="566" y="124" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 133 h96"/>
+        <path class="fg thin" d="M618 145 h58"/>
+        <text class="fg-sm" x="736" y="146" text-anchor="end">¥680</text>
+        <rect class="fg thin" x="566" y="168" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 177 h96"/>
+        <path class="fg thin" d="M618 189 h58"/>
+        <text class="fg-sm" x="736" y="190" text-anchor="end">¥1,180</text>
+        <rect class="fg thin" x="566" y="212" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 221 h96"/>
+        <path class="fg thin" d="M618 233 h58"/>
+        <text class="fg-sm" x="736" y="234" text-anchor="end">¥760</text>
+        <rect class="fg thin" x="566" y="256" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 265 h96"/>
+        <path class="fg thin" d="M618 277 h58"/>
+        <text class="fg-sm" x="736" y="278" text-anchor="end">¥940</text>
+        <rect class="fg thin" x="566" y="300" width="38" height="26" rx="3"/>
+        <path class="fg thin" d="M618 309 h96"/>
+        <path class="fg thin" d="M618 321 h58"/>
+        <text class="fg-sm" x="736" y="322" text-anchor="end">¥430</text>
+        <g transform="translate(550,387) scale(0.95)"><path class="fg acc" d="M0 0 C8 -9.5 26 -9.5 34 0 C26 9.5 8 9.5 0 0 Z"/><circle class="fg acc thin" cx="17" cy="0" r="4.5"/></g>
+        <text class="fg-lab" x="596" y="392">GOOD ORDER</text>
+        <text class="fg-lab jp" x="596" y="416">全体が見えて、全部に出番がある</text>
+        </svg>
+      <svg class="fig-sp" viewBox="0 0 480 560" role="img" aria-label="よくあるモバイルオーダーとGOOD ORDERの比較">
+        <g transform="translate(28,36) scale(0.85)"><path class="fg" d="M0 0 C8 -9.5 26 -9.5 34 0 C26 9.5 8 9.5 0 0 Z"/><circle class="fg thin" cx="17" cy="0" r="4.5"/><path class="fg" d="M3 9 L31 -9"/></g>
+        <text class="fg-lab jp" x="66" y="42">よくあるオーダー</text>
+        <g transform="translate(262,36) scale(0.85)"><path class="fg acc" d="M0 0 C8 -9.5 26 -9.5 34 0 C26 9.5 8 9.5 0 0 Z"/><circle class="fg acc thin" cx="17" cy="0" r="4.5"/></g>
+        <text class="fg-lab" x="300" y="42">GOOD ORDER</text>
+        <rect class="fg" x="28" y="64" width="188" height="300" rx="14"/>
+        <rect class="fg thin" x="46" y="88" width="40" height="28" rx="3"/>
+        <path class="fg thin" d="M100 97 h78"/>
+        <path class="fg thin" d="M100 109 h48"/>
+        <rect class="fg thin" x="46" y="136" width="40" height="28" rx="3"/>
+        <path class="fg thin" d="M100 145 h78"/>
+        <path class="fg thin" d="M100 157 h48"/>
+        <rect class="fg thin" x="46" y="184" width="40" height="28" rx="3"/>
+        <path class="fg thin" d="M100 193 h78"/>
+        <path class="fg thin" d="M100 205 h48"/>
+        <path class="fg acc thin" d="M28.0 236 h12.5"/>
+        <path class="fg acc thin" d="M53.1 236 h12.5"/>
+        <path class="fg acc thin" d="M78.1 236 h12.5"/>
+        <path class="fg acc thin" d="M103.2 236 h12.5"/>
+        <path class="fg acc thin" d="M128.3 236 h12.5"/>
+        <path class="fg acc thin" d="M153.3 236 h12.5"/>
+        <path class="fg acc thin" d="M178.4 236 h12.5"/>
+        <path class="fg acc thin" d="M203.5 236 h12.5"/>
+        <g data-dim>
+        <rect class="fg thin" x="46" y="250" width="40" height="26" rx="3"/>
+        <path class="fg thin" d="M100 259 h78"/>
+        <path class="fg thin" d="M100 271 h48"/>
+        <rect class="fg thin" x="46" y="298" width="40" height="26" rx="3"/>
+        <path class="fg thin" d="M100 307 h78"/>
+        <path class="fg thin" d="M100 319 h48"/>
+        </g>
+        <text class="fg-lab jp acc" x="28" y="394">下半分は見られない</text>
+        <rect class="fg" x="262" y="64" width="188" height="300" rx="14"/>
+        <path class="fg acc" d="M278 88 h30 M320 88 h22 M352 88 h26"/>
+        <path class="fg acc thin" d="M278 96 h30"/>
+        <rect class="fg thin" x="278" y="110" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 119 h84"/>
+        <path class="fg thin" d="M326 131 h50"/>
+        <rect class="fg thin" x="278" y="154" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 163 h84"/>
+        <path class="fg thin" d="M326 175 h50"/>
+        <rect class="fg thin" x="278" y="198" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 207 h84"/>
+        <path class="fg thin" d="M326 219 h50"/>
+        <rect class="fg thin" x="278" y="242" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 251 h84"/>
+        <path class="fg thin" d="M326 263 h50"/>
+        <rect class="fg thin" x="278" y="286" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 295 h84"/>
+        <path class="fg thin" d="M326 307 h50"/>
+        <rect class="fg thin" x="278" y="330" width="34" height="24" rx="3"/>
+        <path class="fg thin" d="M326 339 h84"/>
+        <path class="fg thin" d="M326 351 h50"/>
+        <path class="fg acc thin" d="M266 452 l4 11 M240 446 v12 M214 452 l-4 11"/>
+        <text class="fg-num" x="240" y="496" text-anchor="middle">+18%</text>
+        <text class="fg-lab" x="240" y="524" text-anchor="middle">ITEMS PER ORDER</text>
+        <text class="fg-lab jp" x="240" y="550" text-anchor="middle">注文点数の変化（自社店舗）</text>
+        </svg>
+    </div>
+  </div>
+
+  <!-- GOOD REVIEW -->
+  <div class="af-sec prod">
+    <p class="sec-eyebrow rv">Good Review</p>
+    <div class="prod-head rv">
+      <h3>ほめ言葉は外、苦言は内。</h3>
+      <a class="linkbtn onpaper" href="https://good-review.jp" target="_blank" rel="noopener">公式サイトへ <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 9.5V13H3V3.5h3.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M13.5 2.5 7.5 8.5"/></svg></a>
+    </div>
+    <p class="lead rv">卓上のQRから、5段階の評価にひとつ。高い評価はAIが下書きしたクチコミとともにGoogleマップへ。低い評価は店内向けのアンケートに分かれ、公開の場には出ません。</p>
+    <div class="fig rv" data-fig>
+      <svg class="fig-pc" viewBox="0 0 900 430" role="img" aria-label="卓上のQRから5段階評価へ。星4〜5はGoogleマップへ、星1〜3は店内アンケートへ分かれる">
+        <rect class="fg" x="64" y="176" width="46" height="46" rx="5"/>
+        <rect class="fg thin" x="72" y="184" width="11" height="11" rx="1"/>
+        <rect class="fg thin" x="72" y="203" width="11" height="11" rx="1"/>
+        <rect class="fg thin" x="92" y="184" width="11" height="11" rx="1"/>
+        <text class="fg-lab jp" x="64" y="252">卓上のQR</text>
+        <path class="fg" d="M118 199 H340"/>
+        <circle class="fg" cx="344" cy="199" r="4"/>
+        <path class="fg acc" d="M348 197 C424 190 436 96 520 96 H660"/>
+        <path class="fg" d="M348 201 C424 208 436 302 520 302 H660"/>
+        <text class="fg-lab acc" x="520" y="74">HIGH ★4–5</text>
+        <text class="fg-lab jp" x="520" y="132">AIが下書きしたクチコミと、Googleマップへ</text>
+        <text class="fg-lab" x="520" y="280">LOW ★1–3</text>
+        <text class="fg-lab jp" x="520" y="336">店内向けのアンケートへ</text>
+        <path class="fg acc" d="M712 70 a20 20 0 0 1 20 20 c0 15 -20 34 -20 34 c0 0 -20 -19 -20 -34 a20 20 0 0 1 20 -20 z"/>
+        <circle class="fg acc thin" cx="712" cy="90" r="7"/>
+        <path class="fg" d="M694 322 v-22 l18 -15 l18 15 v22 z M706 322 v-14 h12 v14"/>
+        <text class="fg-num" x="64" y="396">12 → 47</text>
+        <text class="fg-lab" x="64" y="420">GOOGLE REVIEWS / MONTH</text>
+        <text class="fg-lab jp ink" x="520" y="414">低い評価は、公開の場に出ない。</text>
+      </svg>
+      <svg class="fig-sp" viewBox="0 0 480 560" role="img" aria-label="卓上のQRから5段階評価へ。星4〜5はGoogleへ、星1〜3は店内アンケートへ">
+        <rect class="fg" x="217" y="30" width="46" height="46" rx="5"/>
+        <rect class="fg thin" x="225" y="38" width="11" height="11" rx="1"/>
+        <rect class="fg thin" x="225" y="57" width="11" height="11" rx="1"/>
+        <rect class="fg thin" x="245" y="38" width="11" height="11" rx="1"/>
+        <text class="fg-lab jp" x="240" y="102" text-anchor="middle">卓上のQR</text>
+        <path class="fg" d="M240 118 V166"/>
+        <circle class="fg" cx="240" cy="172" r="4"/>
+        <path class="fg acc" d="M238 174 C220 220 120 226 120 290 V340"/>
+        <path class="fg" d="M242 174 C260 220 360 226 360 290 V340"/>
+        <text class="fg-lab acc" x="120" y="252" text-anchor="middle">★4–5</text>
+        <text class="fg-lab" x="360" y="252" text-anchor="middle">★1–3</text>
+        <path class="fg acc" d="M120 356 a18 18 0 0 1 18 18 c0 13 -18 30 -18 30 c0 0 -18 -17 -18 -30 a18 18 0 0 1 18 -18 z"/>
+        <circle class="fg acc thin" cx="120" cy="374" r="6"/>
+        <path class="fg" d="M342 402 v-20 l18 -15 l18 15 v20 z M354 402 v-13 h12 v13"/>
+        <text class="fg-lab jp" x="120" y="440" text-anchor="middle">Googleマップへ</text>
+        <text class="fg-lab jp" x="360" y="440" text-anchor="middle">店の中へ</text>
+        <text class="fg-lab jp ink" x="360" y="466" text-anchor="middle">公開の場に出ない</text>
+        <text class="fg-num" x="240" y="520" text-anchor="middle">12 → 47</text>
+        <text class="fg-lab" x="240" y="548" text-anchor="middle">GOOGLE REVIEWS / MONTH</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 二人。丸（.fd-ph）は後日ローポリ3Dの canvas に差し替える受け皿 -->
+  <div class="af-sec" data-ink id="founders">
+    <p class="sec-eyebrow rv">Founders</p>
+    <h3 class="rv">店側と、デザイン側から。</h3>
+    <div class="fd-grid">
+      <div class="fd rv">
+        <div class="fd-ph ava" data-head="yosuke" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+        <p class="fd-role">共同創業者 / ビジネスプロデューサー</p>
+        <p class="fd-name">板倉 洋輔</p>
+        <p class="fd-en">Yosuke Itakura</p>
+        <p class="fd-ex">「YORKYS BRUNCH」から複数ブランドを立ち上げ、関西・関東へ。2026年、3ブランドの全国フランチャイズ展開を開始。</p>
+        <button class="profile-btn" type="button" data-bio="yosuke">Profile　＋</button>
+      </div>
+      <div class="fd rv">
+        <div class="fd-ph ava" data-head="temma" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+        <p class="fd-role">共同創業者 / クリエイティブディレクター</p>
+        <p class="fd-name">平澤 天真</p>
+        <p class="fd-en">Temma Hirasawa</p>
+        <p class="fd-ex">2,000万会員規模のUI/UXからAdobe公式TikTokまで。「GOODシリーズ」の設計と開発を統括。</p>
+        <button class="profile-btn" type="button" data-bio="temma">Profile　＋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 締め -->
+  <div class="af-sec af-stmt" data-ink id="next">
+    <p class="sec-eyebrow rv">And Next</p>
+    <h3 class="rv">検証は、今日も営業中。</h3>
+    <p class="lead rv">私たちの店は、これからも実験台です。使いながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべてはこの店の一日から始まります。</p>
+    <p class="next-line rv"><i></i>Next product — Reservation System and more</p>
+  </div>
+
+  <div id="foot" class="rv">
+    <span>© UTUTU Inc.</span>
+    <span class="pages"><span class="soon">会社概要（準備中）</span><span class="soon">お問い合わせ（準備中）</span></span>
+  </div>
+</div></section>
+
+<div id="bioVeil"></div>
+<div id="bioModal" role="dialog" aria-modal="true" aria-label="プロフィール">
+  <div class="grip" aria-hidden="true"></div>
+  <button id="bioClose" type="button" aria-label="閉じる">✕</button>
+  <p class="bm-role"></p>
+  <p class="bm-name"></p>
+  <p class="bm-en"></p>
+  <p class="bm-bio"></p>
+</div>
+
+<div id="load">
+  <!-- 線画。イラレから書き出したものをそのまま貼っている。
+       塗り・線色・線幅は CSS 側で一括指定するので属性は落としてある。
+       viewBox は原寸 0 0 1281.74 856.99 に、線幅ぶんの余白を四方6ずつ足したもの -->
+  <svg id="loadArt" viewBox="0 0 1281.74 856.99" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g id="_01_地面">
+    <line x1="412.93" y1="856.5" x2="1281.63" y2="744.41"/>
+    <line x1="610.23" y1="856.5" x2="1281.63" y2="767.39"/>
+    </g>
+    <g id="_02_建物の輪郭">
+    <polyline points="594.01 .5 1079.14 68.74 1085.9 551.17 1281.63 593.06"/>
+    </g>
+    <g id="_03_開口部">
+    <polyline points="203.47 488.93 605.38 481.9 605.38 642.15 838.47 613.57 927.56 645.51 948.29 641.59 948.29 249.37 937.82 248.47 937.82 224.14 203.47 161.98 208.69 681.37 605.38 642.15"/>
+    <polyline points="937.82 248.47 837.35 270.1 838.47 613.57"/>
+    <line x1="203.47" y1="218.55" x2="880.13" y2="260.89"/>
+    <line x1="492.12" y1="236.61" x2="492.12" y2="486.38"/>
+    <line x1="351.06" y1="227.79" x2="351.06" y2="486.38"/>
+    </g>
+    <g id="_04_中の様子">
+    <path d="M704.14,249.88s-27.44,35.67-16.95,69.53c0,0,30.26,7.84,60.51,0,0,0,3.67-54.16-9.93-67.42"/>
+    <path d="M556.09,482.76v-51.74s146.79,21.74,281.26,6.05"/>
+    <path d="M605.38,533.45s37.72,38.1,232.9,22.41"/>
+    <line x1="765.68" y1="253.73" x2="765.68" y2="442.21"/>
+    <line x1="585.19" y1="242.44" x2="585.19" y2="434.62"/>
+    </g>
+    <g id="_05_ベンチ_鉢">
+    <polygon points="948.29 124.6 948.29 227.79 1034.49 232.39 1035.79 132.39 948.29 124.6"/>
+    <polygon points="271.56 575.81 270.95 584.26 277.59 593.32 630.8 575.81 628.38 566.15 604.23 558.9 271.56 575.81"/>
+    <polyline points="309.61 591.73 310.8 679.05 326.5 679.05 324.75 590.98"/>
+    <polyline points="569.79 578.83 566.8 648.86 580.08 648.86 582.53 578.2 585.19 658.52 598.8 658.52 594.79 577.59"/>
+    <path d="M108.95,596.2s-84.05,6.72-77.32,15.69,91.89,20.17,147.92,1.12-70.6-16.81-70.6-16.81Z"/>
+    <path d="M31.63,611.89s-29.14,80.68,12.33,123.27c0,0,25.77,26.89,118.79,0,0,0,21.29-2.24,36.98-28.02s-6.72-104.22-6.72-104.22"/>
+    <path d="M107.83,617.49l1.12-173.7L.25,381.04l101.98,51.55-56.03-156.89,67.24,155.77,32.5-212.92-23.53,217.4v13.45l146.8-81.81-147.92,91.89,1.12,158.01s0,2.24-14.57,0Z"/>
+    <path d="M1064.84,551.94s-57.15,0-53.23,4.48,76.76,19.61,112.06,6.16c0,0-4.48-11.77-58.83-10.65Z"/>
+    <path d="M1011.61,556.42s-17.93,52.67,6.16,94.69c0,0,47.63,25.77,96.37,5.6,0,0,27.46-44.82,9.53-94.13"/>
+    <path d="M1064.84,562.58s7.84-85.73,3.92-94.69-52.11-83.49-52.11-83.49c0,0,51.55,66.12,53.23,70.6s35.86-76.76,46.51-86.85c0,0-39.78,84.61-38.1,108.7,0,0,98.61-8.96,105.34-12.33,0,0-80.68,16.25-103.1,17.37l-6.16,82.37s-1.12.56-9.53-1.68Z"/>
+    </g>
+  </svg>
+  <div id="loadMark">
+    <svg viewBox="0 0 1160 149" role="img" aria-label="UTUTU">
+      <g transform="translate(8 8)" fill-rule="evenodd">
+        <g transform="translate(0,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+        <g transform="translate(248,0)"><g><path d="M0 0H152V22H87V133H65V22H0Z"/></g></g>
+        <g transform="translate(496,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+        <g transform="translate(744,0)"><g><path d="M0 0H152V22H87V133H65V22H0Z"/></g></g>
+        <g transform="translate(992,0)"><g><path d="M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z"/></g></g>
+      </g>
+    </svg>
+  </div>
+  <p class="pct"><span id="loadPct">0</span>%</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   設定
+   ============================================================ */
+var CFG = {
+  realFrames: 589,      // 仮想の目盛り。停止点も四隅の座標もこの番号のまま
+  frameStep: 2,         // 実ファイルは1コマおき（24fps→12fps）。転送量と本数が半分になる
+  files: 295,           // 実際に置いてある枚数
+  headHi: 60,           // 冒頭のこの枚数だけは高解像度が揃うまで待つ
+  loStep: 4,            // 先読みは4枚に1枚。理由は enqueue() を参照
+  /* 線画を引く順番（レイヤー名の頭の番号）。
+     スマホは左右の植木（05）が画角の外なので、そこを最後に引いても動きが見えない。
+     画面の中央にある開口部（03）と中の様子（04）を最後に回している */
+  artOrder: [1,2,5,3,4],
+  /* 素材は1年 immutable で配信している（vercel.json）。
+     連番や動画を作り直したときは、必ずこの版を上げること。上げないと
+     一度見た人のブラウザは古い絵を使い続ける */
+  ver: '20260818b',
+  maxWait: 15000,       // それでも揃わなければ待たずに始める（ミリ秒）
+
+  /* 停止点。映像の好きなコマで止めて、そこでUIを見せる。
+     at   … 止めるコマ番号（連番の実番号）
+     len  … そこで何コマ分スクロールを費やすか
+     ui   … 'order' か 'review'
+     land / port … そのコマでのスマホ画面の四隅（横位置 / 縦位置） */
+  holds: [
+    { at: 447, len: 220, ui: 'order',
+      land: [[704,538],[866,547],[888,722],[666,709]],
+      port: [[456,805],[701,819],[740,1072],[398,1060]] },   // 素材から実測（右下は画角の外）
+    { at: 589, len: 220, ui: 'review',
+      land: [[596,402],[710,404],[717,603],[584,601]],
+      port: [[293,597],[464,603],[474,902],[275,895]] }   // 実機で計測
+  ],
+  fadeLen: 40,          // 停止点どうしが同じコマの場合に挟む白フェードの長さ
+
+  /* 低解像度は縦横それぞれに用意してある。**縦横比は高解像度と完全に一致**させること。
+     ずれると cover の切り取りが変わり、はめ込みの座標が合わなくなる
+     （横 1280x856 → 320x214 = 1/4、縦 720x1278 → 240x426 = 1/3）*/
+  land: { hi: function(i){ return 'frames/f_'      + pad(i) + '.webp' + V(); },
+          lo: function(i){ return 'frames_lo/f_'   + pad(i) + '.webp' + V(); }, w:1280, h:856 },
+  port: { hi: function(i){ return 'frames_p/f_'    + pad(i) + '.webp' + V(); },
+          lo: function(i){ return 'frames_lo_p/f_' + pad(i) + '.webp' + V(); }, w: 720, h:1278 },
+
+  clipOrder:  'clips/good-order-clip.mp4',
+  clipReview: 'clips/good-review-clip.mp4',
+  radius: 44
+};
+function pad(i){ return String(i).padStart(4,'0'); }
+function V(){ return '?v=' + CFG.ver; }
+/* 実コマ番号（1..589）→ 置いてあるファイルの番号（1..295）。
+   1コマおきに間引いてあるが、停止点の 447 と 589 はちょうど 224 / 295 に残る */
+function fileOf(real){
+  return Math.max(1, Math.min(CFG.files, Math.ceil(real / CFG.frameStep)));
+}
+
+var HOLDS = CFG.holds;
+var TOTAL = CFG.realFrames;
+HOLDS.forEach(function(h){ TOTAL += h.len; });
+
+/* 仮想コマ v（1始まり）から、実コマ番号と「いまどの停止点にいるか」を求める */
+function resolve(v){
+  var acc = 0;
+  for (var i=0;i<HOLDS.length;i++){
+    var h = HOLDS[i];
+    if (v <= h.at + acc) return {real: Math.max(1, v-acc), hold:null, t:0};
+    if (v <= h.at + acc + h.len){
+      return {real: h.at, hold: h, idx: i, t: (v - (h.at+acc)) / h.len};
+    }
+    acc += h.len;
+  }
+  return {real: Math.min(v-acc, CFG.realFrames), hold:null, t:0};
+}
+/* 停止点の開始・終了を仮想コマ番号で返す（コピー区間を書くときの目安） */
+function holdRange(i){
+  var acc = 0;
+  for (var k=0;k<i;k++) acc += HOLDS[k].len;
+  return [HOLDS[i].at + acc, HOLDS[i].at + acc + HOLDS[i].len];
+}
+
+/* コピーを出す区間（仮想コマ番号）。
+   **開始は停止点より手前に置くこと。** 停止区間に入ってから出すと、
+   章の移動の9割を過ぎてからの出現になり、1枚目→2枚目（7割あたり）と
+   揃いません。下の値は、どの章でも移動の約7割で出そろうように引いてあります */
+var COPY_AT = [
+  [   1, 150],                                  // 店に、いい一日を。（最初から表示）
+  [ 230, 395],                                  // この店が、開発室です。
+  [ holdRange(0)[0]-30, holdRange(0)[1]+73 ],   // 埋もれる一品を、なくす。
+  [ holdRange(1)[0]-40, holdRange(1)[1]-30 ]    // ほめ言葉は外、苦言は内。
+];
+/* **区間どうしを重ねないこと。** 重なったコマでは両方が不透明度1になり、
+   同じ位置に2つの文章が出ます。
+   そのうえで、隙間は広すぎても狭すぎてもいけません。狭いと消えきる前に
+   次が出て重なり、広いと文字のない時間が延びます。どの区間も
+   **無表示が 0.3〜0.4 秒**になるように引いてあります。
+   3枚目の終わりが停止点より後ろ（+73）なのはそのためで、停止点で切ると
+   2.4秒も文字のない時間ができます（停止区間は速く通り抜けるので、
+   コマ数のわりに時間が進むため） */
+/* 出入りにかける時間（秒）。**コマ数で決めないこと。**
+   章によって毎秒進むコマ数が4倍以上違うため、コマ基準にすると
+   速い区間では一瞬で切り替わってカクつき、遅い区間ではだらだら続きます */
+var COPY_FADE_SEC = 0.38;
+
+/* ============================================================
+   準備
+   ============================================================ */
+var canvas = document.getElementById('seq');
+var ctx = canvas.getContext('2d', {alpha:false});
+var track = document.getElementById('track');
+var loadEl = document.getElementById('load');
+var pctEl = document.getElementById('loadPct');
+
+/* ---- 線を引く ----
+   全パスの長さを足し、進み具合ぶんだけ順に引いていく。
+   同時に少しずつ引くと機械的に見えるので、1本ずつ引き切る */
+/* path だけでなく line / polyline / polygon なども拾う。
+   イラレは直線を <line>、折れ線を <polyline> で書き出すため */
+var artPaths = [].slice.call(document.querySelectorAll(
+  '#loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,' +
+  '#loadArt circle,#loadArt ellipse,#loadArt rect'));
+
+/* 線画は横位置の画角で描かれている。縦位置のときは、縦の連番が写している
+   範囲だけを見せて画角を揃える（横位置の x 400〜879 に相当。
+   1コマ目どうしの相関で実測、一致度 0.988） */
+var ART_VB = { land: '0 0 1281.74 856.99', port: '400 0 479 851' };
+function setArtView(){
+  var el = document.getElementById('loadArt');
+  if (el) el.setAttribute('viewBox', ART_VB[portrait ? 'port' : 'land']);
+}
+
+/* 引く順番。
+   何も指定がなければ SVG の記述順です。イラレは**レイヤーパネルの下から順に**
+   書き出すので、そのままだと「一番下のレイヤー」から引かれます。
+   レイヤー名を 01_ 02_ … と数字で始めておけば、重ね順に関係なく
+   **CFG.artOrder に書いた順**で引きます
+   （イラレの書き出しで「オブジェクトID：レイヤー名」を選ぶこと）。
+   一部にしか番号が無いときは、事故を避けるため記述順のままにします */
+(function orderArt(){
+  function num(el){
+    for (var n = el; n && n.nodeType === 1; n = n.parentNode){
+      var m = (n.id || '').match(/\d+/);
+      if (m) return parseInt(m[0], 10);
+    }
+    return null;
+  }
+  var keys = artPaths.map(num);
+  if (!keys.length || keys.some(function(k){ return k === null; })) return;
+  // CFG.artOrder に並べた順。載っていない番号は後ろにまとめる
+  function rank(k){ var i = CFG.artOrder.indexOf(k); return i < 0 ? 99 : i; }
+  var idx = artPaths.map(function(_,i){ return i; });
+  idx.sort(function(a,b){ return rank(keys[a]) - rank(keys[b]) || a - b; });
+  artPaths = idx.map(function(i){ return artPaths[i]; });
+})();
+
+var artLens = artPaths.map(function(p){ return p.getTotalLength(); });
+var artTotal = artLens.reduce(function(a,b){ return a+b; }, 0);
+artPaths.forEach(function(p,i){
+  p.style.strokeDasharray  = artLens[i];
+  p.style.strokeDashoffset = artLens[i];
+  p.style.visibility = 'hidden';
+});
+function drawArt(t){
+  var want = artTotal * t, acc = 0;
+  for (var i=0;i<artPaths.length;i++){
+    var seg = Math.max(0, Math.min(artLens[i], want - acc));
+    /* 線端が丸なので、長さ0でも始点に点が描かれてしまう。
+       まだ引いていない線は隠す（23個ぶんの点が最初から見えるのを防ぐ） */
+    artPaths[i].style.visibility = seg > 0.5 ? 'visible' : 'hidden';
+    artPaths[i].style.strokeDashoffset = (artLens[i] - seg).toFixed(1);
+    acc += artLens[i];
+  }
+}
+var stageEl = document.getElementById('stage');
+var whiteEl = document.getElementById('white');
+var scrimEl = document.getElementById('scrim');
+var skipEl = document.getElementById('skip');
+var progEl = document.getElementById('prog'), progFill = progEl.firstElementChild;
+var hintEl = document.getElementById('scrollHint');
+var copies = [].slice.call(document.querySelectorAll('.copy'));
+var slots = ['vidOrder','vidReview','tint','sheen'].map(function(id){ return document.getElementById(id); });
+var vOrder = document.getElementById('vOrder'), vReview = document.getElementById('vReview');
+
+var DPR = Math.min(devicePixelRatio || 1, 2);
+function isPortrait(){ return innerHeight / innerWidth > 1.15; }  // 明確に縦長のときだけ縦位置素材を使う
+var portrait = isPortrait();
+setArtView();
+var SET = portrait ? CFG.port : CFG.land;
+var curCorners = (portrait ? HOLDS[0].port : HOLDS[0].land);
+
+var imgs = new Array(CFG.files + 1);   // 1始まりで使う。添字はファイル番号
+var low  = new Array(CFG.files + 1);
+var loLoaded = 0, hiLoaded = 0, ready = false;
+
+/* ---- 動画は縦横で共通。読み込みは表示の直前でよい ---- */
+vOrder.src  = CFG.clipOrder  + V();
+vReview.src = CFG.clipReview + V();
+
+/* ============================================================
+   ホモグラフィ（矩形 → 画面の四隅）
+   ============================================================ */
+function homography(dst){
+  var W = 390, H = 844;
+  var src = [[0,0],[W,0],[W,H],[0,H]];
+  var A = [], b = [];
+  for (var i=0;i<4;i++){
+    var sx=src[i][0], sy=src[i][1], dx=dst[i][0], dy=dst[i][1];
+    A.push([sx,sy,1,0,0,0,-sx*dx,-sy*dx]); b.push(dx);
+    A.push([0,0,0,sx,sy,1,-sx*dy,-sy*dy]); b.push(dy);
+  }
+  for (var c=0;c<8;c++){
+    var piv=c;
+    for (var r=c+1;r<8;r++) if (Math.abs(A[r][c])>Math.abs(A[piv][c])) piv=r;
+    var t=A[c];A[c]=A[piv];A[piv]=t; var tb=b[c];b[c]=b[piv];b[piv]=tb;
+    for (var r2=0;r2<8;r2++){
+      if(r2===c) continue;
+      var f=A[r2][c]/A[c][c];
+      for (var c2=c;c2<8;c2++) A[r2][c2]-=f*A[c][c2];
+      b[r2]-=f*b[c];
+    }
+  }
+  var h=[]; for(var k=0;k<8;k++) h.push(b[k]/A[k][k]); h.push(1);
+  return h;
+}
+
+/* ---- 素材の座標 → 画面の座標（cover表示に合わせる） ---- */
+var fit = {s:1, ox:0, oy:0};
+function computeFit(){
+  var cw = innerWidth, ch = innerHeight;
+  var s = Math.max(cw/SET.w, ch/SET.h);
+  fit.s = s;
+  fit.ox = (cw - SET.w*s)/2;
+  fit.oy = (ch - SET.h*s)/2;
+}
+function applyScreenTransform(){
+  var d = curCorners.map(function(p){
+    return [p[0]*fit.s + fit.ox, p[1]*fit.s + fit.oy];
+  });
+  var h = homography(d);
+  var m = 'matrix3d(' + [h[0],h[3],0,h[6], h[1],h[4],0,h[7], 0,0,1,0, h[2],h[5],0,1].join(',') + ')';
+  slots.forEach(function(el){
+    el.style.transform = m;
+    el.style.borderRadius = CFG.radius + 'px';
+  });
+}
+
+/* ============================================================
+   描画
+   ============================================================ */
+function resize(){
+  canvas.width  = Math.round(innerWidth*DPR);
+  canvas.height = Math.round(innerHeight*DPR);
+  canvas.style.width = innerWidth+'px';
+  canvas.style.height = innerHeight+'px';
+  computeFit();
+  applyScreenTransform();
+  shown = -1;
+}
+
+/* 低解像度は縦横それぞれ用意してあるので、どちらの向きでも使える。
+   高解像度 → 同じコマの低解像度 → ひとつ前のコマ、の順に落とす */
+var drawnIdx = 0, drawnExact = false, drawnHi = false;
+function usable(im){ return im && im.complete && im.naturalWidth; }
+function pick(i){
+  if (usable(imgs[i])){ drawnIdx=i; drawnExact=true; drawnHi=true;  return imgs[i]; }
+  if (usable(low[i])) { drawnIdx=i; drawnExact=true; drawnHi=false; return low[i];  }
+  for (var k=i-1;k>=1;k--){
+    if (usable(imgs[k])){ drawnIdx=k; drawnExact=false; drawnHi=true;  return imgs[k]; }
+    if (usable(low[k])) { drawnIdx=k; drawnExact=false; drawnHi=false; return low[k];  }
+  }
+  return null;
+}
+function draw(i){
+  var im = pick(i);
+  if (!im) return;
+  var cw = canvas.width, ch = canvas.height;
+  var s = Math.max(cw/im.naturalWidth, ch/im.naturalHeight);
+  var w = im.naturalWidth*s, h = im.naturalHeight*s;
+  ctx.drawImage(im, (cw-w)/2, (ch-h)/2, w, h);
+}
+
+/* ============================================================
+   読み込み
+   ============================================================ */
+/* 同時4本だと1枚ごとの往復が積み上がって効かない（実測 295枚で約7秒）。
+   HTTP/2 は1本の接続に多重化されるので、8本まで開いても接続は埋まらない */
+var queue = [], active = 0, MAXC = 8;
+var curFile = 1;                       // いま描いているファイル番号。読み込みの優先順位に使う
+
+/* 先読みで取る低解像度のファイル番号。
+   全編を1枚ずつ取ると295往復かかり、バイト数のわりに時間を食う
+   （実測で2.2MBに3.9秒。遅いのは容量ではなく往復の回数）。
+   4枚に1枚だけ取れば74往復で済む。欠けたところは直前のコマを出すが、
+   元が12fpsなので最大3枚ぶん＝映像0.25秒の差でしかなく、見分けがつかない。
+   ただし停止点のコマだけは別。ここはUIを重ねる位置なので、
+   別のコマが出ているとはめ込みがずれて見える */
+function lowList(){
+  var set = {}, out = [];
+  for (var i=1;i<=CFG.files;i+=CFG.loStep) set[i] = 1;
+  set[CFG.files] = 1;
+  HOLDS.forEach(function(h){ set[fileOf(h.at)] = 1; });
+  for (var k in set) out.push(+k);
+  return out.sort(function(a,b){ return a-b; });
+}
+var LOW_LIST = null;
+
+function enqueue(){
+  LOW_LIST = lowList();
+  LOW_LIST.forEach(function(i){ queue.push({i:i, hi:false}); });
+  for (var j=1;j<=CFG.files;j++) queue.push({i:j, hi:true});
+  pump();
+}
+
+/* ローディング画面を閉じてよいか。
+   「全編が低解像度で揃っている」ことと「冒頭が高解像度で揃っている」ことの両方を見る。
+   前者だけだと、粗い絵のまま操作できてしまう */
+function loadProgress(){
+  var a = Math.min(1, loLoaded / (LOW_LIST ? LOW_LIST.length : CFG.files));
+  var b = Math.min(1, hiLoaded / CFG.headHi);
+  return a*0.45 + b*0.55;
+}
+
+function pump(){
+  while (active < MAXC && queue.length){
+    // いま見ているコマに近いものから読む。低解像度を優先
+    var bi=0, bd=Infinity;
+    for (var k=0;k<queue.length;k++){
+      var d = Math.abs(queue[k].i - curFile) + (queue[k].hi ? 100000 : 0);
+      if (d < bd){ bd = d; bi = k; }
+    }
+    var job = queue.splice(bi,1)[0];
+    active++;
+    (function(job){
+      var im = new Image(); im.decoding = 'async';
+      im.onload = im.onerror = function(){
+        active--;
+        if (job.hi) hiLoaded++; else loLoaded++;
+        if (job.hi && job.i === shown) shown = -1;   // 高解像度が来たら描き直す
+        pump();
+      };
+      im.src = job.hi ? SET.hi(job.i) : SET.lo(job.i);
+      (job.hi ? imgs : low)[job.i] = im;
+    })(job);
+  }
+}
+
+/* 線を引く速さの上限（秒）。キャッシュ済みで一瞬で終わる場合でも、
+   引き切るまでにこれだけかける。読み込みが遅いときは進み具合のほうが遅いので、
+   線もそれに従う。**引き切ってから始める**ので、線の途中で切り替わることはない */
+var LOAD_DRAW_SEC = 1.6;
+var LOAD_HOLD_MS = 420;   // 引き終わった絵を見せる間
+var artT = 0, loadFloor = 0, lastLoad = 0;
+function loadTick(now){
+  var dt = Math.min((now - lastLoad)/1000, 0.05); lastLoad = now;
+  var want = Math.max(loadProgress(), loadFloor);
+  artT = Math.min(want, artT + dt / LOAD_DRAW_SEC);
+  drawArt(artT);
+  pctEl.textContent = Math.round(artT*100);
+  if (artT >= 1){ start(); return; }
+  requestAnimationFrame(loadTick);
+}
+
+function loadAll(){
+  lastLoad = performance.now();
+  requestAnimationFrame(loadTick);
+  enqueue();
+  // 動画は停止点まで要らない。画像と並行して取り、間に合わなければHTMLのUIに切り替える
+  [vOrder, vReview].forEach(function(v){
+    v.addEventListener('loadeddata', function(){ tryPlay(v); }, {once:true});
+    v.load();
+    setTimeout(function(){
+      if (v.readyState < 2){
+        v.parentNode.classList.add('usefb');
+        console.warn('動画を読み込めないため、HTMLのUIに切り替えました:', v.currentSrc || v.src);
+      }
+    }, 6000);
+  });
+  // 回線が細いときにローディングで足止めしない。
+  // 打ち切っても線は同じ速さで引き切ってから始める
+  setTimeout(function(){
+    if (!ready){
+      console.warn('読み込みが ' + CFG.maxWait + 'ms で揃わないため、先に始めます');
+      loadFloor = 1;
+    }
+  }, CFG.maxWait);
+}
+function start(){
+  ready = true;
+  console.log('読み込み完了まで ' + Math.round(performance.now()) + 'ms' +
+              '（先読み ' + loLoaded + ' / 高解像度 ' + hiLoaded + '）');
+  resize();   // 裏で1コマ目を描いておく。明けたときに線画とそのまま入れ替わる
+  // 引き終わった絵を一拍見せてから明ける。すぐ消すと完成した絵が目に入らない
+  setTimeout(function(){
+    loadEl.style.opacity = 0;
+    startMarkPlay();   // ロゴの遊びはここから
+    setTimeout(function(){ loadEl.style.display='none'; }, 720);
+  }, LOAD_HOLD_MS);
+  window.__ready = true;
+}
+
+/* ============================================================
+   スクロール → コマ番号
+   ============================================================ */
+var target = 1, cur = 1, shown = -1, prog = 0;
+function readScroll(){
+  var max = track.offsetHeight - innerHeight;
+  prog = max>0 ? Math.min(1, Math.max(0, scrollY/max)) : 0;
+  target = expand(SCROLL_BASE + prog*SCROLL_SPAN, SCROLL_RATE);
+}
+addEventListener('scroll', function(){
+  readScroll();
+  syncChrome();
+  if (!SNAP) return;
+  if (tweening) return;
+  var n = nearestChapter();
+  if (n !== chapIdx){ chapIdx = n; markDots(); }
+  else lockScroll(inHero());
+}, {passive:true});
+var resizeTimer = null;
+addEventListener('resize', function(){
+  DPR = Math.min(devicePixelRatio||1, 2);
+  var p = isPortrait();
+  if (p !== portrait){
+    portrait = p;
+    setArtView();
+    SET = portrait ? CFG.port : CFG.land;
+    // 向きが変わると素材そのものが変わるので、読み込み直す。
+    // これをしないと、古い向きの絵に新しい向きの座標を当てることになりズレる
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(reloadForOrientation, 200);
+  }
+  resize(); readScroll();
+  applySnapMode();
+});
+function reloadForOrientation(){
+  queue.length = 0;
+  imgs = new Array(CFG.files + 1);
+  low  = new Array(CFG.files + 1);
+  loLoaded = 0; hiLoaded = 0; shown = -1;
+  var r = resolve(Math.round(cur));
+  curCorners = r.hold ? (portrait ? r.hold.port : r.hold.land)
+                      : (portrait ? HOLDS[0].port : HOLDS[0].land);
+  applyScreenTransform();
+  enqueue();
+}
+
+/* ============================================================
+   区間ごとの演出
+   ============================================================ */
+function seg01(v, a, b){ return Math.min(1, Math.max(0, (v-a)/(b-a))); }
+
+var copyOpa = copies.map(function(){ return 0; });
+function updateOverlays(f, dt){
+  var r = resolve(f);
+  var h = r.hold;
+
+  /* 停止のあいだは絵が止まる。スクロールしても無反応に見えないよう、
+     ごくゆっくり寄る。sin なので両端で 1.0 に戻り、前後の映像と継ぎ目が出ない。
+     canvas と はめ込み は同じ #stage の中なので、一緒に拡縮されてズレない。
+     編集モードでは掛けない（緑の丸は #stage の外にあり、ズレるため） */
+  /* **スマホでは掛けない。** 章送りは停止区間を数%の時間で駆け抜けるので、
+     着地際に拡大が一瞬で入り、かえってカクついて見える。
+     そもそも「スクロールしても動かない」はPCの自由スクロール固有の問題 */
+  var zoom = (h && !EDIT && !SNAP) ? Math.sin(r.t * Math.PI) * 0.045 : 0;
+  stageEl.style.transform = zoom > 0.0005 ? 'scale(' + (1 + zoom).toFixed(4) + ')' : '';
+
+  // 停止点に入ったら、その点の四隅に切り替える
+  if (h){
+    var want = portrait ? h.port : h.land;
+    if (want !== curCorners){ curCorners = want; applyScreenTransform(); }
+  }
+
+  // コピー。区間に入っているかで行き先を決め、そこへ一定の速さで寄せる
+  var step = dt / COPY_FADE_SEC;
+  copies.forEach(function(c,i){
+    var rr = COPY_AT[i];
+    var want = (f >= rr[0] && f <= rr[1]) ? 1 : 0;
+    var o = copyOpa[i];
+    o = want > o ? Math.min(want, o + step) : Math.max(want, o - step);
+    copyOpa[i] = o;
+    c.style.opacity = o.toFixed(3);
+    c.style.setProperty('--dy', ((1-o)*22).toFixed(1)+'px');
+  });
+
+  // 白フェード：同じコマで止まる停止点どうしの切り替えにだけ使う
+  var w = 0;
+  for (var i=0;i<HOLDS.length-1;i++){
+    if (HOLDS[i].at !== HOLDS[i+1].at) continue;
+    var end = holdRange(i)[1], half = CFG.fadeLen/2;
+    if (f > end-half && f < end+half){
+      w = Math.sin(((f-(end-half))/CFG.fadeLen)*Math.PI);
+    }
+  }
+  whiteEl.style.opacity = (w*0.92).toFixed(3);
+
+  // 端末UI
+  var showOrder  = !!h && h.ui === 'order'  && w < 0.5;
+  var showReview = !!h && h.ui === 'review' && w < 0.5;
+  document.getElementById('vidOrder').classList.toggle('on', showOrder);
+  document.getElementById('vidReview').classList.toggle('on', showReview);
+  document.getElementById('tint').classList.toggle('on', showOrder || showReview);
+  document.getElementById('sheen').classList.toggle('on', showOrder || showReview);
+  playIf(vOrder, showOrder);
+  playIf(vReview, showReview);
+
+  scrimEl.style.opacity = h ? (portrait ? 0.85 : 0.45) : 1;
+  skipEl.style.opacity = prog > 0.96 ? 0 : 1;
+  // 右側のスクロール位置。映像を抜けたら引っ込める
+  progFill.style.height = (prog*100).toFixed(2) + '%';
+  progEl.style.opacity = prog > 0.995 ? 0 : 1;
+  // スマホは送りボタンで進むので案内は出さない
+  hintEl.style.opacity = SNAP ? 0 : (prog > 0.03 ? 0 : 1);
+}
+/* 一時停止と再生を繰り返すと自動再生の制限に当たりやすい。
+   軽い動画なので、読み込めたら止めずに回し続ける */
+function tryPlay(v){
+  if (!v || !v.paused) return;
+  var pr = v.play();
+  if (pr && pr.catch) pr.catch(function(){});
+}
+function playIf(v, on){ if (on) tryPlay(v); }
+
+/* 自動再生が拒否された場合に備え、最初の操作で解除する */
+(function unlock(){
+  var done = false;
+  function go(){
+    if (done) return;
+    done = true;
+    tryPlay(vOrder); tryPlay(vReview);
+    ['pointerdown','touchstart','keydown','scroll','wheel'].forEach(function(ev){
+      window.removeEventListener(ev, go);
+    });
+  }
+  ['pointerdown','touchstart','keydown','scroll','wheel'].forEach(function(ev){
+    window.addEventListener(ev, go, {passive:true});
+  });
+  setInterval(function(){ tryPlay(vOrder); tryPlay(vReview); }, 1500);
+})();
+
+/* ============================================================
+   ループ
+   ============================================================ */
+/* ============================================================
+   四隅の調整モード  …  URLに ?edit を付けると有効
+   緑の丸をドラッグして合わせ、出てきた座標を CFG.holds に貼る
+   ============================================================ */
+console.log('%cUTUTU scroll sequence  build 2026-08-18-p','color:#00E5A0;font-weight:bold');
+console.log('編集モード: URLに ?edit=1 を付けるか、Eキーを押してください');
+
+var EDIT = /[?&]edit/.test(location.search) || /edit/.test(location.hash);
+var editReady = false;
+window.addEventListener('keydown', function(e){
+  if (e.key === 'e' || e.key === 'E'){ EDIT = !EDIT; setupEdit(); }
+});
+function setupEdit(){
+  if (editUI){ editUI.style.display = EDIT ? 'block' : 'none'; }
+  hsAll.forEach(function(h){ h.style.display = EDIT ? 'block' : 'none'; });
+  if (EDIT && !editReady) buildEdit();
+}
+var editUI = null, hsAll = [];
+function buildEdit(){
+  editReady = true;
+  var box = document.createElement('div');
+  editUI = box;
+  box.style.cssText = 'position:fixed;z-index:30;left:14px;top:14px;background:rgba(16,18,22,.92);'+
+    'color:#EDEFF2;font:11px/1.8 ui-monospace,Menlo,monospace;padding:12px 14px;border-radius:10px;'+
+    'border:1px solid rgba(255,255,255,.16);white-space:pre;user-select:all;max-width:60vw';
+  document.body.appendChild(box);
+  var hs = [];
+  for (var hi=0; hi<4; hi++){
+    (function(hi){
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;z-index:31;width:34px;height:34px;margin:-17px 0 0 -17px;'+
+        'border-radius:50%;border:3px solid #00E5A0;background:rgba(0,229,160,.25);cursor:grab;'+
+        'touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 0 18px rgba(0,229,160,.6)';
+      document.body.appendChild(d);
+      var drag = false;
+      d.addEventListener('pointerdown', function(e){ drag=true; d.setPointerCapture(e.pointerId); e.preventDefault(); });
+      d.addEventListener('pointermove', function(e){
+        if (!drag) return;
+        curCorners[hi][0] = Math.round((e.clientX - fit.ox)/fit.s);
+        curCorners[hi][1] = Math.round((e.clientY - fit.oy)/fit.s);
+        applyScreenTransform();
+      });
+      d.addEventListener('pointerup', function(){ drag=false; });
+      hs.push(d); hsAll.push(d);
+    })(hi);
+  }
+  setInterval(function(){
+    for (var i=0;i<4;i++){
+      var sx = curCorners[i][0]*fit.s + fit.ox;
+      var sy = curCorners[i][1]*fit.s + fit.oy;
+      var cx = Math.max(20, Math.min(innerWidth-20, sx));
+      var cy = Math.max(20, Math.min(innerHeight-20, sy));
+      var off = (cx !== sx || cy !== sy);
+      hs[i].style.left = cx + 'px';
+      hs[i].style.top  = cy + 'px';
+      // 画面外にはみ出しているときは色を変えて知らせる（掴んで戻せる）
+      hs[i].style.borderColor = off ? '#FF9F43' : '#00E5A0';
+      hs[i].style.background  = off ? 'rgba(255,159,67,.3)' : 'rgba(0,229,160,.25)';
+    }
+    var names = ['左上','右上','右下','左下'];
+    if (!EDIT) return;
+    var want = fileOf(resolve(Math.round(cur)).real);
+    var ok = drawnExact && drawnHi && drawnIdx === want;
+    box.innerHTML = '● EDIT MODE　（Eキーで切替）<br><br>' +
+      '<span style="color:' + (ok ? '#00E5A0' : '#FF9F43') + '">' +
+      (ok ? '表示中 f_' + String(want).padStart(4,'0') + '　高解像度'
+          : '⚠ 目標 f_' + String(want).padStart(4,'0') + ' / 実表示 f_' + String(drawnIdx).padStart(4,'0') +
+            (drawnExact && !drawnHi ? '（低解像度）' : '') +
+            '<br>　読み込み待ちです。完了してから合わせてください') +
+      '</span><br><br>' +
+      (portrait ? 'port' : 'land') + ': [<br>' +
+      curCorners.map(function(c,i){ return '　['+c[0]+','+c[1]+']'+(i<3?',':'')+'　// '+names[i]; }).join('<br>') +
+      '<br>]<br>画面 ' + innerWidth + ' × ' + innerHeight +
+      '<br>読み込み 低 ' + loLoaded + '/' + (LOW_LIST?LOW_LIST.length:'-') + '　高 ' + hiLoaded + '/' + CFG.files +
+      '<br>※ファイルは1コマおき（' + CFG.files + '枚）。実コマ ' + CFG.realFrames + ' に対応';
+  }, 120);
+}
+setupEdit();
+
+/* ============================================================
+   スマホの章送り
+   スクロール量が読めないと不安なので、1スワイプ／1タップで
+   次の停止点まで自動で移動する。PCは自由スクラブのまま
+   ============================================================ */
+var SNAP = false, chapters = [], chapIdx = 0, tweening = false;
+var dotsEl = document.getElementById('dots');
+var nextBtn = document.getElementById('nextBtn');
+
+function heroMax(){ return Math.max(1, track.offsetHeight - innerHeight); }
+function frameToY(f){ return (compress(f, SCROLL_RATE) - SCROLL_BASE) / SCROLL_SPAN * heroMax(); }
+
+/* 章から章への移動にかける時間（ミリ秒）。
+   [0→1, 1→2, 2→3] の順。景色が大きく変わる区間ほど長くする */
+/* 素材は1コマおき（12fps）なので、移動が遅いほどコマ送りに見える。
+   4200msでは毎秒18枚しか出ず、そこがカクつきの正体だった。
+   半分にすると35枚/秒前後になり滑らかになる */
+var CHAPTER_DUR = [1300, 1700, 2100];
+var AFTER_DUR = 650;                     // 最後のNEXTで下のセクションへ送る時間
+
+/* 停止区間は絵が止まっている。ここに素のスクロール量を割り当てると、
+   **スクロールしても何も起きない区間**ができる（PCで実測 578px×2＝全体の43%）。
+   そこで「停止区間を詰めた座標系」を用意し、スクロールとコマの対応そのものを
+   これで結ぶ。rate は停止区間の1コマを通常の何コマ分として数えるか。
+
+   SCROLL_RATE … スクロール↔コマ。詰めすぎると停止点を一瞬で通り過ぎるので中庸に
+   TWEEN_RATE  … 章送りの補間。押した瞬間に絵が動き出すよう、より強く詰める */
+var SCROLL_RATE = 0.3;
+var TWEEN_RATE  = 0.05;
+
+function compress(v, rate){
+  var acc = 0, out = 0, prev = 0;
+  for (var i=0;i<HOLDS.length;i++){
+    var s0 = HOLDS[i].at + acc, e0 = s0 + HOLDS[i].len;
+    if (v <= s0) return out + (v - prev);
+    out += (s0 - prev);
+    if (v <= e0) return out + (v - s0)*rate;
+    out += HOLDS[i].len*rate;
+    prev = e0; acc += HOLDS[i].len;
+  }
+  return out + (v - prev);
+}
+function expand(x, rate){
+  var acc = 0, out = 0, prev = 0;
+  for (var i=0;i<HOLDS.length;i++){
+    var s0 = HOLDS[i].at + acc, e0 = s0 + HOLDS[i].len;
+    if (x <= out + (s0 - prev)) return prev + (x - out);
+    out += (s0 - prev);
+    if (x <= out + HOLDS[i].len*rate) return s0 + (x - out)/rate;
+    out += HOLDS[i].len*rate;
+    prev = e0; acc += HOLDS[i].len;
+  }
+  return prev + (x - out);
+}
+var SCROLL_BASE = compress(1, SCROLL_RATE);
+var SCROLL_SPAN = compress(TOTAL, SCROLL_RATE) - SCROLL_BASE;
+/* スクロール位置 ↔ 仮想コマ。互いに逆関数であること */
+function yToFrame(y){ return expand(SCROLL_BASE + (y/heroMax())*SCROLL_SPAN, SCROLL_RATE); }
+
+/* **章はピクセルではなくコマ番号で持つこと。**
+   iOSはURLバーの出入りで innerHeight が変わり heroMax が縮む。ピクセルで
+   覚えておくと、縮んだあとは同じ座標が別のコマを指し、最後の章に至っては
+   heroMax を超えて到達不能になる（映像が途中で止まる）。
+   コマで持てば、必要になった時点で chapY() が現在の heroMax で換算する */
+function chapY(i){ return frameToY(chapters[i]); }
+function buildChapters(){
+  var o = holdRange(0), r = holdRange(1);
+  chapters = [
+    1,                                   // 冒頭
+    330,                                 // 入店
+    (o[0]+o[1])/2,                       // GOOD ORDER
+    (r[0]+r[1])/2                        // GOOD REVIEW
+  ];
+  dotsEl.innerHTML = '';
+  chapters.forEach(function(_,i){
+    var b = document.createElement('button');
+    b.innerHTML = '<i></i>';
+    b.addEventListener('click', function(){ gotoChapter(i); });
+    dotsEl.appendChild(b);
+  });
+}
+function nearestChapter(){
+  var y = scrollY, best = 0, bd = Infinity;
+  chapters.forEach(function(_,i){
+    var d = Math.abs(chapY(i) - y);
+    if (d < bd){ bd = d; best = i; }
+  });
+  return best;
+}
+function markDots(){
+  var kids = dotsEl.children;
+  for (var i=0;i<kids.length;i++) kids[i].classList.toggle('on', i === chapIdx);
+  var first = chapIdx <= 0;
+  var back = document.getElementById('backBtn');
+  back.style.opacity = first ? 0 : 1;
+  back.style.pointerEvents = first ? 'none' : 'auto';
+  if (SNAP) lockScroll(inHero());
+}
+/* 等速。行きも戻りも同じ速さで動かす。
+   イーズアウトを入れると、着地の直前に数コマだけ動く尾が残って気になる */
+function easeMove(t){ return t; }
+
+var tweenToken = 0;
+function gotoChapter(i){
+  i = Math.max(0, Math.min(chapters.length-1, i));
+  var prev = chapIdx;
+  if (i === prev && !tweening) return;
+  chapIdx = i; markDots();
+
+  var from = scrollY, to = chapY(i);
+  if (Math.abs(to-from) < 2){ tweening = false; return; }
+
+  /* 停止区間を詰めた“見た目の距離”で補間する。ここが実際に絵の変わる量。
+     行き先はコマから直に取る（ピクセルへ往復させると誤差が乗る） */
+  var vFrom = compress(yToFrame(from), TWEEN_RATE), vTo = compress(chapters[i], TWEEN_RATE);
+
+  // 移動する区間ごとに時間を決める（進む向き・戻る向きで同じ）
+  var lo  = Math.min(prev, i);
+  var seg = Math.max(0, Math.min(CHAPTER_DUR.length-1, lo));
+  var dur = CHAPTER_DUR[seg] || 2400;
+  // 途中から引き返す場合は、残りの距離に応じて短くする
+  var hi   = Math.min(chapters.length-1, lo+1);
+  var full = Math.abs(compress(chapters[hi], TWEEN_RATE) - compress(chapters[lo], TWEEN_RATE)) || 1;
+  dur = Math.max(600, dur * Math.min(1, Math.abs(vTo-vFrom)/full));
+
+  var my = ++tweenToken;                 // 新しい操作が来たら古い移動は捨てる
+  var t0 = performance.now();
+  tweening = true;
+  lockScroll(false);
+  (function step(now){
+    if (my !== tweenToken) return;       // 割り込まれた
+    var t = Math.min(1, (now-t0)/dur);
+    window.scrollTo(0, frameToY(expand(vFrom + (vTo-vFrom)*easeMove(t), TWEEN_RATE)));
+    readScroll();
+    if (t < 1) requestAnimationFrame(step);
+    else { tweening = false; markDots(); }
+  })(performance.now());
+}
+
+/* 最後のNEXTは、映像を抜けて下のセクションまで送る */
+function gotoAfter(){
+  var from = scrollY;
+  var to = Math.round(document.getElementById('after').getBoundingClientRect().top + scrollY);
+  if (to - from < 2) return;
+  var my = ++tweenToken, t0 = performance.now();
+  tweening = true;
+  lockScroll(false);
+  (function step(now){
+    if (my !== tweenToken) return;
+    var t = Math.min(1, (now-t0)/AFTER_DUR);
+    window.scrollTo(0, from + (to-from)*easeMove(t));
+    readScroll();
+    if (t < 1) requestAnimationFrame(step);
+    else { tweening = false; markDots(); }
+  })(performance.now());
+}
+
+function inHero(){ return scrollY < heroMax() - 2; }
+/* 映像区間にいるかどうかで、標準のスクロールバーと送りUIの出し入れを決める */
+function syncChrome(){
+  var v = inHero();
+  document.documentElement.classList.toggle('hide-sb', v);
+  document.body.classList.toggle('past-hero', !v);
+}
+/* スマホでは指のスクロールを完全に止め、ボタン操作だけにする */
+function lockScroll(on){
+  document.documentElement.style.overflow = on ? 'hidden' : '';
+  document.body.style.overflow = on ? 'hidden' : '';
+}
+function applySnapMode(){
+  SNAP = isPortrait();
+  document.body.classList.toggle('snap', SNAP);
+  if (SNAP){ buildChapters(); chapIdx = nearestChapter(); markDots(); }
+  syncChrome();
+  lockScroll(SNAP && inHero());
+}
+
+/* ============================================================
+   ロゴの遊び
+   2つの動きを交互に、たまに。UTUTU は回文で、1文字84・字送り110の等間隔。
+   ・すべる … 位置を入れ替える（U3つが順ぐり、T2つが交換）。**語は UTUTU のまま**
+   ・裏返す … 位置は変えず、左から1文字ずつ左右反転。どの文字も左右対称なので形は同じ
+   どちらも終わった状態が正しい並びなので、何度くり返しても崩れません
+   ============================================================ */
+var MARK = {
+  base:     [0,248,496,744,992],   // 正式ロゴの字送り
+  slideMap: [2,3,4,1,0],   // 位置pにいる文字の行き先
+  slideDur: 2800,          // ゆっくり見せる
+  flipDur:  1250,
+  flipGap:   210,          // 1文字ずつずらす間隔
+  pivot:      76,          // 1文字の中心（幅152の半分）。裏返す軸
+  first:    5000,          // 明けてから最初に動くまで
+  every:   15000,          // 次に動くまで
+  ease: 'cubic-bezier(.42,.02,.32,1)'
+};
+var markLetters = null, markTurn = 0;
+
+function markPivot(x,s){
+  return 'translateX('+x+'px) scaleX('+s+') translateX('+(-x)+'px)';
+}
+function markSlide(){
+  markLetters.forEach(function(L){
+    var to = MARK.slideMap[L.at];
+    if (to === L.at) return;
+    L.pos.animate([
+      {transform:'translateX('+MARK.base[L.at]+'px)'},
+      {transform:'translateX('+MARK.base[to]+'px)'}
+    ], {duration:MARK.slideDur, easing:MARK.ease, fill:'forwards'});
+    L.at = to;
+  });
+}
+function markFlip(){
+  markLetters.forEach(function(L,i){
+    var a = L.sx, b = -a;
+    L.flip.animate([
+      {transform:markPivot(MARK.pivot,a)},{transform:markPivot(MARK.pivot,0)},{transform:markPivot(MARK.pivot,b)}
+    ], {duration:MARK.flipDur, delay:i*MARK.flipGap, easing:MARK.ease, fill:'forwards'});
+    L.sx = b;
+  });
+}
+function startMarkPlay(){
+  if (markLetters) return;
+  var wrap = document.querySelector('#brand svg > g');
+  if (!wrap) return;
+  markLetters = [].slice.call(wrap.children).map(function(g,i){
+    g.style.transform = 'translateX(' + MARK.base[i] + 'px)';
+    return { pos:g, flip:g.firstElementChild, at:i, sx:1 };
+  });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  (function next(wait){
+    setTimeout(function(){
+      if (!document.hidden){ (markTurn++ % 2 === 0) ? markSlide() : markFlip(); }
+      next(MARK.every);
+    }, wait);
+  })(MARK.first);
+}
+
+/* ロゴを押したら先頭へ。スマホは1つ目の章と同じ動き、PCも同じ速さで戻す */
+function gotoTop(){
+  if (SNAP && chapters.length){ gotoChapter(0); return; }
+  var from = scrollY;
+  if (from < 2) return;
+  var dur = Math.max(700, CHAPTER_DUR[0] * Math.min(1, from / heroMax()));
+  var my = ++tweenToken, t0 = performance.now();
+  tweening = true;
+  (function step(now){
+    if (my !== tweenToken) return;
+    var t = Math.min(1, (now - t0) / dur);
+    window.scrollTo(0, Math.round(from * (1 - easeMove(t))));
+    readScroll();
+    if (t < 1) requestAnimationFrame(step);
+    else { tweening = false; markDots(); }
+  })(performance.now());
+}
+document.getElementById('brand').addEventListener('click', gotoTop);
+
+nextBtn.addEventListener('click', function(){
+  if (chapIdx >= chapters.length-1) gotoAfter();   // 最後は下のセクションへ
+  else gotoChapter(chapIdx+1);
+});
+document.getElementById('backBtn').addEventListener('click', function(){ gotoChapter(chapIdx-1); });
+
+/* ---- 映像区間では指の操作を受け付けない（ボタン操作のみ） ---- */
+addEventListener('touchmove', function(e){
+  if (SNAP && inHero() && !document.body.classList.contains('menu-open')) e.preventDefault();
+}, {passive:false});
+
+/* ============================================================
+   紙のセクション
+   語彙は2つだけ。「静かに現れる」（.rv → .in）と「線が引かれる」（.fig）。
+   図解のSVGはイラレ書き出しに差し替える前提で、規則はローディングの線画と同じ：
+   fill無しのストローク＝線として順に引く／文字と塗り＝あとから現れる。
+   <g data-dim> に入れた一群は、引き終わったあと18%に沈む
+   ============================================================ */
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var rvs = [].slice.call(document.querySelectorAll('.rv'));
+  if (!reduce && 'IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:.2, rootMargin:'0px 0px -6% 0px'});
+    rvs.forEach(function(el){ io.observe(el); });
+  } else {
+    rvs.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  function prepFig(fig){
+    return [].slice.call(fig.querySelectorAll('svg')).map(function(svg){
+      var strokes = [], marks = [];
+      [].slice.call(svg.querySelectorAll('path,line,polyline,polygon,circle,ellipse,rect,text'))
+        .forEach(function(el){
+          var cs = getComputedStyle(el);
+          if (el.tagName !== 'text' && cs.fill === 'none' && cs.stroke !== 'none') strokes.push(el);
+          else marks.push(el);
+        });
+      strokes.forEach(function(el){
+        var L = el.getTotalLength();
+        el.dataset.len = L;
+        el.style.strokeDasharray = L;
+        el.style.strokeDashoffset = L;
+        el.style.visibility = 'hidden';   // 線端が丸だと、長さ0でも始点に点が出る
+      });
+      marks.forEach(function(el){ el.style.opacity = 0; });
+      return {svg:svg, strokes:strokes, marks:marks};
+    });
+  }
+  function playFig(items){
+    items.forEach(function(it){
+      var total = 0;
+      it.strokes.forEach(function(el){ total += +el.dataset.len; });
+      var DUR = 2400, acc = 0;
+      it.strokes.forEach(function(el){
+        var L = +el.dataset.len;
+        var delay = DUR*acc/total, d = Math.max(120, DUR*L/total);
+        acc += L;
+        setTimeout(function(){ el.style.visibility = 'visible'; }, delay);
+        el.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+          {duration:d, delay:delay, easing:'linear', fill:'forwards'});
+      });
+      it.marks.forEach(function(el,i){
+        el.animate([{opacity:0, transform:'translateY(6px)'},{opacity:1, transform:'none'}],
+          {duration:600, delay:DUR*0.62 + i*90, easing:'cubic-bezier(.4,0,.25,1)', fill:'forwards'});
+      });
+      [].slice.call(it.svg.querySelectorAll('g[data-dim]')).forEach(function(g){
+        g.animate([{opacity:1},{opacity:.18}],
+          {duration:800, delay:DUR+250, easing:'ease-out', fill:'forwards'});
+      });
+    });
+  }
+  /* data-ink の節が画面の中ほどに来たら、#after 全体を墨に反転する */
+  var afterEl = document.getElementById('after');
+  var inkZones = [].slice.call(document.querySelectorAll('[data-ink]'));
+  var inkOn = false;
+  function inkSync(){
+    var on = inkZones.some(function(z){
+      var r = z.getBoundingClientRect();
+      return r.top < innerHeight*.62 && r.bottom > innerHeight*.30;
+    });
+    if (on !== inkOn){ inkOn = on; afterEl.classList.toggle('inked', on); }
+  }
+  addEventListener('scroll', inkSync, {passive:true});
+  addEventListener('resize', inkSync);
+  inkSync();
+
+  /* 帯の速さを画素/秒で揃える。img に width/height が付いているので、
+     読み込み前でも組の幅は確定している */
+  function bandSpeed(){
+    [].slice.call(document.querySelectorAll('.band-row')).forEach(function(r){
+      var set = r.querySelector('.set');
+      if (!set) return;
+      var w = set.getBoundingClientRect().width;
+      if (w < 50) return;
+      var pps = r.classList.contains('rev') ? 50 : 62;   // 上段をわずかに速く
+      r.style.animationDuration = (w / pps).toFixed(1) + 's';
+    });
+  }
+  bandSpeed();
+  addEventListener('resize', bandSpeed);
+
+  /* ローポリ頭のビューア。three.js（733KB・gzipで約180KB）は
+     Founders が近づいたときだけ動的に読み込む。KVの速度には影響させない。
+     読み込みや WebGL に失敗したら、破線の丸のまま何もしない */
+  (function(){
+    var fd = document.getElementById('founders');
+    if (!fd || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        import('./js/head-viewer.js?v=20260819b')   /* 版番号は必須。付けないと端末が古いJSを掴み続ける */
+          .then(function(m){ m.initHeads([].slice.call(fd.querySelectorAll('.fd-ph'))); })
+          .catch(function(err){ console.warn('3Dビューアを読み込めませんでした', err); });
+      });
+    }, {rootMargin:'400px'});
+    io.observe(fd);
+  })();
+
+  /* プロフィールのモーダル。スマホはシート、PCはポップアップ（出し分けはCSS） */
+  var BIOS = {
+    yosuke: { role:'共同創業者 / ビジネスプロデューサー', name:'板倉 洋輔', en:'Yosuke Itakura',
+      bio:'2014年、兵庫県西宮市・夙川にブランチカフェ「YORKYS BRUNCH」を創業。以降、クレープ専門店「YORKYS Creperie」、生ドーナツ専門店「PIECE OF BAKE」、チーズ料理専門店「FROMA」など複数のブランドを立ち上げ、阪急三番街、うめきたグリーンプレイス、コピス吉祥寺など関西・関東の商業施設や駅前立地へ出店。2026年より3ブランドの全国フランチャイズ展開を開始する。株式会社YORKYS ENTERTAINMENT 代表取締役。2026年、株式会社UTUTUを共同創業。' },
+    temma: { role:'共同創業者 / クリエイティブディレクター', name:'平澤 天真', en:'Temma Hirasawa',
+      bio:'グラフィックデザイナーとしてキャリアを始め、Webデザイン、UIデザインへと領域を広げる。サイバーエージェントのDX部門で、2,000万会員を超える大規模サービスのアプリや、短期間で全国規模へ拡大したチェーンの会員アプリなど、UI/UX設計を担当。並行してAdobe公式TikTok広告「1日1分Photoshop」の企画・制作を手がける。2026年、株式会社UTUTUを共同創業。店舗事業者のためのプロダクト群「GOODシリーズ」の設計と開発を統括する。' }
+  };
+  var bioModal = document.getElementById('bioModal');
+  var bioLast = null;
+  function bioOpen(key){
+    var d = BIOS[key];
+    bioModal.querySelector('.bm-role').textContent = d.role;
+    bioModal.querySelector('.bm-name').textContent = d.name;
+    bioModal.querySelector('.bm-en').textContent   = d.en;
+    bioModal.querySelector('.bm-bio').textContent  = d.bio;
+    bioLast = document.activeElement;
+    document.body.classList.add('bio-open');
+    document.getElementById('bioClose').focus();
+  }
+  function bioClose(){
+    if (!document.body.classList.contains('bio-open')) return;
+    document.body.classList.remove('bio-open');
+    if (bioLast) bioLast.focus();
+  }
+  [].slice.call(document.querySelectorAll('.profile-btn')).forEach(function(b){
+    b.addEventListener('click', function(){ bioOpen(b.dataset.bio); });
+  });
+  document.getElementById('bioClose').addEventListener('click', bioClose);
+  document.getElementById('bioVeil').addEventListener('click', bioClose);
+  addEventListener('keydown', function(e){ if (e.key === 'Escape') bioClose(); });
+
+  var figs = [].slice.call(document.querySelectorAll('[data-fig]'));
+  if (reduce || !('IntersectionObserver' in window)){
+    // 動かさず、完成形だけ見せる
+    figs.forEach(function(fig){
+      [].slice.call(fig.querySelectorAll('g[data-dim]')).forEach(function(g){ g.style.opacity = .18; });
+    });
+  } else {
+    var fio = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (!e.isIntersecting) return;
+        fio.unobserve(e.target);
+        playFig(e.target.__items || prepFig(e.target));
+      });
+    }, {threshold:.3});
+    figs.forEach(function(fig){ fig.__items = prepFig(fig); fio.observe(fig); });
+  }
+})();
+
+/* ---- メニュー ---- */
+(function(){
+  var btn = document.getElementById('menuBtn');
+  var menu = document.getElementById('menu');
+  btn.addEventListener('click', function(){ document.body.classList.toggle('menu-open'); });
+  menu.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') document.body.classList.remove('menu-open');
+  });
+  window.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') document.body.classList.remove('menu-open');
+  });
+})();
+
+var last = performance.now();
+function tick(now){
+  var dt = Math.min((now-last)/1000, 0.05); last = now;
+
+  /* 送り中は補間しない。ここで指数の追従を挟むと、スクロールが止まったあとも
+     しばらく絵が動き続け、着地に尾が残る。送りの動き自体が等速なので、
+     そのまま写せばよい。指の操作で進む場合だけ、揺れを均すために補間する */
+  if (tweening) cur = target;
+  else          cur += (target - cur) * (1 - Math.exp(-9*dt));
+
+  var idx = fileOf(resolve(Math.round(cur)).real);   // 置いてあるファイルの番号
+  curFile = idx;
+
+  if (ready && idx !== shown){ draw(idx); shown = idx; }
+  // コピーの濃度は小数のまま渡す。丸めるとフェードが段になる
+  updateOverlays(cur, dt);
+
+  requestAnimationFrame(tick);
+}
+
+applySnapMode();
+loadAll();
+readScroll();
+syncChrome();
+cur = target;
+requestAnimationFrame(tick);
+})();
+</script>
+</body></html>

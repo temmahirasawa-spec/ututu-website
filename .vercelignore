@@ -1,0 +1,11 @@
+# ===== Vercel にアップロードしないもの =====
+.DS_Store
+node_modules/
+*.zip
+
+# 移植元の原本。参照用に置いてあるだけで、配信には要らない
+reference/
+
+# 素材の原本・中間ファイル（Dropbox の KV/ に残してあります）
+master.mp4
+master2.mp4
