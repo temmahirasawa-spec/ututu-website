@@ -276,6 +276,11 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
  font-size:11.5px;color:var(--mut);letter-spacing:.04em}
 #foot .pages{display:flex;gap:22px}
 #foot .soon{opacity:.6}
+/* 既定の下線と青は使わない。色は必ずトークン経由にする
+   （#after では墨に反転するため、直に色を書くと取り残される）*/
+#foot a{color:var(--mut);text-decoration:none;transition:color .25s ease}
+#foot a:hover{color:var(--tx)}
+#foot a:focus-visible{outline:1px solid var(--bd);outline-offset:4px}
 
 
 @media (max-width:760px){

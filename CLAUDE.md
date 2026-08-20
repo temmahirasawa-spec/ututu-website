@@ -36,7 +36,14 @@ app/
   layout.tsx              フォント（next/font）とメタ情報
   page.tsx                トップ ＝ <Hero /> ＋ <After />
   globals.css             トークン・素の指定・ロゴ/メニュー・紙のセクション
+  about/page.tsx          会社概要
+  contact/page.tsx        お問い合わせ（フォームは ContactForm.tsx）
+  api/contact/route.ts    フォームの受け口。Resend でメールにして送る
 components/
+  site/                   トップと下層で共有する部品
+    SiteHeader.tsx        ロゴ＋メニュー。variant="hero" / "page"
+    SiteFooter.tsx        フッター。いま開いているページへのリンクは出さない
+    site.css              下層ページの土台（.pg）とフォーム
   hero/                   KV（映像区間）
     Hero.tsx              マークアップ。useEffect で startHero() を起動し、戻り値で破棄
     heroEngine.ts         コマ送り・ホモグラフィ・読み込みキュー・章送り・ロゴの遊び
@@ -92,6 +99,22 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
 
 ### 踏んだ落とし穴
 
+- **`html{overflow-anchor:none}` を消さないこと（globals.css）。**
+  Chrome は画面より上の中身の高さが変わると、見た目を保とうとして
+  **scrollY のほうを黙って動かす**（スクロールアンカリング）。
+  **この機能があるのは Chrome だけで Safari には無い。**
+  和文は容量が大きいので preload せず swap で当てているため、遅れて届くと
+  `#after` の長い本文が一斉に組み直され、そこで Chrome が補正に入る。
+  症状は「Chromeでだけスクロール位置が飛ぶ・戻される、Safariでは起きない」。
+  和文を7秒遅らせ、y=5200 で止めて**一切操作せずに**観察すると、
+  切る前は 5200→5174 と動き、切ると 5200 のまま動かない（各3回で再現）
+- **映像区間を抜けたら KV は止まる**（`heroEngine` の `heroHidden()` / `.kv-idle`）。
+  `#stage` は `#after` に完全に覆われて見えないのに、放っておくと canvas への
+  描き込みとコピーの濃度計算が毎フレーム走り、動画も loop で回り続ける。
+  `#after` の上端は必ず `heroMax + innerHeight` にあるので、そこが境目。
+  **止める前に `updateOverlays` を1回ぶん寄せ切ること。**途中で抜けると
+  コピーの濃度が寄り切らず、SKIP と SCROLL の案内が出たまま固まる。
+  `resize` では `scroll` が飛ばないので `applySnapMode` からも起こしている
 - **`public/frames_lo_p/` を忘れないこと。**土台を作ったとき、この1つだけ
   コピーが漏れていた。**縦位置の先読みが全部404になる**が、欠けたコマは
   直前のコマで埋まる実装なので、PCで見るかぎり何も起きず気づけない。
@@ -111,8 +134,38 @@ scripts/        エッジ温めスクリプトと Blender 用スクリプト
    打ち直していないので、実測値はそのまま残っている
 2. ~~**KV（`components/hero/`）**~~ … 済。canvas・ホモグラフィ・読み込みキュー・章送り
 3. ~~**紙のセクション（`#after`）**~~ … 済。反転・帯・図解・Founders・モーダル
-4. **下層ページ** … GOOD ORDER / GOOD REVIEW / 会社概要 / お問い合わせ　← いまここ
+4. **下層ページ** … 会社概要・お問い合わせは済。**GOOD ORDER / GOOD REVIEW が残り**　← いまここ
 5. **メタ情報** … OGP画像・favicon（未着手）
+
+### 下層ページの流儀
+
+紙のトンマナは `#after` と同じ色だが、**トークンは共有していない。**
+`#after` は `data-ink` の節で紙⇄墨に反転するので、同じ変数名でも中身が
+入れ替わる。下層は反転しないため、`site.css` の `.pg` が紙の値だけを持つ。
+変数名を揃えてあるのは `#foot` などをそのまま使い回すため。
+
+ロゴとハンバーガーは `#brand path{fill:#fff}` で**白が既定**。下層は紙地なので
+`SiteHeader variant="page"` が `.ink` を付けて墨に反転する。
+**メニューを開いているあいだは白へ戻すこと。**幕（`#menu`）が墨なので、
+反転したままだと閉じるための×が地に沈む。
+
+### お問い合わせに要る環境変数
+
+Vercel の Project Settings → Environment Variables に入れる。
+**値をコードに書かないこと。**このリポジトリは Public。
+
+| | |
+|---|---|
+| `RESEND_API_KEY` | Resend の API キー |
+| `CONTACT_TO` | 受け取るアドレス。カンマ区切りで複数可 |
+| `CONTACT_FROM` | 差出人。**Resend で認証済みのドメインであること。**未設定なら試験用に落ちる |
+
+未設定のあいだ `/api/contact` は 503 を返し、画面には「いま受け付けられない」
+とだけ出る（事情は見せず、ログにだけ残す）。SDK は入れず `fetch` で叩いている。
+
+連投よけは**関数のインスタンスが生きているあいだだけ効く簡易なもの**で、
+Vercel は実行環境を使い回さないことがあるのですり抜ける。
+本気でやるなら Upstash などの外部の保存先が要る。
 
 分け方は原本の構成に合わせてあります。`ScrollSequence` / `ScreenComposite` /
 `ChapterNav` の3つに割るという当初案は採りませんでした。**3つは同じ状態
@@ -252,9 +305,13 @@ npm run build    # 本番ビルド
 
 ### 下層ページ（これから）
 
-- GOOD ORDER / GOOD REVIEW / 会社概要 / お問い合わせ
+- GOOD ORDER / GOOD REVIEW の下層ページ（会社概要・お問い合わせは済）
 - メニューのリンク先URL（いまは `good-order.jp` などの仮）
-- フッターの「（準備中）」を、できたページへ差し替える
+- **会社概要の未確定の行**（所在地 / 設立 / 資本金 / 代表者）。
+  `app/about/page.tsx` に `tbd` を付けて「—」で置いてある。
+  **埋めたら `tbd` を外すこと。**薄いだけで見た目は同じなので、
+  外し忘れると空欄のまま公開される
+- お問い合わせの環境変数（上の表）を Vercel に入れる
 
 ### 移植元から引き継いだもの
 
