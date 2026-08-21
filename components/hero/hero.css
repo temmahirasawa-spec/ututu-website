@@ -59,11 +59,22 @@
 .rule{width:34px;height:1px;background:currentColor;opacity:.5;margin:0 0 18px}
 
 /* ===== スクロールの案内 ===== */
-#scrollHint{position:fixed;z-index:5;left:50%;bottom:30px;transform:translateX(-50%);
- color:rgba(255,255,255,.8);font-size:10px;letter-spacing:.22em;display:flex;
- flex-direction:column;align-items:center;gap:9px;transition:opacity .5s;pointer-events:none}
-#scrollHint i{display:block;width:1px;height:34px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));
- animation:sh 1.9s ease-in-out infinite}
+/* SCROLL の案内。**映像を抜けるまで出し続ける**（消えると、まだ続くことが伝わらない）。
+   線が下へ抜けて、そのあとに山形がひとつ落ちる。2つの動きは同じ周期で揃える */
+#scrollHint{position:fixed;z-index:5;left:50%;bottom:26px;transform:translateX(-50%);
+ color:#fff;font-size:12px;font-weight:600;letter-spacing:.26em;display:flex;
+ flex-direction:column;align-items:center;gap:11px;transition:opacity .5s;pointer-events:none;
+ text-shadow:0 1px 12px rgba(0,0,0,.45)}
+/* 字間は最後の1文字の右にも入る。そのぶん左へ寄せて中央に見せる */
+#scrollHint span{padding-left:.26em}
+#scrollHint i{display:block;width:2px;height:46px;border-radius:2px;
+ background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0));
+ animation:sh 1.8s ease-in-out infinite}
+#scrollHint b{display:block;width:9px;height:9px;
+ border-right:2px solid rgba(255,255,255,.9);border-bottom:2px solid rgba(255,255,255,.9);
+ animation:shb 1.8s ease-in-out infinite}
+@keyframes shb{0%,100%{transform:rotate(45deg) translate(-3px,-3px);opacity:.3}
+ 55%{transform:rotate(45deg) translate(2px,2px);opacity:1}}
 @keyframes sh{0%{transform:scaleY(.2);transform-origin:top;opacity:0}
  40%{transform:scaleY(1);transform-origin:top;opacity:1}
  60%{transform:scaleY(1);transform-origin:bottom;opacity:1}
@@ -117,9 +128,25 @@ body.menu-open #dots,body.menu-open #navBar{opacity:0;pointer-events:none}
 body.snap #prog{display:none}
 
 /* ===== 映像を飛ばす ===== */
-#skip{position:fixed;z-index:5;bottom:24px;right:26px;color:rgba(255,255,255,.75);font-size:10px;
- letter-spacing:.16em;text-decoration:none;border:1px solid rgba(255,255,255,.3);
- padding:8px 15px;border-radius:99px;transition:opacity .4s}
+/* 映像を飛ばす。NEXT ボタンと同じ地・同じふちに揃えてある */
+#skip{position:fixed;z-index:6;bottom:26px;right:26px;
+ display:inline-flex;align-items:center;gap:9px;
+ color:#fff;font-size:12px;font-weight:600;letter-spacing:.16em;text-decoration:none;
+ border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:11px 20px;
+ background:rgba(255,255,255,.12);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ text-shadow:0 1px 10px rgba(0,0,0,.4);
+ transition:opacity .4s, background .25s ease, border-color .25s ease}
+#skip i{display:block;width:7px;height:7px;flex:none;
+ border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+ transform:rotate(45deg) translate(-1px,-1px);transition:transform .25s ease}
+#skip:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.55)}
+#skip:hover i{transform:rotate(45deg) translate(1px,1px)}
+#skip:active{background:rgba(255,255,255,.28)}
+#skip:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:4px}
+/* **opacity では隠せない。**エンジンが inline で opacity を書くので勝てない。
+   visibility なら競合しない */
+body.menu-open #skip{visibility:hidden;pointer-events:none}
 
 /* ローディング。読み込みの進み具合で線を引いていく。
    絵を差し替えるときは #loadArt の中身を入れ替えるだけでよい。
@@ -167,10 +194,20 @@ body.snap #prog{display:none}
   #loadArt path,#loadArt line,#loadArt polyline,#loadArt polygon,
   #loadArt circle,#loadArt ellipse,#loadArt rect{stroke-width:.68}
   body.snap .copy{padding-right:34px}
-  body.snap #skip{display:none}
+  /* SKIP はスマホでも出す。NEXT の帯の左側、空いているところに長丸で置く。
+     **z-index は #navBar(6) より上にすること。**下だと NEXT に指を吸われる。
+     高さは NEXT の文字の中心（下から 30.5px ＋ セーフエリア）に合わせてある */
+  body.snap #skip{
+    display:inline-flex;left:16px;right:auto;z-index:8;
+    bottom:calc(15px + env(safe-area-inset-bottom));
+    font-size:11px;letter-spacing:.14em;padding:9px 16px;gap:7px}
+  body.snap #skip i{width:6px;height:6px;border-width:1.4px}
+  body.snap.past-hero #skip{visibility:hidden;pointer-events:none}
   .eyebrow{margin:0 0 10px}
   .rule{margin:0 0 14px}
   #scrim{background:linear-gradient(180deg,rgba(12,14,18,.74) 0%,rgba(12,14,18,.52) 34%,
     rgba(12,14,18,.12) 58%,rgba(12,14,18,.34) 100%)}
-  #skip{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  #scrollHint i,#scrollHint b,#nextBtn i{animation:none}
 }

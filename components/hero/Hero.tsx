@@ -64,7 +64,7 @@ export function Hero() {
           <li><a href="#after">CONTACT<small>お問い合わせ</small></a></li>
         </ul>
       </nav>
-      <div id="scrollHint"><span>SCROLL</span><i /></div>
+      <div id="scrollHint"><span>SCROLL</span><i /><b /></div>
       <div id="prog" aria-hidden="true"><i /></div>
       {/* ドットの中身は heroEngine の buildChapters が章の数だけ作る */}
       <div id="dots" aria-hidden="true" />
@@ -72,7 +72,7 @@ export function Hero() {
         <button id="backBtn"><i /><span>BACK</span></button>
         <button id="nextBtn"><span>NEXT</span><i /></button>
       </div>
-      <a id="skip" href="#after">SKIP ↓</a>
+      <a id="skip" href="#after"><span>SKIP</span><i /></a>
 
       <div id="copyLayer">
         <div className="copy mid"><p className="eyebrow">Ututu</p><div className="rule" />

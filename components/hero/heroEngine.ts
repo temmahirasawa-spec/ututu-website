@@ -8,7 +8,7 @@
 import {
   ART_VB, AFTER_DUR, CFG, CHAPTER_DUR, COPY_AT, COPY_FADE_SEC,
   HOLDS, LOAD_DRAW_SEC, LOAD_HOLD_MS, MARK, MAXC, SCROLL_RATE, TOTAL,
-  TWEEN_RATE, chapterFrames, fileOf, holdRange, pad, resolve, V,
+  SWIPE, TWEEN_RATE, chapterFrames, fileOf, holdRange, pad, resolve, V,
   type Corners, type FrameSet,
 } from './heroConfig';
 
@@ -443,7 +443,8 @@ export function startHero(): () => void {
     progFill.style.height = (prog * 100).toFixed(2) + '%';
     progEl.style.opacity = prog > 0.995 ? '0' : '1';
     // スマホは送りボタンで進むので案内は出さない
-    hintEl.style.opacity = SNAP ? '0' : (prog > 0.03 ? '0' : '1');
+    // **映像を抜けるまで出し続ける。**途中で消すと、まだ続くことが伝わらない
+    hintEl.style.opacity = SNAP ? '0' : (prog > 0.985 ? '0' : '1');
   }
 
   /* 一時停止と再生を繰り返すと自動再生の制限に当たりやすい。
@@ -786,10 +787,50 @@ export function startHero(): () => void {
   });
   on(backBtn, 'click', () => gotoChapter(chapIdx - 1));
 
-  /* ---- 映像区間では指の操作を受け付けない（ボタン操作のみ） ---- */
+  /* ---- スマホの指の操作 ----
+     映像区間ではページのスクロールを止めているが、**指の運びは拾う**。
+     下から上へのスワイプで次の章、上から下へで前の章。
+     送りボタンとドットがあっても、スクロールしようとする人のほうが多い。
+
+     判定は touchend で一度だけ。**1スワイプ＝1つ進む**。
+     touchmove の途中で送ると、指を動かし続けるあいだ何章も飛んでしまう */
+  const menuOpen = () => document.body.classList.contains('menu-open');
+  const swipeLive = () => SNAP && inHero() && !menuOpen();
+  let swY = 0, swAt = 0, swOk = false;
+
+  on(window, 'touchstart', (e) => {
+    const t = e as TouchEvent;
+    if (!swipeLive() || t.touches.length !== 1) { swOk = false; return; }
+    /* 送りボタン・ドット・ロゴ・SKIP の上から始めた指は、そちらに任せる。
+       ここを外すと、ボタンを押しただけで二重に進む */
+    const el = t.target as Element | null;
+    swOk = !(el && el.closest && el.closest('#navBar,#dots,#menu,#menuBtn,#brand,#skip'));
+    swY = t.touches[0].clientY;
+    swAt = performance.now();
+  }, { passive: true });
+
   on(window, 'touchmove', (e) => {
-    if (SNAP && inHero() && !document.body.classList.contains('menu-open')) e.preventDefault();
+    if (swipeLive()) e.preventDefault();   // ページは動かさない
   }, { passive: false });
+
+  on(window, 'touchend', (e) => {
+    if (!swOk) return;
+    swOk = false;
+    if (!swipeLive()) return;
+    const t = e as TouchEvent;
+    const dy = t.changedTouches[0].clientY - swY;
+    const ms = performance.now() - swAt;
+    const enough = Math.abs(dy) >= SWIPE.min
+      || (Math.abs(dy) >= SWIPE.fastPx && ms <= SWIPE.fastMs);
+    if (!enough) return;
+    if (dy < 0) {
+      // 下から上 → 次へ。最後は映像を抜けて下のセクションへ（NEXTと同じ）
+      if (chapIdx >= chapters.length - 1) gotoAfter();
+      else gotoChapter(chapIdx + 1);
+    } else {
+      gotoChapter(chapIdx - 1);            // 上から下 → 前へ（先頭では何も起きない）
+    }
+  }, { passive: true });
 
   /* ============================================================
      ループ
