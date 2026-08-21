@@ -94,7 +94,11 @@ export function After() {
           </div>
         </div>
         {/* 会社概要はここからも辿れる。ナビとフッターにも同じ道がある */}
-        <p className="fd-more rv"><a className="profile-btn" href="/company">会社概要を見る</a></p>
+        <p className="fd-more rv">
+          <a href="/company">会社概要を見る
+            <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 9h13M10.5 4 15.5 9 10.5 14"/></svg>
+          </a>
+        </p>
       </div>
 
       {/* 締め */}

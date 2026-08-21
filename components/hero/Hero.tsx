@@ -7,6 +7,7 @@
    その処理は heroEngine 側にあります。 */
 
 import { useEffect } from 'react';
+import { SiteNav } from '@/components/site/SiteNav';
 import { startHero } from './heroEngine';
 import { LoadArt } from './LoadArt';
 import { Mark } from './Mark';
@@ -14,7 +15,6 @@ import './hero.css';
 
 export function Hero() {
   useEffect(() => startHero(), []);
-  useMenu();
 
   return (
     <>
@@ -55,16 +55,7 @@ export function Hero() {
       <button id="brand" type="button" aria-label="はじめに戻る">
         <Mark />
       </button>
-      <button id="menuBtn" aria-label="メニュー"><span /><span /><span /></button>
-      <nav id="menu">
-        <ul>
-          <li><a href="#after">PRODUCTS<small>プロダクト</small></a></li>
-          <li><a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<small>モバイルオーダー</small></a></li>
-          <li><a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<small>レビューと満足度</small></a></li>
-          <li><a href="/company">COMPANY<small>会社概要</small></a></li>
-          <li><a href="/company#contact">CONTACT<small>お問い合わせ</small></a></li>
-        </ul>
-      </nav>
+      <SiteNav variant="top" />
       <div id="scrollHint"><span>SCROLL</span><i /><b /></div>
       <div id="prog" aria-hidden="true"><i /></div>
       {/* ドットの中身は heroEngine の buildChapters が章の数だけ作る */}
@@ -117,32 +108,6 @@ export function Hero() {
       </div>
     </>
   );
-}
-
-/* メニューの開閉。開いている間は body に .menu-open が付く
-   （ハンバーガーの変形と、映像区間のスワイプ抑止の解除に使う） */
-function useMenu() {
-  useEffect(() => {
-    const btn = document.getElementById('menuBtn');
-    const menu = document.getElementById('menu');
-    if (!btn || !menu) return;
-    const toggle = () => document.body.classList.toggle('menu-open');
-    const close = (e: Event) => {
-      if ((e.target as HTMLElement).tagName === 'A') document.body.classList.remove('menu-open');
-    };
-    const esc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') document.body.classList.remove('menu-open');
-    };
-    btn.addEventListener('click', toggle);
-    menu.addEventListener('click', close);
-    window.addEventListener('keydown', esc);
-    return () => {
-      btn.removeEventListener('click', toggle);
-      menu.removeEventListener('click', close);
-      window.removeEventListener('keydown', esc);
-      document.body.classList.remove('menu-open');
-    };
-  }, []);
 }
 
 /* 外部リンクの矢印 */

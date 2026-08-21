@@ -1,23 +1,24 @@
 'use client';
 
-/* 会社概要＋お問い合わせ。見立ては「お品書き」と「注文伝票」。
-   会社の情報はメニューとして読ませ、問い合わせは注文として受ける。
-   CSSは company.css。数字や文言の確定待ちは CLAUDE.md の「残っている作業」参照。 */
+/* 会社概要＋お問い合わせ。
+   組版は品書きと伝票の見立てだが、**文字は普通の言葉で書くこと。**
+   「お品書き」「ご注文伝票」と直に名乗ると寒くなる。見立ては見た目で伝わる。
+   CSSは company.css。確定待ちの項目は CLAUDE.md の「残っている作業」参照。 */
 
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Mark } from '@/components/hero/Mark';
+import { SiteNav } from '@/components/site/SiteNav';
 import './company.css';
 
-/* お品書きの中身。**確定していない項目はここに足さないこと。**
-   所在地は登記の公開待ちで、いまは載せていない */
+/* 会社概要の中身。**確定していない項目はここに足さないこと。** */
 const MENU: [string, string][] = [
   ['商号', '株式会社UTUTU'],
-  ['創業', '2026年'],
+  ['創業', '2026年9月1日'],
   ['共同代表', '板倉 洋輔　／　平澤 天真'],
+  ['所在地', '〒650-0023　兵庫県神戸市中央区栄町通1-1-9'],
   ['事業内容', '店舗向けソフトウェアの企画・開発・提供'],
   ['プロダクト', 'GOOD ORDER ／ GOOD REVIEW'],
-  ['検証の場', '直営4ブランド（YORKYS BRUNCH ほか）'],
 ];
 
 const KINDS = ['導入の相談', '取材・掲載', '協業のお誘い', 'その他'] as const;
@@ -45,23 +46,21 @@ export function CompanyClient() {
 
   return (
     <div className="cp">
+      <SiteNav variant="page" tone="ink" />
       <header className="cp-top">
-        <Link className="cp-back" href="/"><i />TOP</Link>
         <Link className="cp-mark" href="/" aria-label="トップへ戻る"><Mark title="UTUTU" /></Link>
-        <span className="sp" aria-hidden="true" />
       </header>
 
-      {/* ---- お品書き ---- */}
+      {/* ---- 会社概要 ---- */}
       <main className="cp-in">
         <p className="cp-eyebrow cp-rv">Company</p>
-        <h1 className="cp-rv" style={{ ['--d' as string]: '.06s' }}>お品書き</h1>
+        <h1 className="cp-rv" style={{ ['--d' as string]: '.06s' }}>会社概要</h1>
         <p className="cp-lead cp-rv" style={{ ['--d' as string]: '.12s' }}>
-          株式会社UTUTUの会社概要を、一枚にまとめました。
+          株式会社UTUTUについて、一枚にまとめました。
         </p>
 
         <section className="cp-menu" aria-label="会社概要">
           <div className="cp-menu-in">
-            <p className="cp-menu-title">御品書</p>
             <p className="cp-menu-sub">COMPANY PROFILE</p>
             <dl>
               {MENU.map(([k, v], i) => (
@@ -72,14 +71,13 @@ export function CompanyClient() {
                 </div>
               ))}
             </dl>
-            <p className="cp-menu-note">※ お品書きは、予告なく増えます。</p>
           </div>
         </section>
 
-        {/* ---- 注文伝票 ---- */}
+        {/* ---- お問い合わせ ---- */}
         <section className="cp-contact" id="contact" aria-label="お問い合わせ">
           <p className="cp-eyebrow cp-rv">Contact</p>
-          <h2 className="cp-rv" style={{ ['--d' as string]: '.06s' }}>ご注文は、こちらから。</h2>
+          <h2 className="cp-rv" style={{ ['--d' as string]: '.06s' }}>お問い合わせ</h2>
           <p className="cp-lead cp-rv" style={{ ['--d' as string]: '.12s' }}>
             導入のご相談も、取材も、「まずは話だけ」も歓迎です。
           </p>
@@ -146,8 +144,8 @@ function ContactSlip() {
     return (
       <div className="cp-slip cp-rv in">
         <div className="cp-done" role="status">
-          <span className="cp-stamp" aria-hidden="true">受付済</span>
-          <h3>ご注文、承りました。</h3>
+          <span className="cp-stamp" aria-hidden="true">受付</span>
+          <h3>お問い合わせを受け付けました。</h3>
           <p>内容を確認して、折り返しご連絡します。<br />しばらくお待ちください。</p>
         </div>
       </div>
@@ -157,7 +155,7 @@ function ContactSlip() {
   return (
     <form className="cp-slip cp-rv" style={{ ['--d' as string]: '.18s' }} ref={formRef} onSubmit={submit}>
       <div className="cp-slip-head">
-        <b>ご注文伝票</b>
+        <b>お問い合わせ</b>
         <span>{slipNo}</span>
       </div>
 
@@ -185,7 +183,7 @@ function ContactSlip() {
         <input id="cf-email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
       </div>
       <div className="cp-field">
-        <label htmlFor="cf-msg">ご注文の内容</label>
+        <label htmlFor="cf-msg">お問い合わせ内容</label>
         <textarea id="cf-msg" name="message" required placeholder="お店のこと、いま困っていること、聞いてみたいこと。なんでもどうぞ。" />
       </div>
 
@@ -193,14 +191,10 @@ function ContactSlip() {
       <input name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true"
         style={{ position: 'absolute', left: '-9999px', width: 1, height: 1 }} />
 
-      <div className="cp-total">
-        <b>合計</b>
-        <span className="lead" aria-hidden="true" />
-        <span>ご相談 一式 …… ¥0</span>
-      </div>
+      <div className="cp-cut" aria-hidden="true" />
 
       <button className="cp-submit" type="submit" disabled={state === 'sending'}>
-        {state === 'sending' ? '送信中…' : 'この内容で注文する'}
+        {state === 'sending' ? '送信中…' : '送信する'}
       </button>
 
       {state === 'error' && (

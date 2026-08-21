@@ -9,20 +9,16 @@
  padding:0 clamp(24px,5vw,40px) clamp(64px,9vw,110px)}
 .cp-in{max-width:680px;margin:0 auto}
 
-/* ===== 上部。ロゴはトップへ帰る道 ===== */
-.cp-top{max-width:1040px;margin:0 auto;padding:26px 0 clamp(48px,7vw,84px);
- display:flex;align-items:center;justify-content:space-between}
+/* ===== 上部 =====
+   ロゴは画面の真ん中に置く。**両脇に要素を置かないこと。**
+   左右に何か入れると、その幅の差ぶんだけ中央からずれる（実際にずれた）。
+   ハンバーガーは position:fixed で流れの外にいるので影響しない。
+   上下は、ハンバーガーの中心線（--markY）にロゴの中心が乗るように取る */
+.cp-top{display:flex;justify-content:center;
+ padding:calc(var(--markY) - var(--markBox) / 2) 0 clamp(48px,7vw,84px)}
 .cp-mark{line-height:0}
 .cp-mark svg{display:block;height:var(--markBox);width:auto}
 .cp-mark path{fill:var(--ink)}
-.cp-back{display:inline-flex;align-items:center;gap:8px;color:var(--sub);
- text-decoration:none;font-size:11.5px;letter-spacing:.16em;font-weight:600;
- transition:color .25s ease}
-.cp-back i{display:block;width:6px;height:6px;border-left:1.5px solid currentColor;
- border-bottom:1.5px solid currentColor;transform:rotate(45deg)}
-.cp-back:hover{color:var(--ink)}
-/* 左右の重さを揃えるための空box（ロゴを真ん中に置く） */
-.cp-top .sp{width:64px}
 
 /* ===== 見出し ===== */
 .cp-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;
@@ -46,9 +42,7 @@
  border:1px solid rgba(20,22,26,.28);padding:7px}
 .cp-menu-in{border:1px solid rgba(20,22,26,.14);
  padding:clamp(28px,4.6vw,46px) clamp(22px,4.6vw,46px) clamp(24px,4vw,38px)}
-.cp-menu-title{margin:0 0 6px;text-align:center;font-family:var(--jp-title);
- font-weight:700;font-size:19px;letter-spacing:.5em;text-indent:.5em}
-.cp-menu-sub{margin:0 0 clamp(24px,3.6vw,34px);text-align:center;
+.cp-menu-sub{margin:0 0 clamp(22px,3.4vw,32px);text-align:center;
  font-size:10px;letter-spacing:.3em;color:var(--sub);font-weight:500}
 
 /* 一行 ＝ 項目 …… 値。中トビの点線は .in で左から伸びる */
@@ -124,15 +118,11 @@
 .cp-field input:focus,.cp-field textarea:focus{outline:none;border-bottom-color:var(--ink)}
 .cp-field input::placeholder,.cp-field textarea::placeholder{color:rgba(20,22,26,.28)}
 
-/* 合計行と送信。伝票の締め */
-.cp-total{display:flex;align-items:baseline;gap:14px;margin:26px 0 0;
- padding:14px 0 0;border-top:1px dashed rgba(20,22,26,.3)}
-.cp-total b{flex:none;font-size:12.5px;letter-spacing:.2em;font-weight:600}
-.cp-total .lead{flex:1;align-self:center;height:1em;
+/* 送信の手前の切り取り線。伝票の締めだが、文字は載せない */
+.cp-cut{height:1px;margin:28px 0 0;
  background-image:radial-gradient(circle,rgba(20,22,26,.3) 1px,transparent 1.3px);
- background-size:9px 9px;background-position:0 62%;background-repeat:repeat-x}
-.cp-total span{font-size:13.5px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.cp-submit{margin:22px 0 0;width:100%;display:flex;align-items:center;
+ background-size:9px 9px;background-repeat:repeat-x}
+.cp-submit{margin:24px 0 0;width:100%;display:flex;align-items:center;
  justify-content:center;gap:10px;padding:16px 0;border:0;border-radius:4px;
  background:var(--ink);color:var(--paper);font:600 13.5px/1 var(--jp-title);
  letter-spacing:.24em;text-indent:.24em;cursor:pointer;
