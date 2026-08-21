@@ -24,9 +24,9 @@ export function ProductOrder() {
       <div className="pv-in">
         <div className="pv-head">
           <div className="pv-copy rv">
-            <p className="pv-eyebrow"><Sparkle />MOBILE ORDER FOR CAFÉS &amp; RESTAURANTS</p>
+            <p className="pv-eyebrow"><Sparkle />MOBILE ORDER</p>
             <h4>いいデザインは、<br /><em>売上に効く。</em></h4>
-            <p className="pv-lead">小さな画面でも、メニューはぜんぶ届く。スクロールの下に沈んでいた一品に出番をつくり、客単価とお客様の満足度を一緒に育てるモバイルオーダーです。注文は席のまま、オペレーションはいまのままで。</p>
+            <p className="pv-lead">小さな画面でも、メニューはぜんぶ届く。埋もれていた一品に、出番をつくります。</p>
             <div className="pv-actions">
               <a className="pv-cta" href="https://good-order.jp" target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
               <p className="pv-run"><i />神戸のカフェ〈YORKYS BRUNCH〉で実運用テスト中</p>
@@ -47,21 +47,20 @@ export function ProductOrder() {
           </div>
         </div>
 
+        {/* **ここは概要だけ。**細かい説明はLPに書いてあるので、同じことを
+            二度読ませない。お客様にとって何が良くなるかだけを置く */}
         <ul className="pv-feats">
           <li className="pv-feat rv">
-            <p className="pv-feat-no"><b>01</b> NAVIGATION</p>
-            <h5>いまどこにいるか、迷わない。</h5>
-            <p>カテゴリタブと追従ナビゲーションで、自分の現在地がいつでもわかる。欲しい一品まで、最短ルートでたどり着けます。</p>
+            <p className="pv-feat-no"><b>01</b> FIND</p>
+            <h5>メニューが、埋もれない。</h5>
           </li>
           <li className="pv-feat rv">
-            <p className="pv-feat-no"><b>02</b> OVERVIEW</p>
-            <h5>紙のメニューのような、一覧性。</h5>
-            <p>全カテゴリと人気メニューを、トップでさっと見渡せる。デジタルになっても、埋もれるメニューをつくりません。</p>
+            <p className="pv-feat-no"><b>02</b> CHOOSE</p>
+            <h5>迷わず、決められる。</h5>
           </li>
           <li className="pv-feat rv">
-            <p className="pv-feat-no"><b>03</b> RECOMMEND</p>
-            <h5>「もう一品」が、自然に増える。</h5>
-            <p>パッと決めたい人には、おすすめを最前列に。シズル感のある大きな写真が「もう一品」を後押しします。</p>
+            <p className="pv-feat-no"><b>03</b> ONE MORE</p>
+            <h5>「もう一品」が、増える。</h5>
           </li>
         </ul>
       </div>
@@ -79,9 +78,9 @@ export function ProductReview() {
       <div className="pv-in">
         <div className="pv-head">
           <div className="pv-copy rv">
-            <p className="pv-eyebrow"><Sparkle />CUSTOMER FEEDBACK IN ONE MINUTE</p>
+            <p className="pv-eyebrow"><Sparkle />CUSTOMER FEEDBACK</p>
             <h4>良い声は表へ、<br /><em>本音はお店へ。</em></h4>
-            <p className="pv-lead">クチコミは、書きたくないから書かれないのではなく、書くまでが遠いだけ。卓上の二次元コードを読んで、星をひとつ選ぶ。その1分が、クチコミにも、改善のヒントにもなります。アプリも、ログインも、個人情報もいりません。</p>
+            <p className="pv-lead">卓上の二次元コードから、1分。その回答が、クチコミにも、改善のヒントにもなります。</p>
             <div className="pv-actions">
               <a className="pv-cta" href="https://good-review.jp" target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
               <p className="pv-run"><i />神戸・西宮の2店舗で実運用中</p>
@@ -96,28 +95,25 @@ export function ProductReview() {
         <ul className="pv-feats">
           <li className="pv-feat pv-feat--shot rv">
             <div className="pv-shot"><img src="/img/products/review-rate.webp" width="481" height="1040" alt="5段階の評価を選ぶ画面。所要時間は約1分" loading="lazy" decoding="async" /></div>
-            <p className="pv-feat-no"><b>01</b> ONE MINUTE</p>
-            <h5>「お願いします」を、言わなくていい。</h5>
-            <p>声をかけるのは卓上の二次元コード。星を選んで、当てはまるものをタップするだけです。</p>
+            <p className="pv-feat-no"><b>01</b> 1 MINUTE</p>
+            <h5>声かけは、二次元コードに。</h5>
           </li>
           <li className="pv-feat pv-feat--shot rv">
             <div className="pv-shot"><img src="/img/products/review-draft.webp" width="481" height="1040" alt="お客様の回答から作られたクチコミの下書きが表示されている画面" loading="lazy" decoding="async" /></div>
             <p className="pv-feat-no"><b>02</b> AI DRAFT</p>
-            <h5>回答が、そのまま下書きになる。</h5>
-            <p>選んだタグとひとことから、その場で下書きを用意。コピーして、Googleマップに貼るだけです。</p>
+            <h5>回答が、そのまま下書きに。</h5>
           </li>
           <li className="pv-feat pv-feat--shot rv">
             <div className="pv-shot"><img src="/img/products/review-list.webp" width="481" height="1040" alt="店舗の管理画面。Googleへ誘導済みの回答と、店舗のみに共有された回答が並んでいる" loading="lazy" decoding="async" /></div>
             <p className="pv-feat-no"><b>03</b> THE FORK</p>
-            <h5>高い評価はGoogleへ、低い評価はお店へ。</h5>
-            <p>★4以上はそのままGoogleマップへ。★3以下は公開の場より先に、お店の手元へ届きます。</p>
+            <h5>良い声はGoogle、本音はお店。</h5>
           </li>
         </ul>
 
         <div className="pv-proof rv">
           <div className="pv-proof-l">
             <b>REAL STORE RESULT</b>
-            <span>FROMA YORKYS CHEESE（神戸）／ Googleマップの店舗評価・導入2ヶ月の実測</span>
+            <span>FROMA（神戸）／ Googleマップの店舗評価・導入2ヶ月の実測</span>
           </div>
           <p className="pv-rating">
             <span className="from"><i>★</i>3.5</span>
