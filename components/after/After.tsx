@@ -77,7 +77,7 @@ export function After() {
         <h3 className="rv">店側と、デザイン側から。</h3>
         <div className="fd-grid">
           <div className="fd rv">
-            <div className="fd-ph ava" data-head="yosuke" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+            <div className="fd-ph ava" data-head="yosuke" data-cm="173" data-tap="stumble" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
             <p className="fd-role">共同創業者 / ビジネスプロデューサー</p>
             <p className="fd-name">板倉 洋輔</p>
             <p className="fd-en">Yosuke Itakura</p>
@@ -85,7 +85,7 @@ export function After() {
             <button className="profile-btn" type="button" data-bio="yosuke">Profile　＋</button>
           </div>
           <div className="fd rv">
-            <div className="fd-ph ava" data-head="temma" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+            <div className="fd-ph ava" data-head="temma" data-cm="160" data-tap="startle" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
             <p className="fd-role">共同創業者 / クリエイティブディレクター</p>
             <p className="fd-name">平澤 天真</p>
             <p className="fd-en">Temma Hirasawa</p>
