@@ -21,6 +21,7 @@
    規則は CLAUDE.md の「図解の差し替え」を参照。 */
 
 import { useEffect } from 'react';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { startAfter } from './afterEffects';
 import { BioModal } from './BioModal';
 import { ProductOrder, ProductReview } from './Products';
@@ -103,10 +104,7 @@ export function After() {
         <p className="next-line rv"><i></i>Next product — Reservation System and more</p>
       </div>
 
-      <div id="foot" className="rv">
-        <span>© UTUTU Inc.</span>
-        <span className="pages"><span className="soon">会社概要（準備中）</span><span className="soon">お問い合わせ（準備中）</span></span>
-      </div>
+      <SiteFooter className="rv" />
       </div></section>
       <BioModal />
     </>

@@ -1,0 +1,114 @@
+/* 下層ページ（会社概要・お問い合わせ）の土台。
+
+   紙の色は #after と同じだが、**トークンは共有していない。**
+   あちらは data-ink の節で紙⇄墨に反転するため、同じ変数名でも中身が
+   入れ替わる。ここは反転しないので、紙の側の値だけを持たせている。
+   変数名を #after と揃えてあるのは、#foot など既存の指定を
+   そのまま使い回せるようにするため。 */
+.pg {
+  --pg: #F3F1EC; --tx: #14161A; --mut: #7A7F87; --acc: #6E7D57;
+  --ln: rgba(20, 22, 26, .14); --bd: rgba(20, 22, 26, .32); --bd-soft: rgba(20, 22, 26, .05);
+  background: var(--pg); color: var(--tx);
+  /* 上の余白はロゴ（#brand・fixed・--markY:41px）を避ける高さが要る */
+  padding: clamp(104px, 13vw, 170px) clamp(24px, 5vw, 40px) 0;
+  min-height: 100svh;
+  display: flex; flex-direction: column;
+}
+.pg .wrap { max-width: 1040px; margin: 0 auto; width: 100%; flex: 1 0 auto; display: flex; flex-direction: column; }
+/* フッターは中身がどれだけ短くても最下部に置く */
+.pg .wrap > #foot { margin-top: auto }
+
+/* ===== 見出し ===== */
+.pg-head { margin: 0 0 clamp(44px, 6vw, 72px) }
+.pg-eyebrow { font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--acc); margin: 0 0 16px; font-weight: 500 }
+.pg h1 { font-family: var(--jp-title); font-weight: 700; color: var(--tx);
+  font-size: clamp(26px, 4.2vw, 40px); letter-spacing: .08em; line-height: 1.6; margin: 0 0 18px }
+.pg-lead { color: var(--mut); font-size: 14.5px; line-height: 2.05; margin: 0; max-width: 38em }
+
+/* ===== 会社概要の表 ===== */
+/* dl を2列のグリッドにする。行の区切りは上の罫だけで、
+   最初の行にも引いて表の頭を見せる */
+/* **列のすきまは gap ではなく dt の padding で作ること。**
+   gap にすると各セルの border-top がそこで途切れ、罫が破線のように見える */
+.pg-dl { margin: 0; display: grid; grid-template-columns: minmax(140px, 210px) minmax(0, 1fr);
+  column-gap: 0 }
+.pg-dl dt, .pg-dl dd {
+  margin: 0; padding: 19px 0; border-top: 1px solid var(--ln); font-size: 13.5px; line-height: 1.95;
+}
+.pg-dl dt { color: var(--mut); letter-spacing: .06em; font-weight: 500;
+  padding-right: clamp(20px, 4vw, 56px) }
+.pg-dl dd { color: var(--tx) }
+.pg-dl dd p { margin: 0 }
+.pg-dl dd p + p { margin-top: 4px }
+/* 値がまだ決まっていない行。**中身が入ったら .tbd ごと消すこと。**
+   薄いだけで見た目は同じなので、消し忘れると空欄のまま公開される */
+.pg-dl .tbd { color: var(--mut); opacity: .5 }
+.pg-note { margin: 22px 0 0; font-size: 11.5px; line-height: 1.9; color: var(--mut) }
+
+/* ===== ブランドの並び ===== */
+.pg-brands { list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2px 0 }
+.pg-brands li { padding: 16px 0; border-top: 1px solid var(--ln) }
+.pg-brands .nm { margin: 0 0 5px; font-size: 13px; letter-spacing: .1em; font-weight: 600 }
+.pg-brands .tp { margin: 0; font-size: 11.5px; color: var(--mut); letter-spacing: .04em }
+
+/* ===== 節 ===== */
+.pg-sec { margin: 0 0 clamp(64px, 9vw, 110px) }
+.pg-sec h2 { font-family: var(--jp-title); font-weight: 700; color: var(--tx);
+  font-size: clamp(17px, 2.2vw, 21px); letter-spacing: .08em; line-height: 1.7; margin: 0 0 22px }
+
+/* ===== お問い合わせのフォーム ===== */
+.fm { max-width: 620px; margin: 0 }
+.fm-row { margin: 0 0 22px }
+.fm label { display: block; font-size: 12px; letter-spacing: .08em; color: var(--mut);
+  margin: 0 0 8px; font-weight: 500 }
+.fm label .req { color: var(--acc); margin-left: 6px; font-size: 10.5px; letter-spacing: .1em }
+.fm input, .fm textarea, .fm select {
+  width: 100%; font: inherit; font-size: 14px; line-height: 1.8; color: var(--tx);
+  background: #fff; border: 1px solid var(--ln); border-radius: 8px;
+  padding: 13px 15px; transition: border-color .2s ease, box-shadow .2s ease;
+  -webkit-appearance: none; appearance: none;
+}
+.fm select { background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%),
+    linear-gradient(135deg, var(--mut) 50%, transparent 50%);
+  background-position: calc(100% - 19px) 50%, calc(100% - 14px) 50%;
+  background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 40px }
+.fm textarea { resize: vertical; min-height: 168px }
+.fm input:focus, .fm textarea:focus, .fm select:focus {
+  outline: none; border-color: var(--acc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 18%, transparent);
+}
+.fm input[aria-invalid="true"], .fm textarea[aria-invalid="true"] { border-color: #B4462F }
+.fm-err { margin: 7px 0 0; font-size: 11.5px; color: #B4462F; line-height: 1.7 }
+/* 迷惑投稿よけ。**目にも読み上げにも出さないこと。**
+   display:none だと埋めてこない相手がいるので、位置で画面の外へ出す */
+.fm-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden }
+
+.fm-send { display: inline-flex; align-items: center; gap: 10px; margin-top: 6px;
+  padding: 15px 32px; border: 0; border-radius: 99px; cursor: pointer;
+  background: var(--tx); color: var(--pg); font: inherit; font-size: 13.5px;
+  font-weight: 700; letter-spacing: .06em;
+  transition: transform .25s ease, opacity .25s ease }
+.fm-send:hover:not(:disabled) { transform: translateY(-1px) }
+.fm-send:disabled { opacity: .45; cursor: default }
+.fm-send:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px }
+.fm-privacy { margin: 18px 0 0; font-size: 11.5px; line-height: 1.9; color: var(--mut) }
+
+/* 送信後の知らせ。役割は role="status" 側で持たせる */
+.fm-msg { margin: 20px 0 0; padding: 16px 18px; border-radius: 10px; font-size: 13px; line-height: 1.9 }
+.fm-msg.ok { background: color-mix(in srgb, var(--acc) 12%, #fff); color: var(--tx);
+  border: 1px solid color-mix(in srgb, var(--acc) 34%, transparent) }
+.fm-msg.ng { background: #FBF0ED; color: #8A382F; border: 1px solid rgba(180, 70, 47, .3) }
+
+.fm-done h2 { font-family: var(--jp-title); font-weight: 700; font-size: clamp(19px, 2.6vw, 24px);
+  letter-spacing: .06em; margin: 0 0 16px; line-height: 1.7 }
+.fm-done p { margin: 0 0 12px; font-size: 14px; line-height: 2.05; color: var(--mut) }
+
+@media (max-width: 640px) {
+  .pg-dl { grid-template-columns: minmax(0, 1fr) }
+  .pg-dl dt { padding-right: 0 }
+  /* 1列になったら、項目名と値のあいだの罫は引かない（項目名の上だけ） */
+  .pg-dl dd { border-top: 0; padding-top: 0; padding-bottom: 20px }
+  .pg-dl dt { padding-bottom: 6px }
+}

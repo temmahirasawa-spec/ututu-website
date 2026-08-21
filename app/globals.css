@@ -10,6 +10,23 @@
  --jp-title:var(--font-barlow),var(--font-zen-kaku),"Hiragino Sans",sans-serif}
 *{box-sizing:border-box}html,body{margin:0}
 html{scroll-behavior:auto}
+/* Chrome の「スクロールアンカリング」を切る。
+   画面より上の中身の高さが変わると、Chrome は見た目を保とうとして
+   scrollY のほうを黙って動かす。**この機能があるのは Chrome だけで、
+   Safari には無い。**そのため「Chromeでだけ位置が飛ぶ・戻される」が起きた。
+
+   このサイトでは和文（Noto Sans JP / Zen Kaku Gothic New）を preload せず
+   swap で当てている（KVの連番と帯域を取り合わせないための判断。app/layout.tsx）。
+   その和文が遅れて届くと #after の長い本文が一斉に組み直され、
+   画面より上の高さが変わる。そこで Chrome が補正に入る、という筋道。
+   和文を遅らせて再現したところ、scrollHeight の変化に合わせて
+   入力していないのに scrollY が動くのを確認した。
+
+   切ると、Chrome も Safari と同じく「文字は組み直るが、スクロール位置は
+   動かない」ようになる。このサイトは KV をまるごと scrollY から起こしている
+   ので、ブラウザーに位置を触られないほうが都合がよい。
+   （無限スクロールのように上へ中身を足す作りは無いため、失うものは無い）*/
+html{overflow-anchor:none}
 /* 映像区間のあいだは、OS標準のスクロールバーを消して独自の縦棒（#prog）だけにする。
    クラスは <html> に付ける。スクロールバーは根の要素のものなので、
    body のクラスからは指定できない */
@@ -74,6 +91,16 @@ body.menu-open #menu{opacity:1;pointer-events:auto}
 #menu a{color:#fff;text-decoration:none;font-size:clamp(22px,4vw,30px);font-weight:600;
  letter-spacing:.02em;opacity:.92}
 #menu small{display:block;font-size:10px;letter-spacing:.2em;opacity:.45;margin-top:6px;font-weight:400}
+
+/* 下層ページは紙の地なので、ロゴとハンバーガーを墨に反転する（SiteHeader の .ink）。
+   KVでは白のまま。映像の上に置くので影も要る。
+   **メニューを開いているあいだは白に戻すこと。**幕（#menu）が墨なので、
+   反転したままだと閉じるための×が地に沈んで見えなくなる */
+#brand.ink path{fill:var(--ink)}
+#menuBtn.ink span{background:var(--ink);box-shadow:none}
+body.menu-open #brand.ink path{fill:#fff}
+body.menu-open #menuBtn.ink span{background:#fff}
+#brand.ink:focus-visible{outline-color:var(--ink)}
 
 /* ===== プロフィールのモーダル ===== */
 /* ---- プロフィールのモーダル。スマホは下からのシート、PCは中央のポップアップ。
@@ -249,6 +276,11 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
  font-size:11.5px;color:var(--mut);letter-spacing:.04em}
 #foot .pages{display:flex;gap:22px}
 #foot .soon{opacity:.6}
+/* 既定の下線と青は使わない。色は必ずトークン経由にする
+   （#after では墨に反転するため、直に色を書くと取り残される）*/
+#foot a{color:var(--mut);text-decoration:none;transition:color .25s ease}
+#foot a:hover{color:var(--tx)}
+#foot a:focus-visible{outline:1px solid var(--bd);outline-offset:4px}
 
 
 @media (max-width:760px){
