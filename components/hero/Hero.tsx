@@ -72,7 +72,7 @@ export function Hero() {
         <button id="backBtn"><i /><span>BACK</span></button>
         <button id="nextBtn"><span>NEXT</span><i /></button>
       </div>
-      <a id="skip" href="#after"><span>SKIP</span><i /></a>
+      <a id="skip" href="#after">SKIP</a>
 
       <div id="copyLayer">
         <div className="copy mid"><p className="eyebrow">Ututu</p><div className="rule" />

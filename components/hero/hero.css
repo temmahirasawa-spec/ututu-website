@@ -128,20 +128,17 @@ body.menu-open #dots,body.menu-open #navBar{opacity:0;pointer-events:none}
 body.snap #prog{display:none}
 
 /* ===== 映像を飛ばす ===== */
-/* 映像を飛ばす。NEXT ボタンと同じ地・同じふちに揃えてある */
+/* 映像を飛ばす。NEXT ボタンと同じ地・同じふちに揃えてある。
+   **下向きの山形は付けないこと。**ドロップダウンに見える（本人判断）*/
 #skip{position:fixed;z-index:6;bottom:26px;right:26px;
- display:inline-flex;align-items:center;gap:9px;
+ display:inline-flex;align-items:center;
  color:#fff;font-size:12px;font-weight:600;letter-spacing:.16em;text-decoration:none;
  border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:11px 20px;
  background:rgba(255,255,255,.12);
  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
  text-shadow:0 1px 10px rgba(0,0,0,.4);
  transition:opacity .4s, background .25s ease, border-color .25s ease}
-#skip i{display:block;width:7px;height:7px;flex:none;
- border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
- transform:rotate(45deg) translate(-1px,-1px);transition:transform .25s ease}
 #skip:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.55)}
-#skip:hover i{transform:rotate(45deg) translate(1px,1px)}
 #skip:active{background:rgba(255,255,255,.28)}
 #skip:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:4px}
 /* **opacity では隠せない。**エンジンが inline で opacity を書くので勝てない。
@@ -200,8 +197,7 @@ body.menu-open #skip{visibility:hidden;pointer-events:none}
   body.snap #skip{
     display:inline-flex;left:16px;right:auto;z-index:8;
     bottom:calc(15px + env(safe-area-inset-bottom));
-    font-size:11px;letter-spacing:.14em;padding:9px 16px;gap:7px}
-  body.snap #skip i{width:6px;height:6px;border-width:1.4px}
+    font-size:11px;letter-spacing:.14em;padding:9px 16px}
   body.snap.past-hero #skip{visibility:hidden;pointer-events:none}
   .eyebrow{margin:0 0 10px}
   .rule{margin:0 0 14px}
