@@ -61,7 +61,8 @@ export function Hero() {
           <li><a href="#after">PRODUCTS<small>プロダクト</small></a></li>
           <li><a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<small>モバイルオーダー</small></a></li>
           <li><a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<small>レビューと満足度</small></a></li>
-          <li><a href="#after">CONTACT<small>お問い合わせ</small></a></li>
+          <li><a href="/company">COMPANY<small>会社概要</small></a></li>
+          <li><a href="/company#contact">CONTACT<small>お問い合わせ</small></a></li>
         </ul>
       </nav>
       <div id="scrollHint"><span>SCROLL</span><i /><b /></div>

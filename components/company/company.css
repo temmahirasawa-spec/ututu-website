@@ -1,0 +1,178 @@
+/* 会社概要＋お問い合わせ（/company）。
+   見立ては「お品書き」と「注文伝票」。店をつくる会社の概要はメニューで、
+   問い合わせは注文で受ける。世界観は紙のセクションと同じ（紙・墨・オリーブ1点）。
+
+   動きの語彙も同じ「静かに現れる」だけ。クラスは .cp-rv（トップの .rv と
+   同名にすると、あちらの初期化に依存してしまうので分けてある）。 */
+
+.cp{background:var(--paper);color:var(--ink);min-height:100svh;
+ padding:0 clamp(24px,5vw,40px) clamp(64px,9vw,110px)}
+.cp-in{max-width:680px;margin:0 auto}
+
+/* ===== 上部。ロゴはトップへ帰る道 ===== */
+.cp-top{max-width:1040px;margin:0 auto;padding:26px 0 clamp(48px,7vw,84px);
+ display:flex;align-items:center;justify-content:space-between}
+.cp-mark{line-height:0}
+.cp-mark svg{display:block;height:var(--markBox);width:auto}
+.cp-mark path{fill:var(--ink)}
+.cp-back{display:inline-flex;align-items:center;gap:8px;color:var(--sub);
+ text-decoration:none;font-size:11.5px;letter-spacing:.16em;font-weight:600;
+ transition:color .25s ease}
+.cp-back i{display:block;width:6px;height:6px;border-left:1.5px solid currentColor;
+ border-bottom:1.5px solid currentColor;transform:rotate(45deg)}
+.cp-back:hover{color:var(--ink)}
+/* 左右の重さを揃えるための空box（ロゴを真ん中に置く） */
+.cp-top .sp{width:64px}
+
+/* ===== 見出し ===== */
+.cp-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+ color:var(--olive);margin:0 0 16px;font-weight:500;text-align:center}
+.cp h1,.cp h2{font-family:var(--jp-title);font-weight:700;color:var(--ink);
+ font-size:clamp(26px,4vw,38px);letter-spacing:.1em;line-height:1.6;
+ margin:0 0 14px;text-align:center}
+.cp-lead{color:var(--sub);font-size:13.5px;line-height:2.05;margin:0 auto;
+ max-width:36em;text-align:center}
+
+/* ===== 静かに現れる ===== */
+.cp-rv{opacity:0;transform:translateY(16px);
+ transition:opacity .9s cubic-bezier(.4,0,.25,1) var(--d,0s),
+  transform .9s cubic-bezier(.4,0,.25,1) var(--d,0s)}
+.cp-rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.cp-rv{opacity:1;transform:none;transition:none}}
+
+/* ===== お品書き ===== */
+/* 二重の枠。外は細く、内は少し離す。品書きの表具のつもり */
+.cp-menu{margin:clamp(36px,5vw,56px) 0 0;background:var(--cream);
+ border:1px solid rgba(20,22,26,.28);padding:7px}
+.cp-menu-in{border:1px solid rgba(20,22,26,.14);
+ padding:clamp(28px,4.6vw,46px) clamp(22px,4.6vw,46px) clamp(24px,4vw,38px)}
+.cp-menu-title{margin:0 0 6px;text-align:center;font-family:var(--jp-title);
+ font-weight:700;font-size:19px;letter-spacing:.5em;text-indent:.5em}
+.cp-menu-sub{margin:0 0 clamp(24px,3.6vw,34px);text-align:center;
+ font-size:10px;letter-spacing:.3em;color:var(--sub);font-weight:500}
+
+/* 一行 ＝ 項目 …… 値。中トビの点線は .in で左から伸びる */
+.cp-row{display:flex;align-items:baseline;gap:14px;padding:13px 0;
+ border-bottom:1px solid rgba(20,22,26,.06)}
+.cp-row:last-of-type{border-bottom:0}
+.cp-row dt{flex:none;width:6.5em;font-size:12.5px;letter-spacing:.14em;
+ color:var(--sub);font-weight:500}
+.cp-row .lead{flex:1;align-self:center;height:1em;min-width:24px;
+ background-image:radial-gradient(circle,rgba(20,22,26,.34) 1px,transparent 1.3px);
+ background-size:9px 9px;background-position:0 62%;background-repeat:repeat-x;
+ transform:scaleX(0);transform-origin:left;
+ transition:transform .9s cubic-bezier(.4,0,.25,1) var(--d,0s)}
+.cp-row dd{margin:0;max-width:58%;text-align:right;font-size:13.5px;
+ line-height:1.9;letter-spacing:.04em;color:var(--ink);
+ word-break:auto-phrase;   /* 折るときは文節で。「開発」の途中で折らない */
+ opacity:0;transition:opacity .7s ease calc(var(--d,0s) + .45s)}
+.cp-menu.in .cp-row .lead{transform:scaleX(1)}
+.cp-menu.in .cp-row dd{opacity:1}
+@media (prefers-reduced-motion:reduce){
+  .cp-row .lead{transform:none;transition:none}
+  .cp-row dd{opacity:1;transition:none}
+}
+.cp-menu-note{margin:clamp(20px,3vw,28px) 0 0;text-align:center;
+ font-size:10.5px;letter-spacing:.14em;color:var(--sub)}
+
+/* ===== 注文伝票（お問い合わせ） ===== */
+.cp-contact{margin-top:clamp(84px,12vw,140px)}
+/* 上端をミシン目に。穴の列をマスクで抜く。効かないブラウザでは角の丸い紙のまま */
+.cp-slip{margin:clamp(36px,5vw,56px) 0 0;background:#fff;border-radius:0 0 6px 6px;
+ box-shadow:0 18px 40px -24px rgba(20,22,26,.35),0 2px 8px rgba(20,22,26,.06);
+ padding:clamp(26px,4.6vw,42px) clamp(22px,4.6vw,46px) clamp(28px,4.6vw,42px);
+ -webkit-mask:
+  radial-gradient(circle at 9px 5px,transparent 4px,#000 4.5px) top left/18px 10px repeat-x,
+  linear-gradient(#000,#000) 0 10px/100% calc(100% - 10px) no-repeat;
+ mask:
+  radial-gradient(circle at 9px 5px,transparent 4px,#000 4.5px) top left/18px 10px repeat-x,
+  linear-gradient(#000,#000) 0 10px/100% calc(100% - 10px) no-repeat}
+.cp-slip-head{display:flex;align-items:baseline;justify-content:space-between;
+ gap:12px;border-bottom:2px solid var(--ink);padding:6px 0 12px;margin:0 0 8px}
+.cp-slip-head b{font-family:var(--jp-title);font-weight:700;font-size:16px;letter-spacing:.3em}
+.cp-slip-head span{font-size:10px;letter-spacing:.18em;color:var(--sub);
+ font-variant-numeric:tabular-nums}
+
+/* 用件。メニューから選ぶ */
+.cp-kinds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+ margin:18px 0 6px;padding:0;border:0}
+.cp-kinds legend{padding:0;margin:0 0 10px;font-size:11px;letter-spacing:.2em;
+ color:var(--sub);font-weight:600}
+.cp-kind{position:relative}
+.cp-kind input{position:absolute;opacity:0;pointer-events:none}
+.cp-kind label{display:flex;align-items:center;justify-content:center;gap:7px;
+ padding:12px 8px;border:1px solid rgba(20,22,26,.22);border-radius:4px;
+ font-size:12.5px;letter-spacing:.08em;color:var(--ink);cursor:pointer;
+ transition:border-color .2s ease,background .2s ease,box-shadow .2s ease}
+.cp-kind label::before{content:"";width:7px;height:7px;border-radius:50%;
+ border:1.5px solid rgba(20,22,26,.35);transition:all .2s ease;flex:none}
+.cp-kind input:checked + label{border-color:var(--ink);background:var(--cream);
+ box-shadow:inset 0 0 0 1px var(--ink)}
+.cp-kind input:checked + label::before{background:var(--olive);border-color:var(--olive)}
+.cp-kind input:focus-visible + label{outline:2px solid var(--olive);outline-offset:2px}
+
+/* 記入欄。伝票なので下線だけ */
+.cp-field{margin:16px 0 0}
+.cp-field label{display:block;font-size:11px;letter-spacing:.2em;color:var(--sub);
+ font-weight:600;margin:0 0 6px}
+.cp-field label i{font-style:normal;letter-spacing:.06em;color:rgba(20,22,26,.35);margin-left:8px}
+.cp-field input,.cp-field textarea{display:block;width:100%;border:0;
+ border-bottom:1px solid rgba(20,22,26,.3);background:transparent;border-radius:0;
+ padding:8px 2px 10px;font:inherit;font-size:14px;line-height:1.8;color:var(--ink);
+ transition:border-color .2s ease}
+.cp-field textarea{resize:vertical;min-height:112px;line-height:2}
+.cp-field input:focus,.cp-field textarea:focus{outline:none;border-bottom-color:var(--ink)}
+.cp-field input::placeholder,.cp-field textarea::placeholder{color:rgba(20,22,26,.28)}
+
+/* 合計行と送信。伝票の締め */
+.cp-total{display:flex;align-items:baseline;gap:14px;margin:26px 0 0;
+ padding:14px 0 0;border-top:1px dashed rgba(20,22,26,.3)}
+.cp-total b{flex:none;font-size:12.5px;letter-spacing:.2em;font-weight:600}
+.cp-total .lead{flex:1;align-self:center;height:1em;
+ background-image:radial-gradient(circle,rgba(20,22,26,.3) 1px,transparent 1.3px);
+ background-size:9px 9px;background-position:0 62%;background-repeat:repeat-x}
+.cp-total span{font-size:13.5px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.cp-submit{margin:22px 0 0;width:100%;display:flex;align-items:center;
+ justify-content:center;gap:10px;padding:16px 0;border:0;border-radius:4px;
+ background:var(--ink);color:var(--paper);font:600 13.5px/1 var(--jp-title);
+ letter-spacing:.24em;text-indent:.24em;cursor:pointer;
+ transition:opacity .25s ease,transform .2s ease}
+.cp-submit:hover{opacity:.88}
+.cp-submit:active{transform:translateY(1px)}
+.cp-submit:disabled{opacity:.45;cursor:default;transform:none}
+.cp-submit:focus-visible{outline:2px solid var(--olive);outline-offset:3px}
+.cp-form-note{margin:14px 0 0;text-align:center;font-size:11px;letter-spacing:.08em;
+ color:var(--sub);line-height:1.9}
+.cp-error{margin:14px 0 0;text-align:center;font-size:12px;line-height:1.9;
+ color:#A0522D;letter-spacing:.04em}
+.cp-error a{color:inherit}
+
+/* 受付済。判子 */
+.cp-done{text-align:center;padding:clamp(20px,4vw,36px) 0 clamp(8px,2vw,16px)}
+.cp-stamp{display:inline-grid;place-items:center;width:92px;height:92px;margin:0 0 20px;
+ border:2.5px solid var(--olive);border-radius:50%;color:var(--olive);
+ font-family:var(--jp-title);font-weight:700;font-size:17px;letter-spacing:.14em;
+ transform:rotate(-8deg);
+ animation:cpstamp .4s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes cpstamp{from{transform:rotate(-8deg) scale(1.7);opacity:0}
+ to{transform:rotate(-8deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.cp-stamp{animation:none}}
+.cp-done h3{margin:0 0 10px;font-family:var(--jp-title);font-weight:700;
+ font-size:18px;letter-spacing:.1em}
+.cp-done p{margin:0;font-size:12.5px;line-height:2;color:var(--sub)}
+
+/* ===== ページの足元 ===== */
+.cp-foot{max-width:680px;margin:clamp(72px,10vw,120px) auto 0;
+ padding:22px 0 0;border-top:1px solid var(--line);
+ display:flex;flex-wrap:wrap;gap:8px 22px;align-items:baseline;
+ justify-content:space-between;font-size:11px;color:var(--sub);letter-spacing:.06em}
+.cp-foot a{color:inherit;text-decoration:none}
+.cp-foot a:hover{color:var(--ink)}
+
+@media (max-width:600px){
+  .cp-row{flex-wrap:wrap;gap:8px 12px}
+  .cp-row dt{width:auto}
+  /* 値が長い行は、点線の下の段に左寄せで置く */
+  .cp-row dd{max-width:100%;flex-basis:100%;text-align:left;padding-left:2px}
+  .cp-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

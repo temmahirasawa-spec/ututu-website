@@ -93,6 +93,8 @@ export function After() {
             <button className="profile-btn" type="button" data-bio="temma">Profile　＋</button>
           </div>
         </div>
+        {/* 会社概要はここからも辿れる。ナビとフッターにも同じ道がある */}
+        <p className="fd-more rv"><a className="profile-btn" href="/company">会社概要を見る</a></p>
       </div>
 
       {/* 締め */}
@@ -101,11 +103,18 @@ export function After() {
         <h3 className="rv">検証は、今日も営業中。</h3>
         <p className="lead rv">私たちの店は、これからも実験台です。使いながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべてはこの店の一日から始まります。</p>
         <p className="next-line rv"><i></i>Next product — Reservation System and more</p>
+        {/* トップの出口。ここまで読んだ人を問い合わせへ送る */}
+        <div className="af-cta rv">
+          <a className="cta-main" href="/company#contact">お問い合わせ
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+          </a>
+          <a className="cta-sub" href="/company">会社概要</a>
+        </div>
       </div>
 
       <div id="foot" className="rv">
         <span>© UTUTU Inc.</span>
-        <span className="pages"><span className="soon">会社概要（準備中）</span><span className="soon">お問い合わせ（準備中）</span></span>
+        <span className="pages"><a href="/company">会社概要</a><a href="/company#contact">お問い合わせ</a></span>
       </div>
       </div></section>
       <BioModal />
