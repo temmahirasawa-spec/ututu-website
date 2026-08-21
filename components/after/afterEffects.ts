@@ -66,13 +66,17 @@ export function startAfter(): () => void {
      **ssr:false 相当（この関数はブラウザでしか呼ばれない）。**
      読み込みや WebGL に失敗したら、破線の枠のまま何もしない */
   const fd = document.getElementById('founders');
+  let stopViewer: (() => void) | null = null;
   if (fd && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => {
       es.forEach((e) => {
         if (!e.isIntersecting) return;
         io.disconnect();
         import('@/lib/three/headViewer')
-          .then((m) => m.initHeads(Array.from(fd.querySelectorAll<HTMLElement>('.fd-ph'))))
+          .then((m) => {
+            stopViewer = m.stopHeads;
+            return m.initHeads(Array.from(fd.querySelectorAll<HTMLElement>('.fd-ph')));
+          })
           .catch((err) => console.warn('3Dビューアを読み込めませんでした', err));
       });
     }, { rootMargin: '400px' });
@@ -83,5 +87,6 @@ export function startAfter(): () => void {
   return () => {
     timers.forEach((t) => clearTimeout(t));
     offs.forEach((f) => f());
+    stopViewer?.();          // canvas を消して .live を外す。残すと次で二重になる
   };
 }
