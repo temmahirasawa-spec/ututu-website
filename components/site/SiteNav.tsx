@@ -6,8 +6,14 @@
      TOP
      COMPANY / CONTACT   … 同じページなので1行に並べる
      ──
-     PRODUCTS
-     GOOD ORDER | GOOD REVIEW   … **サイトの外**なので下に小さく、新タブの印つき
+     PRODUCTS            … **見出し。リンクではない**
+     GOOD ORDER | GOOD REVIEW   … その見出しのすぐ下に置く行き先。
+                                  **サイトの外**なので新タブの印つき
+
+   PRODUCTS を押せるようにしないこと。押し先はこの2つしかなく、
+   見出しにも道をつけると、どれが本当の行き先か分からなくなる。
+   2つは見出しから離さないこと（画面の下端に逃がすと、
+   別のかたまりに見えて見落とされる）。
 
    CSSは globals.css の「メニュー」の節。 */
 
@@ -73,17 +79,18 @@ export function SiteNav({ variant = 'top', tone = 'film' }: Props) {
             <small>会社概要・お問い合わせ</small>
           </li>
           <li aria-hidden="true"><hr className="menu-rule" /></li>
-          <li>
-            <a href={onTop ? '#after' : '/#after'}>PRODUCTS<small>プロダクト</small></a>
+
+          {/* PRODUCTS は見出し。行き先は下の2つだけ。
+              サイトの外なので、新タブで開く印をつける */}
+          <li className="menu-prod">
+            <p className="menu-head">PRODUCTS</p>
+            <div className="menu-ext">
+              <a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<ExtIcon /></a>
+              <span className="bar" aria-hidden="true" />
+              <a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<ExtIcon /></a>
+            </div>
           </li>
         </ul>
-
-        {/* サイトの外にあるもの。小さく、新タブで開く印をつける */}
-        <div className="menu-ext">
-          <a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<ExtIcon /></a>
-          <span className="bar" aria-hidden="true" />
-          <a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<ExtIcon /></a>
-        </div>
       </nav>
     </>
   );
