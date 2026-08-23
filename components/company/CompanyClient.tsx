@@ -6,7 +6,7 @@
    CSSは company.css。確定待ちの項目は CLAUDE.md の「残っている作業」参照。 */
 
 import Link from 'next/link';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Mark } from '@/components/hero/Mark';
 import { SiteNav } from '@/components/site/SiteNav';
 import './company.css';
@@ -98,7 +98,6 @@ function ContactSlip() {
   const [kind, setKind] = useState<string>(KINDS[0]);
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error' | 'unconfigured'>('idle');
   const [slipNo, setSlipNo] = useState('—');
-  const formRef = useRef<HTMLFormElement>(null);
 
   /* 伝票番号は飾り。**サーバーで作らないこと。**描画のたびに変わる値を
      SSRに含めると、水和で食い違って警告が出る。載せるのはマウント後 */
@@ -153,7 +152,7 @@ function ContactSlip() {
   }
 
   return (
-    <form className="cp-slip cp-rv" style={{ ['--d' as string]: '.18s' }} ref={formRef} onSubmit={submit}>
+    <form className="cp-slip cp-rv" style={{ ['--d' as string]: '.18s' }} onSubmit={submit}>
       <div className="cp-slip-head">
         <b>お問い合わせ</b>
         <span>{slipNo}</span>

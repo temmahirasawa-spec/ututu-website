@@ -1,0 +1,17 @@
+/* 404の見た目。紙・墨・オリーブ1点のトンマナ（globals.css のトークン）に合わせる */
+.nf{min-height:100svh;display:flex;flex-direction:column;align-items:center;
+ justify-content:center;text-align:center;padding:40px 24px;
+ background:var(--paper);color:var(--ink)}
+.nf-code{margin:0 0 18px;font-size:12px;letter-spacing:.3em;font-weight:600;
+ color:var(--olive)}
+.nf h1{margin:0 0 16px;font-family:var(--jp-title);font-weight:700;
+ font-size:clamp(20px,3.4vw,28px);letter-spacing:.08em;line-height:1.7}
+.nf-lead{margin:0;font-size:13px;line-height:2.05;color:var(--sub)}
+.nf-home{margin-top:44px;display:flex;flex-direction:column;align-items:center;
+ gap:14px;color:var(--ink);text-decoration:none}
+.nf-home svg{height:15px;width:auto}
+.nf-home path{fill:var(--ink)}
+.nf-home span{font-size:11.5px;letter-spacing:.16em;color:var(--sub);
+ border-bottom:1px solid var(--line);padding-bottom:3px;
+ transition:color .25s ease,border-color .25s ease}
+.nf-home:hover span{color:var(--ink);border-color:var(--ink)}

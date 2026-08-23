@@ -475,11 +475,17 @@ export function startHero(): () => void {
      緑の丸をドラッグして合わせ、出てきた座標を heroConfig の holds に貼る
      ============================================================ */
   console.log('%cUTUTU scroll sequence  build 2026-08-20-next', 'color:#00E5A0;font-weight:bold');
-  console.log('編集モード: URLに ?edit=1 を付けるか、Eキーを押してください');
+  console.log('編集モード: URLに ?edit=1 を付けて開く（そのあとはEキーで出し入れ）');
 
-  let EDIT = /[?&]edit/.test(location.search) || /edit/.test(location.hash);
+  /* Eキーの発動は ?edit 付きで開いたときに限る。
+     素のEキーでも開ける作りだと、本番で訪問者が誤ってEを押すだけで
+     緑のハンドルとデバッグパネルが出てしまう。調整の作業手順は
+     いままでどおり「?edit=1 で開いてから、Eで出し入れ」で変わらない */
+  const editAllowed = /[?&]edit/.test(location.search) || /edit/.test(location.hash);
+  let EDIT = editAllowed;
   let editReady = false;
   on(window, 'keydown', (e) => {
+    if (!editAllowed) return;
     const k = (e as KeyboardEvent).key;
     if (k === 'e' || k === 'E') { EDIT = !EDIT; setupEdit(); }
   });

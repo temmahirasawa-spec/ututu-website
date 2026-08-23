@@ -10,7 +10,6 @@ export function startAfter(): () => void {
     t.addEventListener(ev, fn, opt);
     offs.push(() => t.removeEventListener(ev, fn, opt));
   };
-  const timers: ReturnType<typeof setTimeout>[] = [];
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -85,7 +84,6 @@ export function startAfter(): () => void {
   }
 
   return () => {
-    timers.forEach((t) => clearTimeout(t));
     offs.forEach((f) => f());
     stopViewer?.();          // canvas を消して .live を外す。残すと次で二重になる
   };

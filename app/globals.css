@@ -293,17 +293,8 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 @keyframes lamp{0%,100%{opacity:.25}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.next-line i{animation:none}}
 
-/* ---- プロダクト ---- */
-.prod-head{display:flex;align-items:flex-end;justify-content:space-between;
- gap:16px 24px;flex-wrap:wrap;margin:0 0 16px}
-.prod-head h3{margin:0}
-.prod .lead{margin-bottom:clamp(28px,4.4vw,42px)}
-.linkbtn.onpaper{color:var(--tx);border-color:var(--bd);background:transparent;
- backdrop-filter:none;-webkit-backdrop-filter:none;
- transition:color .9s ease,border-color .25s ease,background .25s ease}
-.linkbtn.onpaper:hover{background:var(--bd-soft);border-color:var(--tx)}
-
-/* 図解（.fig / .fg）のCSSは 2026-08-20 に撤去しました。
+/* 旧プロダクト節（.prod-head / .linkbtn.onpaper）と
+   図解（.fig / .fg）のCSSは撤去済み（2026-08-20〜24）。
    プロダクト2節は各サービスのトンマナに切り替え、実物の画面と
    イラストで見せる形にしたためです（components/after/products.css）。
    線引きの図解が再び要るときは、この時点のコミットから戻せます。 */
@@ -316,7 +307,6 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 #foot .pages{display:flex;gap:22px}
 #foot .pages a{color:inherit;text-decoration:none;transition:color .3s ease}
 #foot .pages a:hover{color:var(--tx)}
-#foot .soon{opacity:.6}
 
 
 @media (max-width:760px){

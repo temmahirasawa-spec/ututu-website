@@ -461,9 +461,31 @@ npm run dev
 
 ### これから作るもの
 
-- OGP画像・favicon・メタ情報。**`app/layout.tsx` の `robots: { index: false }` は
-  公開の合図が出るまで外さないこと**
+- **OGP画像**（1200×630）。`public/og.png` に置いて `app/layout.tsx` の
+  `openGraph.images: ['/og.png']` を足す（metadataBase・OGPの文字情報・
+  twitter card は設定済み）
 - 管理画面のスクリーンショット（Figmaから）。プロダクト2節に入れる想定
+- favicon は正式ロゴの「U」で作成済み（`app/icon.svg` / `favicon.ico` /
+  `apple-icon.png`）。別デザインにするならこの3点を差し替える
+
+### 公開の日にやること（この順で）
+
+1. `app/layout.tsx` の `robots: { index: false, follow: false }` の行を**削除**
+   （robots.ts / sitemap.ts は設置済みなので、これ1行で検索に載り始める）
+2. 独自ドメインが決まっていたら、Vercel の環境変数 `NEXT_PUBLIC_SITE_URL` に
+   `https://ドメイン` を入れる（未設定時は ututu-website.vercel.app として動く）
+3. Vercel のダッシュボードで `/api/contact` に WAF のレートリミットを掛ける
+   （コード側にも10分5通の簡易制限はあるが、インスタンス単位なので厳密ではない）
+4. Vercel の Project Settings で Node のバージョンを確認し、`package.json` に
+   `engines` として書き写す（ローカルとの乖離を見えるようにする）
+
+### 画像を差し替えるときの約束
+
+- `public/img/` は**1日キャッシュ＋1週間の stale-while-revalidate**（vercel.json）。
+  ファイルを差し替えれば、翌日までには全員に行き渡る。即時に見せたいときだけ
+  ファイル名を変える。frames系・models と違って `?v=` の管理はしない
+- frames系・clips・models は immutable（1年）。**中身を差し替えたら必ず
+  `?v=` を上げること**（heroConfig の `ver` / headViewer のコメント参照）
 
 ### 未解決の不具合
 

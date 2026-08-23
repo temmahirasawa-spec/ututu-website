@@ -12,7 +12,29 @@
 
 const RESEND_URL = 'https://api.resend.com/emails';
 
+/* 簡易レートリミッタ（インスタンス内メモリ・IPごとに10分5通）。
+   サーバーレスはインスタンスごとに別カウントなので厳密ではないが、
+   単純な連投スクリプトから受信箱と Resend の無料枠（100通/日）を守るには足りる。
+   厳密にやるなら Vercel の WAF ルールか Upstash を足す */
+const hits = new Map<string, number[]>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 10 * 60 * 1000;
+function limited(ip: string) {
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW);
+  if (recent.length >= RATE_LIMIT) { hits.set(ip, recent); return true; }
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 500) {
+    for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW)) hits.delete(k);
+  }
+  return false;
+}
+
 export async function POST(req: Request) {
+  const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
+  if (limited(ip)) return Response.json({ error: 'too-many' }, { status: 429 });
+
   let body: {
     kind?: string; name?: string; org?: string;
     email?: string; message?: string; website?: string;
@@ -27,8 +49,10 @@ export async function POST(req: Request) {
      （エラーを返すと、機械が学習して埋めなくなる） */
   if (body.website) return Response.json({ ok: true });
 
-  const kind = (body.kind || '').slice(0, 40);
-  const name = (body.name || '').trim().slice(0, 120);
+  /* kind と name は件名に入る。改行を通すとメールヘッダに漏れるので潰す */
+  const flat = (s: string) => s.replace(/[\r\n]+/g, ' ');
+  const kind = flat(body.kind || '').slice(0, 40);
+  const name = flat(body.name || '').trim().slice(0, 120);
   const org = (body.org || '').trim().slice(0, 200);
   const email = (body.email || '').trim().slice(0, 254);
   const message = (body.message || '').trim().slice(0, 5000);

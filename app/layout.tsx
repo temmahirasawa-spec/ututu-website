@@ -21,18 +21,36 @@ const notoSansJP = Noto_Sans_JP({
   display: 'swap',
   preload: false,
 });
+/* **weight は 700 だけ。**500 はサイトのどこからも選択されない
+   （見出しは全部700。唯一の font:600 も、500と700からは700が選ばれる）。
+   和文は @font-face 宣言だけで weight あたり約90KB CSSが膨らむので、
+   使わない weight を足さないこと */
 const zenKaku = Zen_Kaku_Gothic_New({
   subsets: ['latin'],
-  weight: ['500', '700'],
+  weight: ['700'],
   variable: '--font-zen-kaku',
   display: 'swap',
   preload: false,
 });
 
+const DESC =
+  '飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。私たちは自分たちでも店を営んでいて、毎日の営業のなかで使い、残ったものだけをかたちにしています。';
+
 export const metadata: Metadata = {
+  /* 独自ドメインが決まったらここを差し替える（相対URLの解決先になる） */
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ututu-website.vercel.app'),
   title: 'UTUTU — 店舗に、いい一日を。',
-  description:
-    '飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。私たちは自分たちでも店を営んでいて、毎日の営業のなかで使い、残ったものだけをかたちにしています。',
+  description: DESC,
+  /* OGP。**画像はまだ無い。**public/ に og.png（1200×630）を置いたら
+     openGraph.images: ['/og.png'] を足すこと（残っている作業に記載あり） */
+  openGraph: {
+    title: 'UTUTU — 店舗に、いい一日を。',
+    description: DESC,
+    siteName: 'UTUTU',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: { card: 'summary' },
   /* まだ検索には出さない。公開してよくなったらこの2行を外す。
      **robots.txt で拒否しないこと。**クロールを止めると noindex 自体を読めず、
      外部リンク経由で逆に登録されてしまう。読ませたうえで noindex を伝える */
