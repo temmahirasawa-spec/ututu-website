@@ -15,6 +15,7 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { Mark } from '@/components/hero/Mark';
+import { GLASS_MAP } from './glassMap';
 
 type Variant = 'hero' | 'page';
 
@@ -40,9 +41,23 @@ export function SiteHeader({ variant = 'page' }: { variant?: Variant }) {
         </Link>
       )}
 
+      {/* Liquid Glass のハンバーガー。丸いガラスの中に3本線。
+          ガラスは backdrop-filter で下の SVG フィルター（#frosted）を通す。
+          出典: codepen.io/Mikhail-Bespalov/pen/MYwrMNy。
+          hover で feDisplacementMap の scale が 1→1.4 に伸びて、屈折が強まる */}
       <button id="menuBtn" ref={btnRef} className={hero ? undefined : 'ink'} aria-label="メニュー">
         <span /><span /><span />
       </button>
+      <svg className="glass-defs" aria-hidden="true" focusable="false">
+        <filter id="frosted" primitiveUnits="objectBoundingBox">
+          <feImage href={GLASS_MAP} x="0" y="0" width="1" height="1" result="map" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="0.02" result="blur" />
+          <feDisplacementMap in="blur" in2="map" scale="1" xChannelSelector="R" yChannelSelector="G">
+            <animate attributeName="scale" to="1.4" dur="0.3s" begin="menuBtn.mouseover" fill="freeze" />
+            <animate attributeName="scale" to="1" dur="0.3s" begin="menuBtn.mouseout" fill="freeze" />
+          </feDisplacementMap>
+        </filter>
+      </svg>
 
       <nav id="menu" ref={menuRef}>
         <ul>

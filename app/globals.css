@@ -70,11 +70,25 @@ body{background:var(--paper);color:var(--ink);
 #brand{border:0;padding:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #brand:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:6px}
 
-#menuBtn{position:fixed;z-index:7;right:22px;width:42px;height:42px;border:0;
- top:calc(var(--markY) - 21px);   /* 42pxの中心を --markY に合わせる */
- background:transparent;cursor:pointer;display:grid;place-items:center;gap:0}
-#menuBtn span{display:block;width:22px;height:1.5px;background:#fff;border-radius:2px;
- transition:transform .35s ease, opacity .25s ease;box-shadow:0 1px 8px rgba(0,0,0,.4)}
+/* ハンバーガーは Liquid Glass の丸ボタン（codepen.io/Mikhail-Bespalov/pen/MYwrMNy を移植）。
+   下地を SVG フィルター（SiteHeader の #frosted）で屈折させ、白い輪で縁取る。
+   **SVG フィルターを backdrop-filter に使えるのは Chrome 系だけ。**Safari は
+   受け付けても描かないので、下の @supports で Safari だけ普通のぼかしに落とす */
+#menuBtn{position:fixed;z-index:7;right:18px;width:48px;height:48px;border-radius:50%;
+ top:calc(var(--markY) - 24px);   /* 48pxの中心を --markY に合わせる */
+ background:rgba(255,255,255,.08);border:2px solid transparent;
+ box-shadow:0 0 0 1.5px rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.18);
+ backdrop-filter:url(#frosted);-webkit-backdrop-filter:url(#frosted);
+ cursor:pointer;display:grid;place-items:center;gap:0;outline:0;
+ -webkit-tap-highlight-color:transparent;transition:box-shadow .3s ease,background .3s ease}
+#menuBtn:hover{background:rgba(255,255,255,.14)}
+#menuBtn:focus-visible{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 10px 24px rgba(0,0,0,.18)}
+@supports (background:-webkit-named-image(i)){
+ #menuBtn{backdrop-filter:blur(6px) saturate(1.4);-webkit-backdrop-filter:blur(6px) saturate(1.4)}
+}
+.glass-defs{position:absolute;width:0;height:0;overflow:hidden}
+#menuBtn span{display:block;width:20px;height:1.5px;background:#fff;border-radius:2px;
+ transition:transform .35s ease, opacity .25s ease}
 #menuBtn span{position:absolute}
 #menuBtn span:nth-child(1){transform:translateY(calc(var(--markCap)/-2 + .75px))}
 #menuBtn span:nth-child(2){transform:translateY(0)}
@@ -97,8 +111,13 @@ body.menu-open #menu{opacity:1;pointer-events:auto}
    **メニューを開いているあいだは白に戻すこと。**幕（#menu）が墨なので、
    反転したままだと閉じるための×が地に沈んで見えなくなる */
 #brand.ink path{fill:var(--ink)}
-#menuBtn.ink span{background:var(--ink);box-shadow:none}
+#menuBtn.ink{background:rgba(0,0,0,.04);
+ box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 10px 24px rgba(0,0,0,.08)}
+#menuBtn.ink:hover{background:rgba(0,0,0,.07)}
+#menuBtn.ink span{background:var(--ink)}
 body.menu-open #brand.ink path{fill:#fff}
+body.menu-open #menuBtn.ink{background:rgba(255,255,255,.08);
+ box-shadow:0 0 0 1.5px rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.18)}
 body.menu-open #menuBtn.ink span{background:#fff}
 #brand.ink:focus-visible{outline-color:var(--ink)}
 
