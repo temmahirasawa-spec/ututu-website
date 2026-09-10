@@ -1,106 +1,100 @@
-/* お問い合わせの受け口。フォームからの POST をメールにして送る。
+/* お問い合わせの受け口。Resend でメールを1通送るだけ。
+   実行は東京リージョン（vercel.json の regions: hnd1）。
 
-   環境変数（Vercel の Project Settings → Environment Variables）
-     RESEND_API_KEY  … Resend の API キー
-     CONTACT_TO      … 受け取るアドレス。カンマ区切りで複数可
-     CONTACT_FROM    … 差出人。**Resend で認証済みのドメインであること。**
-                       未設定なら onboarding@resend.dev（試験用・自分宛にしか届かない）
+   必要な環境変数（Vercel の Project Settings → Environment Variables）
+     RESEND_API_KEY … Resend のAPIキー
+     CONTACT_TO     … 受け取るメールアドレス
+     CONTACT_FROM   … 差出人（任意）。未設定なら Resend の onboarding アドレス。
+                      独自ドメインを Resend に登録したら差し替える
 
-   **鍵と宛先をコードに書かないこと。**この関数はサーバーでしか動かないが、
-   値を直接書くとリポジトリが公開なのでそのまま漏れる。
+   **キー未設定のときは 503 を返す。**フロントはこれを受けて
+   「準備中」の案内に切り替える（黙って握りつぶさない）。 */
 
-   送信そのものは fetch で Resend の API を叩いている。SDK を入れないのは、
-   このリポジトリが three.js 以外の依存を持たない方針のため。
+const RESEND_URL = 'https://api.resend.com/emails';
 
-   迷惑投稿よけは2つ。見えない入力欄（website）が埋まっていたら機械とみなし、
-   **成功したふりをして捨てる**（弾いたと分かると作り直してくる）。
-   もうひとつは同じ IP からの連投を短時間だけ止めるもの。 */
-
-import { NextResponse } from 'next/server';
-
-export const runtime = 'nodejs';
-
-const MAX = { name: 100, company: 100, email: 200, message: 4000, topic: 60 };
-const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-/* 連投よけ。関数のインスタンスが生きているあいだだけ効く簡易なもの。
-   **本気の対策ではない。**Vercel は実行環境を使い回さないことがあるので
-   すり抜ける。厳密にやるなら Upstash などの外部の保存先が要る */
-const RATE = { windowMs: 60_000, max: 3 };
+/* 簡易レートリミッタ（インスタンス内メモリ・IPごとに10分5通）。
+   サーバーレスはインスタンスごとに別カウントなので厳密ではないが、
+   単純な連投スクリプトから受信箱と Resend の無料枠（100通/日）を守るには足りる。
+   厳密にやるなら Vercel の WAF ルールか Upstash を足す */
 const hits = new Map<string, number[]>();
-function tooMany(ip: string) {
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 10 * 60 * 1000;
+function limited(ip: string) {
   const now = Date.now();
-  const seen = (hits.get(ip) ?? []).filter((t) => now - t < RATE.windowMs);
-  seen.push(now);
-  hits.set(ip, seen);
-  if (hits.size > 500) for (const [k, v] of hits) if (!v.some((t) => now - t < RATE.windowMs)) hits.delete(k);
-  return seen.length > RATE.max;
+  const recent = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW);
+  if (recent.length >= RATE_LIMIT) { hits.set(ip, recent); return true; }
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 500) {
+    for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW)) hits.delete(k);
+  }
+  return false;
 }
 
-const bad = (message: string, status: number) => NextResponse.json({ ok: false, message }, { status });
-
 export async function POST(req: Request) {
-  let body: Record<string, unknown>;
+  const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
+  if (limited(ip)) return Response.json({ error: 'too-many' }, { status: 429 });
+
+  let body: {
+    kind?: string; name?: string; org?: string;
+    email?: string; message?: string; website?: string;
+  };
   try {
     body = await req.json();
   } catch {
-    return bad('送信内容を読み取れませんでした。', 400);
+    return Response.json({ error: 'bad-json' }, { status: 400 });
   }
 
-  const str = (k: string) => (typeof body[k] === 'string' ? (body[k] as string).trim() : '');
-  const name = str('name'), email = str('email'), message = str('message');
-  const company = str('company'), topic = str('topic');
+  /* 蜜壺が埋まっていたら機械の投稿。成功したふりをして捨てる
+     （エラーを返すと、機械が学習して埋めなくなる） */
+  if (body.website) return Response.json({ ok: true });
 
-  // 機械が埋めた見えない欄。成功と同じ返事をして、何もしない
-  if (str('website')) return NextResponse.json({ ok: true });
+  /* kind と name は件名に入る。改行を通すとメールヘッダに漏れるので潰す */
+  const flat = (s: string) => s.replace(/[\r\n]+/g, ' ');
+  const kind = flat(body.kind || '').slice(0, 40);
+  const name = flat(body.name || '').trim().slice(0, 120);
+  const org = (body.org || '').trim().slice(0, 200);
+  const email = (body.email || '').trim().slice(0, 254);
+  const message = (body.message || '').trim().slice(0, 5000);
 
-  if (!name || name.length > MAX.name) return bad('お名前を確認してください。', 400);
-  if (!email || !looksLikeEmail(email) || email.length > MAX.email) return bad('メールアドレスを確認してください。', 400);
-  if (!message || message.length > MAX.message) return bad('お問い合わせ内容を確認してください。', 400);
-  if (company.length > MAX.company || topic.length > MAX.topic) return bad('送信内容を確認してください。', 400);
-
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
-  if (tooMany(ip)) return bad('送信が続いています。しばらく置いてからお試しください。', 429);
+  if (!name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return Response.json({ error: 'invalid' }, { status: 400 });
+  }
 
   const key = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO?.split(',').map((s) => s.trim()).filter(Boolean);
-  if (!key || !to?.length) {
-    /* 設定が入るまではここで止まる。**利用者に事情を見せないこと。**
-       ログにだけ残し、画面には「送れなかった」とだけ伝える */
-    console.error('お問い合わせを送れません：RESEND_API_KEY または CONTACT_TO が未設定です');
-    return bad('ただいま送信を受け付けられません。お手数ですが時間をおいてお試しください。', 503);
+  const to = process.env.CONTACT_TO;
+  if (!key || !to) {
+    return Response.json({ error: 'not-configured' }, { status: 503 });
   }
 
-  const lines = [
-    `お名前　　: ${name}`,
-    `会社・店舗: ${company || '(未記入)'}`,
-    `アドレス　: ${email}`,
-    `ご用件　　: ${topic || '(未選択)'}`,
+  const text = [
+    `ご用件　：${kind || '（未選択）'}`,
+    `お名前　：${name}`,
+    `店舗など：${org || '（未記入）'}`,
+    `メール　：${email}`,
     '',
+    '――― ご注文の内容 ―――',
     message,
   ].join('\n');
 
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.CONTACT_FROM || 'UTUTU <onboarding@resend.dev>',
-        to,
-        // 返信をそのまま送信者へ返せるようにする
-        reply_to: email,
-        subject: `[UTUTU] ${topic || 'お問い合わせ'} — ${name}`,
-        text: lines,
-      }),
-    });
-    if (!res.ok) {
-      console.error('Resend からの応答が異常です', res.status, await res.text().catch(() => ''));
-      return bad('送信できませんでした。お手数ですが時間をおいてお試しください。', 502);
-    }
-  } catch (err) {
-    console.error('お問い合わせの送信に失敗しました', err);
-    return bad('送信できませんでした。お手数ですが時間をおいてお試しください。', 502);
-  }
+  const r = await fetch(RESEND_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: process.env.CONTACT_FROM || 'UTUTU <onboarding@resend.dev>',
+      to: [to],
+      reply_to: email,
+      subject: `【${kind || 'お問い合わせ'}】${name} 様より`,
+      text,
+    }),
+  });
 
-  return NextResponse.json({ ok: true });
+  if (!r.ok) {
+    console.error('Resend への送信に失敗:', r.status, await r.text().catch(() => ''));
+    return Response.json({ error: 'send-failed' }, { status: 502 });
+  }
+  return Response.json({ ok: true });
 }

@@ -167,6 +167,18 @@ export const AFTER_DUR = 650; // 最後のNEXTで下のセクションへ送る�
 export const SCROLL_RATE = 0.3;
 export const TWEEN_RATE = 0.05;
 
+/* スマホのスワイプ判定。
+   映像区間では指のスクロールを止めているが、**下から上で次、上から下で前**に送る。
+   送りボタンとドットがあっても、スクロールしようとする人のほうが多いため。
+
+   ゆるめに取ってあります。短くても速ければスワイプと見なすのは、
+   親指の小さな弾きを拾うためです。厳しくすると「動かない」と受け取られます */
+export const SWIPE = {
+  min: 44,      // これだけ動けばスワイプ（px）
+  fastPx: 24,   // 短くても
+  fastMs: 260,  // これより速ければスワイプ
+};
+
 /* 章の位置（仮想コマ）。**ピクセルではなくコマで持つこと。**
    iOSはURLバーの出入りで innerHeight が変わり heroMax が縮む */
 export function chapterFrames(): number[] {

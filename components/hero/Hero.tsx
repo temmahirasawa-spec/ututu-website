@@ -7,7 +7,7 @@
    その処理は heroEngine 側にあります。 */
 
 import { useEffect } from 'react';
-import { SiteHeader } from '@/components/site/SiteHeader';
+import { SiteNav } from '@/components/site/SiteNav';
 import { startHero } from './heroEngine';
 import { LoadArt } from './LoadArt';
 import { Mark } from './Mark';
@@ -52,8 +52,11 @@ export function Hero() {
         <div id="white" />
       </div>
 
-      <SiteHeader variant="hero" />
-      <div id="scrollHint"><span>SCROLL</span><i /></div>
+      <button id="brand" type="button" aria-label="はじめに戻る">
+        <Mark />
+      </button>
+      <SiteNav variant="top" />
+      <div id="scrollHint"><span>SCROLL</span><i /><b /></div>
       <div id="prog" aria-hidden="true"><i /></div>
       {/* ドットの中身は heroEngine の buildChapters が章の数だけ作る */}
       <div id="dots" aria-hidden="true" />
@@ -61,7 +64,7 @@ export function Hero() {
         <button id="backBtn"><i /><span>BACK</span></button>
         <button id="nextBtn"><span>NEXT</span><i /></button>
       </div>
-      <a id="skip" href="#after">SKIP ↓</a>
+      <a id="skip" href="#after">SKIP</a>
 
       <div id="copyLayer">
         <div className="copy mid"><p className="eyebrow">Ututu</p><div className="rule" />

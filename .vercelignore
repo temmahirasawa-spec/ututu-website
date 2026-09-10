@@ -6,6 +6,9 @@ node_modules/
 # 移植元の原本。参照用に置いてあるだけで、配信には要らない
 reference/
 
+# 素材加工の開発用スクリプト。配信には要らない
+scripts/
+
 # 素材の原本・中間ファイル（Dropbox の KV/ に残してあります）
 master.mp4
 master2.mp4

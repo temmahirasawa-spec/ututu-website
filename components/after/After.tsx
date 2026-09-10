@@ -21,7 +21,6 @@
    規則は CLAUDE.md の「図解の差し替え」を参照。 */
 
 import { useEffect } from 'react';
-import { SiteFooter } from '@/components/site/SiteFooter';
 import { startAfter } from './afterEffects';
 import { BioModal } from './BioModal';
 import { ProductOrder, ProductReview } from './Products';
@@ -78,7 +77,7 @@ export function After() {
         <h3 className="rv">店側と、デザイン側から。</h3>
         <div className="fd-grid">
           <div className="fd rv">
-            <div className="fd-ph ava" data-head="yosuke" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+            <div className="fd-ph ava" data-head="yosuke" data-cm="173" data-tap="stumble" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
             <p className="fd-role">共同創業者 / ビジネスプロデューサー</p>
             <p className="fd-name">板倉 洋輔</p>
             <p className="fd-en">Yosuke Itakura</p>
@@ -86,7 +85,7 @@ export function After() {
             <button className="profile-btn" type="button" data-bio="yosuke">Profile　＋</button>
           </div>
           <div className="fd rv">
-            <div className="fd-ph ava" data-head="temma" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
+            <div className="fd-ph ava" data-head="temma" data-cm="160" data-tap="startle" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
             <p className="fd-role">共同創業者 / クリエイティブディレクター</p>
             <p className="fd-name">平澤 天真</p>
             <p className="fd-en">Temma Hirasawa</p>
@@ -94,6 +93,12 @@ export function After() {
             <button className="profile-btn" type="button" data-bio="temma">Profile　＋</button>
           </div>
         </div>
+        {/* 会社概要はここからも辿れる。ナビとフッターにも同じ道がある */}
+        <p className="fd-more rv">
+          <a href="/company">会社概要を見る
+            <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 9h13M10.5 4 15.5 9 10.5 14"/></svg>
+          </a>
+        </p>
       </div>
 
       {/* 締め */}
@@ -102,9 +107,19 @@ export function After() {
         <h3 className="rv">検証は、今日も営業中。</h3>
         <p className="lead rv">私たちの店は、これからも実験台です。使いながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべてはこの店の一日から始まります。</p>
         <p className="next-line rv"><i></i>Next product — Reservation System and more</p>
+        {/* トップの出口。ここまで読んだ人を問い合わせへ送る */}
+        <div className="af-cta rv">
+          <a className="cta-main" href="/company#contact">お問い合わせ
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+          </a>
+          <a className="cta-sub" href="/company">会社概要</a>
+        </div>
       </div>
 
-      <SiteFooter className="rv" />
+      <div id="foot" className="rv">
+        <span>© UTUTU Inc.</span>
+        <span className="pages"><a href="/company">会社概要</a><a href="/company#contact">お問い合わせ</a></span>
+      </div>
       </div></section>
       <BioModal />
     </>
