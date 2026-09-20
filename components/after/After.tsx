@@ -12,7 +12,8 @@
    原本 reference/legacy-index.html の <section id="after"> をそのまま移したもの。
 
    世界観：紙 ／ 墨 ／ アクセントはオリーブ1点。
-   モーションの語彙は「線が引かれる」「静かに現れる」の2つだけ。増やさないこと。
+   モーションの語彙は「線が引かれる」「静かに現れる」、そして節の見出しだけに使う
+   「ピクセルから解ける」（.pxr / pixelReveal.ts）の3つ。**これ以上は増やさないこと。**
    色は必ず #after のトークン（--pg --tx --mut --acc --ln --bd）経由で。
    個々の要素に直接色を書くと、墨への反転から取り残される。
 
@@ -34,14 +35,14 @@ export function After() {
       {/* A 受け：映像の余韻を引き取り、紙の世界に切り替える */}
       <div className="af-sec">
         <p className="sec-eyebrow rv">Ututu</p>
-        <h3 className="rv">店の中から、つくっています。</h3>
+        <h3 className="pxr">店の中から、つくっています。</h3>
         <p className="lead rv">私たちは、店をつくる会社であり、店のための道具をつくる会社です。ふたつは別の仕事ではありません。自分たちの店で毎日使うために道具をつくり、その道具が、また店を強くしています。</p>
       </div>
 
       {/* B 私たちがつくった店：当事者性の証拠。業態の表記は要確認 */}
       <div className="af-sec">
         <p className="sec-eyebrow rv">Our Stores</p>
-        <h3 className="rv">私たちがつくった店。</h3>
+        <h3 className="pxr">私たちがつくった店。</h3>
         <p className="lead rv">企画から内装、メニュー、日々の運営まで。ここに並ぶのは、私たちが立ち上げて、いまも動かしている店。写真には、いま仕込んでいる次の店も混ざっています。</p>
     <div className="band rv">
           <div className="band-row"><div className="set"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="YORKYS BRUNCH の店内" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="FROMA のサイン" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="YORKYS CREPERIE の店舗" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="PIECE OF BAKE の内装" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="FROMA の内装" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="YORKYS BRUNCH のカップ" loading="lazy" decoding="async" /></div><div className="set" aria-hidden="true"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /></div></div>
@@ -58,7 +59,7 @@ export function After() {
 
       {/* 橋：店から道具へ */}
       <div className="af-sec af-bridge af-stmt" data-ink>
-        <h3 className="rv">既製品は、現場に合いませんでした。</h3>
+        <h3 className="pxr">既製品は、現場に合いませんでした。</h3>
         <p className="lead rv">だから自分たちでつくり、自分たちの店で毎日使っています。ピークタイムに耐えられなかった機能は、直すか、捨てる。ここから先に並ぶのは、その繰り返しを生き残ったものだけです。</p>
         {/* 数字はすべてサンプル。実測値が来たら差し替える */}
         <div className="stats rv">
@@ -74,7 +75,7 @@ export function After() {
       {/* 二人。丸（.fd-ph）は後日ローポリ3Dの canvas に差し替える受け皿 */}
       <div className="af-sec" data-ink id="founders">
         <p className="sec-eyebrow rv">Founders</p>
-        <h3 className="rv">店側と、デザイン側から。</h3>
+        <h3 className="pxr">店側と、デザイン側から。</h3>
         <div className="fd-grid">
           <div className="fd rv">
             <div className="fd-ph ava" data-head="yosuke" data-cm="173" data-tap="stumble" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10"/><path d="M13 55 a19 19 0 0 1 38 0"/></svg></div>
@@ -104,7 +105,7 @@ export function After() {
       {/* 締め */}
       <div className="af-sec af-stmt" data-ink id="next">
         <p className="sec-eyebrow rv">And Next</p>
-        <h3 className="rv">検証は、今日も営業中。</h3>
+        <h3 className="pxr">検証は、今日も営業中。</h3>
         <p className="lead rv">私たちの店は、これからも実験台です。使いながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべてはこの店の一日から始まります。</p>
         <p className="next-line rv"><i></i>Next product — Reservation System and more</p>
         {/* トップの出口。ここまで読んだ人を問い合わせへ送る */}
