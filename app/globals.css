@@ -175,8 +175,7 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 
 /* ===== 映像を抜けたあとの紙のセクション =====
    世界観：紙 #F3F1EC ／ 墨 ／ アクセントはオリーブ1点（映像のオリーブの木から採色）。
-   モーションの語彙は「静かに現れる」と、節の見出しだけの
-   「ピクセルから解ける」（.pxr）。**これ以上は増やさないこと。**
+   モーションの語彙は「静かに現れる」だけ。増やさないこと。
    ただしプロダクト2節（.pv）は例外で、各サービスのトンマナに切り替えてある
    （components/after/products.css）。あちらに紙のトークンは通していない */
 /* 色はすべてトークン経由。data-ink の節が画面中央に来ると #after に .inked が付き、
@@ -193,20 +192,7 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 .sec-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;
  color:var(--acc);margin:0 0 16px;font-weight:500}
 #after h3{font-family:var(--jp-title);font-weight:700;color:var(--tx);
- font-size:clamp(23px,3.6vw,36px);letter-spacing:.08em;line-height:1.65;margin:0 0 18px;
- transition:color .9s ease}
-
-/* ---- ピクセルで解ける見出し（components/after/pixelReveal.ts）----
-   節の見出しだけに使う語彙。**本文や小見出しには広げないこと。**
-   字は DOM に残したまま、解けきるまでのあいだ canvas を上に重ねる。
-   .pxr-on が付いているあいだだけ DOM の字を透かし、終わったら外して本物に戻す。
-
-   **transition:none を外さないこと。**#after h3 には反転用の color 遷移が
-   載っているので、これが無いと戻すときに透明から 0.9 秒かけて滲み出る。
-   JSが付け外しの瞬間だけ inline で打ち消すが、こちらでも止めておく */
-.pxr{position:relative}
-#after h3.pxr-on{color:transparent;transition:none}
-.pxr-cv{position:absolute;left:0;top:0;pointer-events:none}
+ font-size:clamp(23px,3.6vw,36px);letter-spacing:.08em;line-height:1.65;margin:0 0 18px}
 .lead{color:var(--mut);font-size:14.5px;line-height:2.05;margin:0;max-width:38em}
 
 /* 静かに現れる。JSが .in を付ける */

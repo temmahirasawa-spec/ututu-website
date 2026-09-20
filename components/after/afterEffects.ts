@@ -1,11 +1,8 @@
 /* 紙のセクションの動き。
    原本 reference/legacy-index.html の <script> 後半をそのまま移したもの。
-   動きは「静かに現れる」（.rv → .in）と、節の見出しの
-   「ピクセルから解ける」（.pxr → pixelReveal.ts）の2つ。
+   動きは「静かに現れる」（.rv → .in）だけ。
    プロダクト2節は各サービスのトンマナに切り替えたので、
    かつての図解（.fig の線引き）はもう無い。 */
-
-import { createPixelReveal } from './pixelReveal';
 
 export function startAfter(): () => void {
   const offs: Array<() => void> = [];
@@ -28,32 +25,6 @@ export function startAfter(): () => void {
     offs.push(() => io.disconnect());
   } else {
     rvs.forEach((el) => el.classList.add('in'));
-  }
-
-  /* ---- ピクセルで解ける見出し ----
-     節の見出し（.pxr）だけ、静かに現れるのではなくピクセルから解けて出る。
-     **作るのは画面に入ってから。**書体が届く前に作ると代替書体の字形を焼いてしまう */
-  const pxrEls = Array.from(document.querySelectorAll<HTMLElement>('.pxr'));
-  if (pxrEls.length) {
-    if (reduce || !('IntersectionObserver' in window)) {
-      // 動かさない。何も足さなければ、素の見出しがそのまま出ている
-    } else {
-      const ctls = new Map<HTMLElement, ReturnType<typeof createPixelReveal>>();
-      const io2 = new IntersectionObserver((es) => {
-        es.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const el = e.target as HTMLElement;
-          io2.unobserve(el);
-          const ctl = createPixelReveal(el);
-          ctls.set(el, ctl);
-          const go = () => ctl.play();
-          if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(go);
-          else go();
-        });
-      }, { threshold: 0.35, rootMargin: '0px 0px -8% 0px' });
-      pxrEls.forEach((el) => io2.observe(el));
-      offs.push(() => { io2.disconnect(); ctls.forEach((c) => c.dispose()); });
-    }
   }
 
   /* ---- 紙⇄墨の反転。data-ink の節が画面の中ほどに来たら #after 全体を反転する ---- */
