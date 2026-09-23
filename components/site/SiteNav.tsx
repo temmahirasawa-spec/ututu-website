@@ -19,6 +19,7 @@
 
 import { useEffect } from 'react';
 import { GLASS_MAP } from './glassMap';
+import { PRODUCT_URL } from './productLinks';
 
 type Props = {
   /** 'top' … トップページ。ページ内の移動で済ませる
@@ -100,9 +101,9 @@ export function SiteNav({ variant = 'top', tone = 'film' }: Props) {
           <li className="menu-prod">
             <p className="menu-head">PRODUCTS</p>
             <div className="menu-ext">
-              <a href="https://good-order.jp" target="_blank" rel="noopener">GOOD ORDER<ExtIcon /></a>
+              <a href={PRODUCT_URL.order} target="_blank" rel="noopener">GOOD ORDER<ExtIcon /></a>
               <span className="bar" aria-hidden="true" />
-              <a href="https://good-review.jp" target="_blank" rel="noopener">GOOD REVIEW<ExtIcon /></a>
+              <a href={PRODUCT_URL.review} target="_blank" rel="noopener">GOOD REVIEW<ExtIcon /></a>
             </div>
           </li>
         </ul>

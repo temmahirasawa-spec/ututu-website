@@ -25,6 +25,7 @@
    紙のトンマナ（#after のトークン）はここには通していません。CSSは products.css。 */
 
 import type { ReactNode } from 'react';
+import { PRODUCT_URL } from '@/components/site/productLinks';
 import './products.css';
 
 type Feat = {
@@ -109,7 +110,7 @@ export function ProductOrder() {
       kind="モバイルオーダー"
       title={<>メニュー全部に、<br />出番をつくるモバイルオーダーです。</>}
       lead="紙のメニューのように全体が見えるので、スクロールの下に沈んでいた一品にも注文が入ります。席のまま注文でき、オペレーションはいまのままで構いません。"
-      href="https://good-order.jp"
+      href={PRODUCT_URL.order}
       visual={
         <div className="pv-phones">
           <div className="pv-phone pv-phone--back">
@@ -143,7 +144,7 @@ export function ProductReview() {
       kind="クチコミ・アンケート"
       title={<>集めた声を、<br />行き先まで仕分けるアンケートです。</>}
       lead="卓上の二次元コードから1分。高い評価はAIの下書きでGoogleへ、それ以外は店内向けの声として、公開せずに届きます。"
-      href="https://good-review.jp"
+      href={PRODUCT_URL.review}
       visual={
         <img className="pv-illust" src="/img/products/review-kv.webp" width="1180" height="664" alt="卓上の二次元コードから、お客様がスマホで評価を送っている様子のイラスト" loading="lazy" decoding="async" />
       }

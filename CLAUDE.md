@@ -46,6 +46,7 @@ app/
 components/
   site/
     SiteNav.tsx           ハンバーガー＋メニュー。**トップと /company で共通**
+    productLinks.ts       GOOD ORDER / GOOD REVIEW のLPのURL。**サイト内のリンクは全部ここを見る**
   company/
     CompanyClient.tsx     会社概要（品書き）＋お問い合わせ（伝票）
     company.css           同上のCSS
@@ -251,11 +252,14 @@ npx serve ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU
   **`.pv + .af-sec` の上マージンを消さないこと。**`.af-sec` は下マージンしか
   持たないので、これが無いと Founders の見出しが帯にくっつきます（18pxまで詰まりました）
 
-**名前の食い違いに注意。**レビュー側は、コーポレートでは `GOOD REVIEW` ですが、
-公式LP・Figma・管理画面（`admin.goodloop.jp`）はすべて `GOOD LOOP` です。
-2026-08-20 時点では**コーポレート側は GOOD REVIEW のまま**という判断（本人）。
-なお `good-order.jp` と `good-review.jp` はまだDNSが引けず（＝「公式サイトへ」は
-現状リンク切れ）、`goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
+**名前の食い違いに注意。**レビュー側のサービス本体は、2026-08-24 に `GOOD LOOP` から
+`GOOD REVIEW` へ改名されています（good-loop リポジトリの docs/handoff.md）。
+アプリは `app.good-review.jp`。コーポレートの表記はこれと揃っています。
+ただし**LP（`goodloop-official.vercel.app`）は改名前に作ったもの**で、ホスト名に旧名が
+残っています（2026-08-20 時点では、LP上の表記も GOOD LOOP でした）。
+`good-order.jp` と `good-review.jp` は 2026-09-23 時点でもDNSが引けないので、
+リンクは各LPの vercel.app に向けてあります（`components/site/productLinks.ts`）。
+`goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
 
 ### Founders のアバター（2026-08-21 に洋輔さんぶんを追加）
 
@@ -471,10 +475,10 @@ npm run dev
 - **お問い合わせの受け口**。Resend のアカウントを作り、Vercel に
   `RESEND_API_KEY` と `CONTACT_TO` を入れるまで、`/api/contact` は 503 を返し、
   フォームは「準備中」と出ます。鍵を入れれば、コードの変更なしで送れるようになります
-- **`good-order.jp` / `good-review.jp` がまだDNSを引けない。**
-  ナビの下段・コピー内の「公式サイトへ」・SiteNav の外部リンクが、いま**行き先なし**です。
-  当面のLPに向けるなら `components/site/SiteNav.tsx` と
-  `components/hero/Hero.tsx` の2か所（各2本）
+- **`good-order.jp` / `good-review.jp` がまだDNSを引けない**（2026-09-23 確認）。
+  それまでのつなぎとして、6本のリンク（ナビの下段・KVのコピーの「公式サイトへ」・
+  プロダクト2節の「公式サイトへ」）は各LPの vercel.app に向けてあります。
+  独自ドメインでLPが開いたら、`components/site/productLinks.ts` の2行を差し替えるだけです
 - **橋の節の数字がサンプルのまま**（直営4 / 導入3 / 3.9倍 / +18%）。
   GOOD REVIEW の図解には FROMA の実測（★3.5→★4.2）が入っているので、
   **同じページに実測とサンプルが同居しています。**公開前に必ず揃えること

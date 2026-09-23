@@ -7,6 +7,7 @@
    その処理は heroEngine 側にあります。 */
 
 import { useEffect } from 'react';
+import { PRODUCT_URL } from '@/components/site/productLinks';
 import { SiteNav } from '@/components/site/SiteNav';
 import { startHero } from './heroEngine';
 import { LoadArt } from './LoadArt';
@@ -81,13 +82,13 @@ export function Hero() {
           <h2>埋もれる一品を、なくす。</h2>
           <p className="entitle">EVERY DISH GETS ITS TURN</p>
           <p>スマホの縦長画面では、スクロールの下にあるメニューほど見られません。紙のメニューのように全体が見える設計にして、埋もれていた一品に出番をつくりました。席のまま注文でき、オペレーションはいまのままで構いません。</p>
-          <a className="linkbtn" href="https://good-order.jp" target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
+          <a className="linkbtn" href={PRODUCT_URL.order} target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
         </div>
         <div className="copy"><p className="eyebrow">Good Review</p><div className="rule" />
           <h2>ほめ言葉は外、苦言は内。</h2>
           <p className="entitle">EVERY VOICE FINDS ITS PLACE</p>
           <p>卓上のQRから、5段階の評価にひとつ答えるだけ。高い評価はAIの下書きでGoogleマップへ。低い評価は店内向けのアンケートに分かれ、公開の場には出ません。</p>
-          <a className="linkbtn" href="https://good-review.jp" target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
+          <a className="linkbtn" href={PRODUCT_URL.review} target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
         </div>
       </div>
 
