@@ -257,8 +257,8 @@ npx serve ~/Library/CloudStorage/Dropbox/UTUTU/コーポレートサイト/UTUTU
 アプリは `app.good-review.jp`。コーポレートの表記はこれと揃っています。
 ただし**LP（`goodloop-official.vercel.app`）は改名前に作ったもの**で、ホスト名に旧名が
 残っています（2026-08-20 時点では、LP上の表記も GOOD LOOP でした）。
-`good-order.jp` と `good-review.jp` は 2026-09-23 時点でもDNSが引けないので、
-リンクは各LPの vercel.app に向けてあります（`components/site/productLinks.ts`）。
+リンクは独自ドメイン `good-order.jp` / `good-review.jp` に向けてあります
+（`components/site/productLinks.ts`。2026-09-23、DNSの切り替えに先立って本人判断で変更）。
 `goodloop.jp` / `good-loop.jp` は**別会社**のサイトです。
 
 ### Founders のアバター（2026-08-21 に洋輔さんぶんを追加）
@@ -475,10 +475,11 @@ npm run dev
 - **お問い合わせの受け口**。Resend のアカウントを作り、Vercel に
   `RESEND_API_KEY` と `CONTACT_TO` を入れるまで、`/api/contact` は 503 を返し、
   フォームは「準備中」と出ます。鍵を入れれば、コードの変更なしで送れるようになります
-- **`good-order.jp` / `good-review.jp` がまだDNSを引けない**（2026-09-23 確認）。
-  それまでのつなぎとして、6本のリンク（ナビの下段・KVのコピーの「公式サイトへ」・
-  プロダクト2節の「公式サイトへ」）は各LPの vercel.app に向けてあります。
-  独自ドメインでLPが開いたら、`components/site/productLinks.ts` の2行を差し替えるだけです
+- **`good-order.jp` / `good-review.jp` のDNSの切り替え**。リンク6本（ナビの下段・
+  KVのコピーの「公式サイトへ」・プロダクト2節の「公式サイトへ」）は**先に独自ドメインへ
+  向けてある**ので、DNSが引けるまでの間はリンク切れになる（2026-09-23 時点では未解決）。
+  切り替えが長引くようなら、`components/site/productLinks.ts` の2行を各LPの
+  vercel.app に戻せば、つなぎになる（戻し先のURLはファイルのコメントに残してある）
 - **橋の節の数字がサンプルのまま**（直営4 / 導入3 / 3.9倍 / +18%）。
   GOOD REVIEW の図解には FROMA の実測（★3.5→★4.2）が入っているので、
   **同じページに実測とサンプルが同居しています。**公開前に必ず揃えること

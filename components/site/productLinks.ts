@@ -4,11 +4,12 @@
      ナビの PRODUCTS（SiteNav）／KVのコピーの「公式サイトへ」（Hero）／
      プロダクト2節の「公式サイトへ」（Products）
 
-   いまは各LPの vercel.app に向けている。good-order.jp / good-review.jp は
-   まだDNSが引けない（2026-09-23 確認）。**独自ドメインでLPが開いたら、ここの2行を
-   差し替えるだけで済む。**
-   GOOD REVIEW のLPは、改名前（GOOD LOOP）に作ったので、ホスト名に旧名が残っている */
+   独自ドメインに向けてある（2026-09-23、本人判断）。この時点ではまだDNSが
+   切り替わる前で、**引けるようになるまでの間は6本ともリンク切れになる。**
+   切り替えが遅れるようなら、つなぎとして各LPの vercel.app に戻せる：
+     order:  https://good-order-lp.vercel.app
+     review: https://goodloop-official.vercel.app （改名前に作ったので旧名が残っている） */
 export const PRODUCT_URL = {
-  order: 'https://good-order-lp.vercel.app',
-  review: 'https://goodloop-official.vercel.app',
+  order: 'https://good-order.jp',
+  review: 'https://good-review.jp',
 } as const;
