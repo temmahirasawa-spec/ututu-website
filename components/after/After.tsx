@@ -23,7 +23,7 @@
 import { useEffect } from 'react';
 import { startAfter } from './afterEffects';
 import { BioModal } from './BioModal';
-import { ProductOrder, ProductReview } from './Products';
+import { Products } from './Products';
 
 export function After() {
   useEffect(() => startAfter(), []);
@@ -68,8 +68,7 @@ export function After() {
           <div className="stat"><b className="stat-n">+18<i>%</i></b><span className="stat-l">注文点数</span></div>
         </div>
       </div>
-      <ProductOrder />
-      <ProductReview />
+      <Products />
 
       {/* 二人。丸（.fd-ph）は後日ローポリ3Dの canvas に差し替える受け皿 */}
       <div className="af-sec" data-ink id="founders">
