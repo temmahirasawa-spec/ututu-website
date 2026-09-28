@@ -11,7 +11,7 @@
    色だけが違う同じ形にして、「これはサービスの紹介だ」と一目で分かるようにする。
    型は下の <Product> ひとつに集約してあります。片方だけに飾りを足さないこと。
 
-     ① 見出し（サービス名＋種別 → 紹介文 → 補足 → 公式サイトへ）と、モック
+     ① 見出し（ロゴ＋種別 → 紹介文 → 補足 → 公式サイトへ）と、モック
      ② 画面つきのカード3枚
 
    **ここに載せるのはキャッチコピーではありません。**
@@ -43,8 +43,11 @@ type Feat = {
 
 type ProductProps = {
   slug: 'order' | 'review';
-  /** サービス名と、その種別。ここで「何のサービスか」を先に言い切る */
+  /** サービス名と、その種別。ここで「何のサービスか」を先に言い切る。
+      name は画面には出ず、ロゴの alt になる */
   name: string;
+  /** 正式ロゴ（横組み）。w / h は SVG の viewBox の寸法をそのまま入れる */
+  logo: { src: string; w: number; h: number };
   kind: string;
   /** 紹介文。キャッチコピーではなく、直接的な一文。
       **読点で改行を入れておくこと。**自動折り返しに任せると
@@ -56,13 +59,22 @@ type ProductProps = {
   feats: Feat[];
 };
 
-function Product({ slug, name, kind, title, lead, href, visual, feats }: ProductProps) {
+function Product({ slug, name, logo, kind, title, lead, href, visual, feats }: ProductProps) {
   return (
     <section className={`pv pv-${slug}`}>
       <div className="pv-in">
         <div className="pv-head">
           <div className="pv-copy rv">
-            <p className="pv-eyebrow"><Sparkle />{name}<i>{kind}</i></p>
+            {/* ロゴは必ず <img> で読むこと。**SVG をインラインで埋めないこと。**
+                Illustrator の書き出しはどちらも .st0〜.st3 というクラス名で色を持っていて、
+                同じページに2つ埋めると互いに上書きし合う（ORDER の文字が消え、丸が緑になった）。
+                <img> なら各ファイルのスタイルはその中で閉じる */}
+            <p className="pv-eyebrow">
+              <span className="pv-logo">
+                <img src={logo.src} width={logo.w} height={logo.h} alt={name} decoding="async" />
+              </span>
+              <i>{kind}</i>
+            </p>
             <h4>{title}</h4>
             <p className="pv-lead">{lead}</p>
             <div className="pv-actions">
@@ -107,6 +119,7 @@ export function ProductOrder() {
     <Product
       slug="order"
       name="GOOD ORDER"
+      logo={{ src: '/img/logos/good-order.svg', w: 584.2, h: 56.6 }}
       kind="モバイルオーダー"
       title={<>メニュー全部に、<br />出番をつくるモバイルオーダーです。</>}
       lead="紙のメニューのように全体が見えるので、スクロールの下に沈んでいた一品にも注文が入ります。席のまま注文でき、オペレーションはいまのままで構いません。"
@@ -141,6 +154,7 @@ export function ProductReview() {
     <Product
       slug="review"
       name="GOOD REVIEW"
+      logo={{ src: '/img/logos/good-review.svg', w: 631.2, h: 66.7 }}
       kind="クチコミ・アンケート"
       title={<>集めた声を、<br />行き先まで仕分けるアンケートです。</>}
       lead="卓上の二次元コードから1分。高い評価はAIの下書きでGoogleへ、それ以外は店内向けの声として、公開せずに届きます。"
@@ -158,13 +172,6 @@ export function ProductReview() {
 }
 
 /* ---- プロダクト2節の小さな絵。LPのあしらいに合わせたもの ---- */
-function Sparkle() {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
-      <path d="M8 0 9.5 5.4 15 7 9.5 8.6 8 14 6.5 8.6 1 7 6.5 5.4Z" />
-    </svg>
-  );
-}
 function ArrowOut() {
   return (
     <svg viewBox="0 0 16 16" aria-hidden="true">
