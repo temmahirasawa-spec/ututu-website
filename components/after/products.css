@@ -253,3 +253,52 @@
 @media (prefers-reduced-motion: reduce) {
   .pv-cta, .pv-vid-play, .pv-vid-bar button { transition: none; }
 }
+
+/* ===== GOOD ORDER の注文画面（見本。OrderScreen.tsx）=====
+   390px 幅の画面を基準に cqw で組む（1cqw = 3.9px）。実在の店名・写真は使わない */
+.pv-phone-scr { container-type: inline-size; }
+.os { height: 100%; background: #FFFDF8; color: #1B1B1F; font-family: var(--jp-body); overflow: hidden; }
+.os-bar { display: flex; align-items: center; justify-content: space-between; padding: 6cqw 5cqw 3cqw; }
+.os-store { font-family: var(--font-barlow), sans-serif; font-weight: 700; font-size: 4.6cqw; letter-spacing: .12em; line-height: 1; }
+.os-store small { display: block; margin-top: 1cqw; font-size: 2cqw; font-weight: 500; letter-spacing: .2em; color: #8A8A90; }
+.os-burger { width: 8cqw; height: 8cqw; border-radius: 50%; border: .5cqw solid #1B1B1F; position: relative; }
+.os-burger::before, .os-burger::after { content: ""; position: absolute; left: 25%; right: 25%; height: .5cqw; background: #1B1B1F; top: 38%; }
+.os-burger::after { top: 56%; }
+.os-tabs { display: flex; gap: 5cqw; padding: 1cqw 5cqw 0; font-size: 3.3cqw; white-space: nowrap; border-bottom: .3cqw solid #ECE7DA; }
+.os-tabs > * { padding-bottom: 2.4cqw; color: #7C7C82; }
+.os-tabs b { color: #1B1B1F; font-weight: 700; border-bottom: .8cqw solid #FAC03D; }
+.os-chips { display: flex; gap: 2cqw; padding: 3.4cqw 5cqw; font-size: 2.8cqw; white-space: nowrap; }
+.os-chips span { border: .3cqw solid #D9D4C7; border-radius: 99px; padding: 1.2cqw 3cqw; }
+.os-hero { position: relative; margin: 0 5cqw; height: 50cqw; border-radius: 4cqw; background: #FDE9B4;
+  background-image: repeating-linear-gradient(60deg, #FBDD8F 0 12cqw, transparent 12cqw 21cqw);
+  display: grid; place-items: center; overflow: hidden; }
+.os-badge { position: absolute; left: 3cqw; top: 3cqw; background: #222460; color: #fff; font-size: 2.6cqw; font-weight: 700; padding: 1.2cqw 2.6cqw; border-radius: 1.4cqw; }
+.os-kicker { margin: 5cqw 5cqw 0; font-size: 2.4cqw; color: #8A8A90; }
+.os-h { margin: 1cqw 5cqw 0; font-family: var(--font-barlow), sans-serif; font-weight: 600; font-size: 6.4cqw; line-height: 1.1; }
+.os-h small { display: block; font-family: var(--jp-body); font-size: 2.4cqw; font-weight: 400; color: #8A8A90; margin-top: .6cqw; }
+.os-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3cqw 3cqw; padding: 3.4cqw 5cqw 0; }
+.os-item { display: flex; flex-direction: column; gap: 1cqw; }
+.os-thumb { height: 30cqw; border-radius: 3cqw; background: #F2EEE3; display: grid; place-items: center; overflow: hidden; }
+.os-tag { align-self: flex-start; font-size: 2.2cqw; background: #FDEFC6; border-radius: 1cqw; padding: .4cqw 1.6cqw; margin-top: 1cqw; }
+.os-name { font-size: 3.2cqw; font-weight: 500; }
+.os-price { font-size: 3cqw; color: #55555B; }
+
+/* 皿：インキの線 + ベタ塗り。i が3つ（皿の中身） */
+.os-plate { --u: 1cqw; position: relative; display: block; width: calc(var(--u) * 22); aspect-ratio: 1; border-radius: 50%;
+  background: #fff; border: calc(var(--u) * .55) solid #222460; box-shadow: calc(var(--u) * .9) calc(var(--u) * 1.3) 0 rgb(34 36 96 / .14); }
+.os-big { --u: 1.75cqw; }
+.os-plate i { position: absolute; display: block; border: calc(var(--u) * .5) solid #222460; }
+.os-pancake i { border-radius: 50%; background: #F2B34A; left: 18%; right: 18%; height: 34%; }
+.os-pancake i:nth-child(1) { top: 40%; }
+.os-pancake i:nth-child(2) { top: 26%; background: #F6C35E; }
+.os-pancake i:nth-child(3) { left: 42%; right: 42%; height: 13%; top: 28%; border-radius: 12%; background: #FFF1A8; }
+.os-toast i:nth-child(1) { left: 20%; right: 20%; top: 22%; bottom: 22%; border-radius: 22% 22% 14% 14%; background: #E7B36A; }
+.os-toast i:nth-child(2) { left: 30%; right: 30%; top: 34%; bottom: 32%; border-radius: 40%; background: #9CC56A; }
+.os-toast i:nth-child(3) { left: 44%; right: 44%; top: 44%; bottom: 44%; border-radius: 50%; background: #7A5A2B; }
+.os-latte i:nth-child(1) { inset: 16%; border-radius: 50%; background: #A0673A; }
+.os-latte i:nth-child(2) { left: 36%; right: 36%; top: 34%; bottom: 38%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #FFF4E0; border-width: 0; }
+.os-latte i:nth-child(3) { display: none; }
+.os-salad i { border-radius: 50%; background: #7DBE5A; width: 34%; height: 34%; }
+.os-salad i:nth-child(1) { left: 18%; top: 22%; }
+.os-salad i:nth-child(2) { right: 18%; top: 30%; background: #A8D46E; }
+.os-salad i:nth-child(3) { left: 34%; bottom: 16%; background: #F06B4E; width: 24%; height: 24%; }

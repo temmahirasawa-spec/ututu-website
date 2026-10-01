@@ -27,6 +27,7 @@
 
 import type { ReactNode } from 'react';
 import { PRODUCT_URL } from '@/components/site/productLinks';
+import { OrderScreen } from './OrderScreen';
 import { ProductVideo } from './ProductVideo';
 import './products.css';
 
@@ -47,7 +48,8 @@ type ProductProps = {
   /** 要点3つ。英字の札と、一行の見出しだけ。説明はLPに任せる */
   points: [string, string][];
   proof: ReactNode;
-  screen: { src: string; w: number; h: number; alt: string };
+  /** スマホの画面。画像か、HTMLで組んだ見本（node） */
+  screen: { src: string; w: number; h: number; alt: string } | { node: ReactNode };
   /** 卓の上の小物。cup＝右上、card＝右下（画面の手前）、accent＝左上（映像の奥） */
   props: { cup: Prop; card: Prop; accent: Prop };
   href: string;
@@ -79,7 +81,9 @@ function Product({ slug, name, logo, kind, sub, main, intro, points, proof, scre
         </div>
         <div className="pv-phone">
           <div className="pv-phone-scr">
-            <img src={screen.src} width={screen.w} height={screen.h} alt={screen.alt} loading="lazy" decoding="async" />
+            {'node' in screen
+              ? screen.node
+              : <img src={screen.src} width={screen.w} height={screen.h} alt={screen.alt} loading="lazy" decoding="async" />}
           </div>
         </div>
         <img className="pv-prop pv-prop--cup" src={props.cup.src} width={props.cup.w} height={props.cup.h} alt="" aria-hidden="true" loading="lazy" decoding="async" />
@@ -127,7 +131,8 @@ export function Products() {
             ]}
             /* **数字は出さないこと。**LPでも客単価・注文点数は検証中（ピンクの「測定中」の判子） */
             proof={<p className="pv-proof"><span className="pv-stamp">測定中</span><span>効果は、いま<br />測定しています。</span></p>}
-            screen={{ src: '/img/products/order-screen.webp', w: 520, h: 1128, alt: 'GOOD ORDER の注文画面。上部にカテゴリのタブ、その下に写真の大きなおすすめメニューが並んでいる' }}
+            /* 実店舗で撮った画面は店名と料理写真が写っていたので使わない（OrderScreen.tsx） */
+            screen={{ node: <OrderScreen /> }}
             props={{
               cup: { src: '/img/products/props/order-latte.webp', w: 240, h: 240 },
               card: { src: '/img/products/props/order-qr.webp', w: 240, h: 278 },

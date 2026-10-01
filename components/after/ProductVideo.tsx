@@ -20,7 +20,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const VER = '20260928';
+const VER = '20261001';
 
 type Shape = 'wide' | 'tall';
 type IosVideo = HTMLVideoElement & { webkitEnterFullscreen?: () => void };
