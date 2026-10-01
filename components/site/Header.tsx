@@ -7,10 +7,11 @@
    PRODUCTS を押せるようにしないこと。押し先は2つしかなく、見出しにも道をつけると
    どれが本当の行き先か分からなくなる。LP はサイトの外なので新タブの印をつける */
 
-import Link from 'next/link';
 import { useEffect } from 'react';
+import { dots } from '@/lib/dots/field';
 import { Mark } from './Mark';
 import { PRODUCT_URL } from './productLinks';
+import { TLink } from './TLink';
 
 const LINKS: { href: string; en: string; jp: string }[] = [
   { href: '/#top', en: 'Studio', jp: 'スタジオ' },
@@ -32,6 +33,7 @@ export function Header() {
   const toggle = () => {
     const open = document.body.classList.toggle('menu-open');
     document.getElementById('menuBtn')?.setAttribute('aria-expanded', String(open));
+    if (open) dots.pointerOff();
   };
   const close = () => {
     document.body.classList.remove('menu-open');
@@ -41,27 +43,27 @@ export function Header() {
   return (
     <>
       <header className="hd">
-        <Link className="hd-brand" href="/" aria-label="UTUTU トップへ" onClick={close}>
+        <TLink className="hd-brand" href="/#top" aria-label="UTUTU トップへ" onClick={close}>
           <Mark />
-        </Link>
+        </TLink>
         <p className="hd-meta" aria-hidden="true">Creative Studio for DX — Kobe, Japan</p>
         <button id="menuBtn" className="hd-menu" type="button" aria-expanded="false" aria-controls="menu" onClick={toggle}>
           <span className="lbl-t">MENU</span>
           <span className="bars" aria-hidden="true"><i /><i /></span>
-            <span className="sr">メニューを開く</span>
+          <span className="sr">メニューを開く</span>
         </button>
       </header>
-      <Link className="hd-cta" href="/company#contact" onClick={close}><i aria-hidden="true" />相談する</Link>
+      <TLink className="hd-cta" href="/company#contact" onClick={close}><i aria-hidden="true" />相談する</TLink>
 
       <nav id="menu" className="mn" aria-label="サイト内の行き先">
         <ul className="mn-list">
           {LINKS.map((l, i) => (
             <li key={l.href}>
-              <Link href={l.href} onClick={close} style={{ ['--i' as string]: i }}>
+              <TLink href={l.href} onClick={close} style={{ ['--i' as string]: i }}>
                 <span className="n">{String(i + 1).padStart(2, '0')}</span>
                 <span className="en">{l.en}</span>
                 <span className="jp">{l.jp}</span>
-              </Link>
+              </TLink>
             </li>
           ))}
         </ul>

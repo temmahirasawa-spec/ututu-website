@@ -3,11 +3,11 @@
 
 .cp{padding-top:clamp(110px,14vh,160px)}
 .cp-sec{padding:0 var(--gut) clamp(100px,13vw,190px)}
-.cp-h{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(48px,9vw,148px);line-height:1.05;letter-spacing:-.02em}
+.cp-ttl{font-size:clamp(56px,12vw,210px)}
 .cp-lead{margin:clamp(20px,2.4vw,30px) 0 0;max-width:30em;font-size:14.5px;line-height:2.05;color:var(--mut)}
 
 /* ---- 会社概要：罫線だけの表 ---- */
-.cp-dl{margin:clamp(40px,6vw,90px) 0 0;border-top:1px solid var(--ink)}
+.cp-dl{margin:clamp(40px,6vw,90px) 0 0;border-top:1.5px solid var(--fg)}
 .cp-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:8px 32px;
  padding:clamp(18px,2.2vw,28px) 0;border-bottom:1px solid var(--line);align-items:baseline}
 .cp-row dt{font-family:var(--jp-title);font-weight:700;font-size:14px;letter-spacing:.06em}
@@ -25,28 +25,28 @@
 .cp-kind input{position:absolute;opacity:0;pointer-events:none}
 .cp-kind label{display:inline-block;padding:10px 16px;border-radius:99px;cursor:pointer;
  box-shadow:inset 0 0 0 1px var(--line);font-size:13px;transition:background-color .25s ease,color .25s ease,box-shadow .25s ease}
-.cp-kind label:hover{box-shadow:inset 0 0 0 1px var(--ink)}
-.cp-kind input:checked+label{background:var(--ink);color:var(--paper);box-shadow:none}
-.cp-kind input:focus-visible+label{outline:2px solid var(--shu);outline-offset:2px}
+.cp-kind label:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.cp-kind input:checked+label{background:var(--fg);color:var(--g);box-shadow:none}
+.cp-kind input:focus-visible+label{outline:2px solid var(--acc);outline-offset:2px}
 .cp-field{display:grid;gap:8px}
 .cp-field label{font-family:var(--jp-title);font-weight:700;font-size:13px;letter-spacing:.06em}
 .cp-field label i{font-style:normal;font-weight:400;margin-left:10px;font-size:11px;color:var(--mut)}
-.cp-field input,.cp-field textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);
+.cp-field input,.cp-field textarea{width:100%;font:inherit;font-size:16px;color:var(--fg);
  background:transparent;border:0;border-bottom:1px solid rgba(14,14,13,.35);border-radius:0;padding:10px 0 12px;
  transition:border-color .25s ease}
 .cp-field textarea{min-height:150px;resize:vertical;line-height:1.8}
 .cp-field input::placeholder,.cp-field textarea::placeholder{color:#A3A097}
-.cp-field input:focus,.cp-field textarea:focus{outline:0;border-bottom-color:var(--shu);box-shadow:0 1px 0 var(--shu)}
+.cp-field input:focus,.cp-field textarea:focus{outline:0;border-bottom-color:var(--acc);box-shadow:0 1px 0 var(--acc)}
 .cp-send{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;margin-top:6px}
 .cp-send .btn[disabled]{opacity:.6;cursor:wait}
 .cp-form-note{margin:0;font-size:12px;color:var(--mut)}
-.cp-error{margin:0;font-size:13px;line-height:1.9;color:var(--shu-ink)}
+.cp-error{margin:0;font-size:13px;line-height:1.9;color:var(--acc)}
 .cp-error a{color:inherit}
-.cp-done{padding:clamp(28px,4vw,48px);border-radius:20px;background:var(--ink);color:var(--paper)}
-.cp-done-n{margin:0 0 16px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--shu);text-transform:uppercase}
+.cp-done{padding:clamp(28px,4vw,48px);border-radius:20px;background:var(--fg);color:var(--g)}
+.cp-done-n{margin:0 0 16px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase}
 .cp-done h3{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(22px,2.4vw,30px)}
-.cp-done p{margin:14px 0 24px;font-size:14px;line-height:2;color:#BDBAB1}
-.cp-done .btn--line{color:var(--paper)}
-.cp-done .btn--line:hover{background:var(--paper);color:var(--ink)}
+.cp-done p{margin:14px 0 24px;font-size:14px;line-height:2;opacity:.75}
+.cp-done .btn--line{color:var(--g);box-shadow:inset 0 0 0 1.5px var(--g)}
+.cp-done .btn--line:hover{background:var(--g);color:var(--fg)}
 /* 2列の左に置くぶん、見出しは一回り小さく（大きいままだと「お問い／合わせ」で割れた） */
-.cp-contact .cp-h{font-size:clamp(40px,5.4vw,88px)}
+.cp-contact .cp-ttl{font-size:clamp(48px,7.4vw,124px)}

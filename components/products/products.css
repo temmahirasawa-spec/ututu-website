@@ -1,262 +1,83 @@
-/* プロダクト2節（2026-09-28 に作り直し）。
-   **ここだけサイトの色（紙・墨・朱）から外れる。**2つのLPの新しい世界観（GOOD SERIES）で見せる。
-   サイトのトークン（--paper / --ink / --shu）は**通さない**。
+/* プロダクト2節（GOOD ORDER / GOOD REVIEW）。2026-10 にサイトの文法へ組み直した（Products.tsx 参照）。
+   色はサイトと同じく地のトークンで塗る。座標の世界ではこの節に入ると地が黄／緑に塗り替わり、
+   トークンもその色（インキは紺／墨、赤ペンは各LPの赤）になる。値は globals.css の html[data-ground]。
 
-   GOOD SERIES の文法（2つのLPで共通。値もLPと同じ）
-   - 地は生成り #FAF6EC。色の強い「卓」には 60° の光の帯（周期 300px の 58%）
-   - 影は**ぼかさない**。インキ 14% の透ける色を、右下へ 2:3 でずらして置くだけ
-     （box-shadow を使うときも blur は 0 にすること）
-   - 見出しは「小さい1行目／大きい2行目」。2行目の下にだけ赤ペンの線
-   - 押せない札は角丸 6px の四角。長丸にするのは押せるもの（ボタン）だけ
-   - 本文の多いところは紙（白）の上。卓の上に直接置くのは、ロゴ・種別・見出しまで
+   GOOD SERIES から残しているもの：
+   - 正式ロゴ（白い札の上に置く。**SVG をインラインで埋めないこと。<img> で読む**）
+   - 見出しは「小さい1行目／大きい2行目」、2行目の下にだけ赤ペンの線
+   - 影はぼかさない（インキ14%を右下へ 2:3）
+   - 「測定中」の判子 */
 
-   **2枚は同じ型。**.pv-order / .pv-review で差し替えるのは色のトークンだけ。
-   採色元 … good-order-lp / good-review-website の styles/v2/tokens.css */
+.pd{padding:calc(var(--hd-h) + clamp(18px,3vw,40px)) var(--gut) clamp(56px,7vw,96px)}
+.pd-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(28px,4vw,72px);align-items:center;min-height:calc(100svh - var(--hd-h) - 120px)}
 
-/* 左右いっぱいに敷く（親の #work が全幅なので、はみ出しの指定は 0 になる）。
-   **上下の余白はここだけで持つこと。**帯の前後に紙を挟むと地の色が細かく切り替わる */
-.pv {
-  --pad-x: clamp(24px, 5vw, 48px);
-  --pv-ink: #14161A;
-  margin: 0 calc(50% - 50vw);
-  padding: clamp(64px, 7vw, 104px) var(--pad-x) clamp(80px, 8vw, 116px);
-  position: relative;
-  overflow: hidden;
-  background: #FAF6EC;
-  color: var(--pv-ink);
-}
-/* 帯のあとに来る紙の節は、自分で間合いをとる（.af-sec は下マージンしか持たないため、
-   ここが無いと Founders の見出しが帯にくっつく。実際に18pxまで詰まった）*/
-.pv + .af-sec { margin-top: clamp(96px, 13vw, 170px) }
-.pv-in { max-width: 1120px; margin: 0 auto; }
+/* ---- 文字の側 ---- */
+.pd-logo{margin:0 0 clamp(18px,2.4vw,28px)}
+.pd-logo span{display:inline-flex;padding:10px 16px 11px;background:#fff;border:2px solid var(--fg);border-radius:12px;box-shadow:4px 6px 0 color-mix(in srgb,var(--fg) 16%,transparent)}
+.pd-logo img{display:block;height:clamp(20px,1.9vw,28px);width:auto}
+.pd-review .pd-logo img{height:clamp(22px,2.1vw,31px);margin-bottom:-3px}
+.pd-hd{margin:0;font-family:var(--jp-title);font-weight:900;line-height:1.3;letter-spacing:.01em}
+.pd-hd .sub{display:block;font-size:clamp(17px,1.8vw,24px);font-weight:700}
+.pd-hd .main{position:relative;display:inline-block;margin-top:4px;font-size:clamp(32px,4.2vw,64px)}
+.pd-pen{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.3em;fill:var(--acc);pointer-events:none}
+.pd-intro{margin:clamp(18px,2vw,26px) 0 0;max-width:30em;font-size:14.5px;line-height:2;word-break:auto-phrase}
+.pd-pts{list-style:none;margin:clamp(18px,2vw,26px) 0 0;padding:0;border-top:1.5px solid var(--fg);max-width:34em}
+.pd-pts li{display:grid;grid-template-columns:8.6em minmax(0,1fr);gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line)}
+.pd-pts span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em}
+.pd-pts b{font-family:var(--jp-title);font-weight:700;font-size:15px;line-height:1.5;word-break:auto-phrase}
+.pd-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 18px;margin-top:clamp(18px,2vw,26px);max-width:34em}
+.pd-proof{margin:0;display:flex;align-items:center;gap:12px;font-size:12.5px;line-height:1.6;font-weight:500}
+.pd-stamp{display:inline-grid;place-items:center;padding:4px 10px;border:2px solid var(--acc);border-radius:6px;color:var(--acc);
+ font-family:var(--jp-title);font-weight:900;font-size:13px;letter-spacing:.12em;rotate:-6deg}
+.pd-proof--n{flex-direction:column;align-items:flex-start;gap:2px}
+.pd-proof--n small{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em;color:var(--mut)}
+.pd-proof--n span{font-family:var(--jp-title);font-weight:700;font-size:16px}
+.pd-proof--n b{font-family:var(--f-disp);font-weight:800;font-size:1.7em;font-variation-settings:"wdth" 80;margin:0 .08em}
 
-/* ---- 節の見出し：線 → 英字 → 見出し（LPの見出しと同じ並び） ---- */
-.pv-head { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; margin: 0 0 clamp(36px, 4.6vw, 56px); }
-.pv-rule { display: block; width: 21px; height: 3px; background: var(--pv-ink); }
-.pv-label { margin: 0; font-family: var(--font-barlow), sans-serif; font-weight: 600; font-size: 12px; line-height: 1; letter-spacing: .2em; }
-.pv-title { margin: 0; font-family: var(--jp-title); font-weight: 700; font-feature-settings: "palt"; line-height: 1.35; text-wrap: balance; }
-.pv-title span { display: block; font-size: clamp(16px, 1.9vw, 22px); line-height: 1.6; letter-spacing: .02em; }
-.pv-title b { display: block; font-weight: 700; font-size: clamp(26px, 3.2vw, 38px); letter-spacing: .01em; }
+/* ---- 映像と画面の側 ---- */
+.pd-media{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.32fr);grid-template-rows:auto auto;gap:clamp(14px,1.6vw,22px);align-items:end}
+.pd-film{grid-column:1/-1;position:relative;z-index:1}
+.pd-phone{grid-column:2;grid-row:2;position:relative;z-index:2;margin-top:-34%;
+ border:2.5px solid var(--fg);border-radius:24px;padding:3px;background:#fff;box-shadow:5px 7.5px 0 color-mix(in srgb,var(--fg) 16%,transparent)}
+.pd-phone-scr{aspect-ratio:390/846;overflow:hidden;border:1.5px solid var(--fg);border-radius:19px;background:#fff;container-type:inline-size}
+.pd-phone-scr img{display:block;width:100%;height:auto}
+/* 点の形（QR／星）。押せる */
+.pd-dots{grid-column:1;grid-row:2;align-self:stretch;position:relative;min-height:clamp(150px,18vw,260px);cursor:pointer}
+.pd-review .pd-dots{min-height:clamp(90px,10vw,150px);align-self:center}
+.pd-dots span{position:absolute;left:0;bottom:-22px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--mut);white-space:nowrap}
 
-/* ---- 色のトークン（ここだけが2枚の違い） ---- */
-.pv-order {
-  --ink: #222460; --ink80: #4E5080; --table: #FAC03D; --band: #FBCF6C;
-  --red: #FA3524; --disc: #FAC03D; --sh: rgb(34 36 96 / .14); --scr: #fff;
-}
-.pv-review {
-  --ink: #233029; --ink80: #4F5954; --table: #34CA9B; --band: #65D7B3;
-  --red: #E53A0A; --disc: #FFBC11; --sh: rgb(35 48 41 / .14); --scr: #FAFBFA;
-}
+/* 映像（ProductVideo）。枠はサイトの線、影は GOOD SERIES のぼかさない影 */
+.pv-vid{position:relative;overflow:hidden;aspect-ratio:16/9;border:2.5px solid var(--fg);border-radius:14px;background:#0E0E0D;
+ box-shadow:6px 9px 0 color-mix(in srgb,var(--fg) 16%,transparent)}
+.pv-vid--tall{display:none}
+.pv-vid video{display:block;width:100%;height:100%;object-fit:cover;background:#0E0E0D}
+.pv-vid:fullscreen{border:0;border-radius:0;box-shadow:none;background:#000}
+.pv-vid:fullscreen video{object-fit:contain}
+.pv-vid-play{position:absolute;left:50%;top:50%;translate:-50% -50%;width:clamp(44px,14%,62px);aspect-ratio:1;padding:0;cursor:pointer;
+ display:grid;place-items:center;border:2.5px solid #0E0E0D;border-radius:50%;background:var(--g);transition:translate .25s var(--ease)}
+.pv-vid-play svg{width:46%;translate:7% 0;fill:#0E0E0D}
+.pv-vid-play:hover{translate:-50% calc(-50% - 2px)}
+.pv-vid-bar{position:absolute;left:8px;bottom:8px;display:flex;gap:6px}
+.pv-vid-bar button{width:30px;height:30px;padding:0;cursor:pointer;display:grid;place-items:center;
+ border:2px solid #0E0E0D;border-radius:50%;background:#fff;color:#0E0E0D}
+.pv-vid-bar button:hover{background:var(--g)}
+.pv-vid-bar svg{width:16px;height:16px;overflow:visible}
+.pv-vid-bar .fl{fill:#0E0E0D;stroke:#0E0E0D;stroke-width:1.5;stroke-linejoin:round}
+.pv-vid-bar .st{fill:none;stroke:#0E0E0D;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pv-vid button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.pv-vid:fullscreen .pv-vid-bar{left:20px;bottom:20px;gap:10px}
+.pv-vid:fullscreen .pv-vid-bar button{width:44px;height:44px}
 
-.pv-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 3vw, 36px); align-items: stretch; }
-
-/* ===== 卓 ===== */
-.pv-card {
-  position: relative; min-width: 0;
-  display: flex; flex-direction: column;
-  padding: clamp(26px, 2.8vw, 34px) clamp(20px, 2.4vw, 30px) clamp(20px, 2.2vw, 26px);
-  border: 3px solid var(--ink); border-radius: 26px;
-  background-color: var(--table);
-  background-image: repeating-linear-gradient(60deg, var(--band) 0 174px, transparent 174px 300px);
-  box-shadow: 14px 21px 0 var(--sh);
-  color: var(--ink);
-}
-/* ファインダーの角（LPの映像枠と同じあしらい） */
-.pv-fd {
-  position: absolute; inset: 14px; pointer-events: none; opacity: .55; --c: var(--ink);
-  background:
-    linear-gradient(var(--c), var(--c)) 0 0 / 22px 2px no-repeat, linear-gradient(var(--c), var(--c)) 0 0 / 2px 22px no-repeat,
-    linear-gradient(var(--c), var(--c)) 100% 0 / 22px 2px no-repeat, linear-gradient(var(--c), var(--c)) 100% 0 / 2px 22px no-repeat,
-    linear-gradient(var(--c), var(--c)) 0 100% / 22px 2px no-repeat, linear-gradient(var(--c), var(--c)) 0 100% / 2px 22px no-repeat,
-    linear-gradient(var(--c), var(--c)) 100% 100% / 22px 2px no-repeat, linear-gradient(var(--c), var(--c)) 100% 100% / 2px 22px no-repeat;
-}
-
-/* ① ロゴ＋種別 */
-.pv-eyebrow { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0; }
-/* ロゴは白い札の上に置く。**明るい地専用**（黒を含むので、卓の黄や緑の上に直に置くと沈む） */
-.pv-sticker { display: inline-flex; background: #fff; border: 2px solid var(--ink); border-radius: 12px; padding: 9px 14px; }
-/* **2つは同じ縮尺で置くこと。**文字の高さもマークの幅も同じ寸法で描かれていて、
-   REVIEW だけ吹き出しのしっぽのぶん箱が縦に長い（56.6 に対して 66.7）。
-   単位あたりの大きさ（--lu）を揃え、箱の高さは ORDER に合わせて、しっぽは下へはみ出させる */
-.pv-logo { --lu: .34px; display: block; height: calc(56.6 * var(--lu)); }
-.pv-logo img { display: block; height: auto; }
-.pv-order .pv-logo img { width: calc(584.2 * var(--lu)); }
-.pv-review .pv-logo img { width: calc(631.2 * var(--lu)); }
-/* 種別は**必ずロゴの下の行に**置く。成り行きで折り返すと、ORDER（短い）は1行・REVIEW（長い）は2行になって
-   見出しの高さが2枚でずれる（幅1000pxで実際にずれた） */
-.pv-kind { flex-basis: 100%; font-weight: 700; font-size: 13px; letter-spacing: .06em; }
-
-/* 見出し。1行目は小さく、2行目は大きく（LPと同じ組み方）。赤ペンは2行目にだけ */
-.pv-hd { position: relative; margin: 18px 0 0; font-family: var(--jp-title); font-weight: 700; font-feature-settings: "palt"; line-height: 1.3; color: var(--ink); }
-.pv-hd .sub { display: block; font-size: clamp(16px, 1.55vw, 20px); line-height: 1.55; letter-spacing: .02em; }
-.pv-hd .main { position: relative; display: inline-block; font-size: clamp(27px, 3vw, 40px); letter-spacing: -.005em; padding-bottom: .16em; white-space: nowrap; }
-.pv-pen { position: absolute; left: -.04em; top: calc(100% - .3em); width: calc(100% + .1em); height: .42em; overflow: visible; fill: var(--red); }
-
-/* ② 映像（左）とスマホの画面（右）。**映像は主役にしない。**
-   列の比は PC で 映像 7：画面 3。スマホは縦長の映像になるので 1：1。
-   2枚の卓は高さを揃えるので、紹介文の長さの差はここ（flex:1）が吸う。
-   紙の側で吸うと、短いほうの卓だけ画面と紙のあいだに隙間が空く */
-.pv-media {
-  position: relative; flex: 1 0 auto;
-  display: grid; grid-template-columns: minmax(0, 1fr) 29%; gap: clamp(14px, 1.8vw, 22px); align-items: center;
-  margin: clamp(22px, 2.4vw, 30px) 0 clamp(22px, 2.4vw, 28px);
-  padding: 10px 0;
-}
-.pv-film { position: relative; z-index: 1; min-width: 0; }
-.pv-phone {
-  position: relative; z-index: 1;
-  border: 3px solid var(--ink); border-radius: 26px; padding: 3px; background: #fff;
-  box-shadow: 6px 9px 0 var(--sh);
-}
-.pv-phone-scr { aspect-ratio: 390 / 846; overflow: hidden; border: 1.5px solid var(--ink); border-radius: 21px; background: var(--scr); }
-.pv-phone-scr img { display: block; width: 100%; height: auto; }
-/* 卓の上の小物（LPのKVの小物をそのまま切り出したもの）。**2枚で同じ位置・同じ数** */
-.pv-prop { position: absolute; display: block; height: auto; pointer-events: none; }
-.pv-prop--accent { z-index: 0; width: 78px; left: -8px; top: -14px; }
-.pv-prop--cup { z-index: 2; width: 84px; right: -18px; top: -22px; }
-.pv-prop--card { z-index: 2; width: 66px; right: calc(29% - 34px); bottom: -14px; rotate: -6deg; }
-.pv-review .pv-prop--accent { width: 90px; left: -10px; top: -8px; }
-.pv-review .pv-prop--card { width: 62px; }
-
-/* ---- 映像（ProductVideo.tsx）---- */
-.pv-vid {
-  position: relative; overflow: hidden;
-  border: 3px solid var(--ink); border-radius: 16px; background: var(--ink);
-  box-shadow: 6px 9px 0 var(--sh);
-}
-.pv-vid--wide { aspect-ratio: 16 / 9; }
-.pv-vid--tall { aspect-ratio: 9 / 16; display: none; }
-.pv-vid video { display: block; width: 100%; height: 100%; object-fit: cover; background: var(--ink); }
-.pv-vid:fullscreen { border: 0; border-radius: 0; box-shadow: none; background: #000; }
-.pv-vid:fullscreen video { object-fit: contain; background: #000; }
-/* 中央の再生ボタン。止まっているあいだだけ出る（押すと音ありで再生） */
-.pv-vid-play {
-  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
-  width: clamp(44px, 16%, 60px); aspect-ratio: 1; padding: 0; cursor: pointer;
-  display: grid; place-items: center;
-  border: 2.5px solid var(--ink); border-radius: 50%; background: var(--disc);
-  box-shadow: 3px 4.5px 0 var(--sh);
-  transition: translate .25s cubic-bezier(.16, 1, .3, 1);
-}
-.pv-vid-play svg { width: 46%; translate: 7% 0; fill: var(--ink); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; }
-.pv-vid-play:hover { translate: -50% calc(-50% - 2px); }
-/* 左下の操作。LPの映像と同じ3つ（再生／一時停止・音・全画面） */
-.pv-vid-bar { position: absolute; left: 8px; bottom: 8px; display: flex; gap: 6px; }
-.pv-vid-bar button {
-  width: 30px; height: 30px; padding: 0; cursor: pointer;
-  display: grid; place-items: center;
-  border: 2px solid var(--ink); border-radius: 50%; background: #fff; color: var(--ink);
-  transition: background-color .25s;
-}
-.pv-vid-bar button:hover { background: var(--band); }
-.pv-vid-bar svg { width: 16px; height: 16px; overflow: visible; }
-.pv-vid-bar .fl { fill: var(--ink); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; }
-.pv-vid-bar .st { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pv-vid button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-/* 全画面では押しやすい大きさに */
-.pv-vid:fullscreen .pv-vid-bar { left: 20px; bottom: 20px; gap: 10px; }
-.pv-vid:fullscreen .pv-vid-bar button { width: 44px; height: 44px; }
-.pv-vid:fullscreen .pv-vid-bar svg { width: 20px; height: 20px; }
-
-/* ③ 紙。**本文はここに置く**（卓の上に直接置かない） */
-.pv-paper {
-  position: relative; margin-top: auto;
-  background: #fff; border: 2px solid var(--ink); border-radius: 20px;
-  padding: clamp(18px, 2vw, 22px) clamp(18px, 2vw, 24px);
-}
-.pv-intro { margin: 0; font-size: 14px; line-height: 1.9; letter-spacing: .02em; font-weight: 500; word-break: auto-phrase; }
-/* 要点3つ。札の幅を揃えるため、3行で列を共有する（subgrid） */
-.pv-pts { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 9px 12px; align-items: center; }
-.pv-pts li { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: center; }
-.pv-tag {
-  justify-self: start;
-  display: inline-flex; align-items: center; height: 24px; padding: 0 9px;
-  border: 1.5px solid var(--ink); border-radius: 6px; background: #fff;
-  font-family: var(--font-barlow), sans-serif; font-weight: 600; font-size: 10.5px; line-height: 1; letter-spacing: .14em; white-space: nowrap;
-}
-.pv-pts b { font-family: var(--jp-title); font-weight: 700; font-size: 15px; line-height: 1.5; letter-spacing: .02em; word-break: auto-phrase; text-wrap: balance; }
-
-.pv-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 16px; margin-top: 18px; }
-.pv-proof { margin: 0; display: flex; align-items: center; gap: 12px; font-size: 12.5px; line-height: 1.6; font-weight: 500; word-break: auto-phrase; }
-/* 「測定中」の判子（LPの実店舗検証と同じもの） */
-.pv-stamp {
-  flex: none; display: inline-grid; place-items: center; padding: 1px 10px 3px;
-  border: 2.5px solid #FF4698; border-radius: 8px; color: #FF4698;
-  font-family: var(--jp-title); font-weight: 700; font-size: 16px; line-height: 1.2; letter-spacing: .08em; rotate: -6deg;
-}
-/* レシート（実測の数字） */
-.pv-proof--rc { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border: 2px solid var(--ink); border-radius: 12px; }
-.pv-proof--rc small { font-size: 11px; color: var(--ink80); }
-.pv-proof--rc span { font-weight: 700; font-size: 13.5px; }
-.pv-proof--rc b { font-family: var(--font-barlow), sans-serif; font-weight: 700; font-size: 22px; line-height: 1; margin: 0 2px; }
-
-/* 丸ボタン（押せるものだけ長丸）。影は hover のときだけ、ぼかさずに */
-.pv-cta {
-  display: inline-flex; align-items: center; gap: 10px; flex: none;
-  height: 46px; padding: 0 24px; border-radius: 99px;
-  border: 2px solid var(--ink); background: var(--ink); color: #fff;
-  text-decoration: none; font-size: 13.5px; font-weight: 700; letter-spacing: .04em; white-space: nowrap;
-  transition: translate .25s cubic-bezier(.16, 1, .3, 1), box-shadow .25s cubic-bezier(.16, 1, .3, 1);
-}
-.pv-cta svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.pv-cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-@media (hover: hover) {
-  .pv-cta:hover { translate: 0 -2px; box-shadow: 4px 6px 0 var(--sh); }
-}
-
-/* 2枚並べると窮屈になる幅（900〜1060px）では、映像と画面の比を少し画面寄りに */
-@media (max-width: 1060px) and (min-width: 901px) {
-  .pv-hd .main { font-size: clamp(24px, 2.8vw, 30px); }
-  .pv-pts b { font-size: 14px; }
-}
-
-@media (max-width: 900px) {
-  /* **2枚は縦に積まず、横スライドにする。**次の卓を少しのぞかせて指を誘う。
-     影（右下 7/10px）が切れないよう、下と右に余白を持たせる */
-  .pv-duo {
-    display: flex; gap: 16px;
-    margin-inline: calc(var(--pad-x) * -1);
-    padding: 2px var(--pad-x) 16px;
-    scroll-padding-inline: var(--pad-x);
-    overflow-x: auto; overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none; -ms-overflow-style: none;
-  }
-  .pv-duo::-webkit-scrollbar { display: none }
-  .pv-card { flex: 0 0 min(86%, 400px); scroll-snap-align: start; box-shadow: 7px 10px 0 var(--sh); padding: 24px 18px 18px; }
-  .pv-fd { inset: 10px; }
-  .pv-logo { --lu: .3px; }
-  .pv-kind { font-size: 12.5px; }
-  /* 判子の横に並べると本文の欄が狭すぎて本文が細かく折れる。判子は上に */
-  .pv-proof:not(.pv-proof--rc) { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .pv-proof br { display: none; }
-  .pv-hd .main { font-size: clamp(24px, 7.2vw, 30px); }
-  /* スマホは縦長の映像。画面と並べて 1：1 */
-  .pv-vid--wide { display: none; }
-  .pv-vid--tall { display: block; }
-  .pv-media { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: end; padding: 8px 0 0; }
-  .pv-vid { border-radius: 14px; box-shadow: 4px 6px 0 var(--sh); }
-  .pv-vid-bar { left: 6px; bottom: 6px; gap: 4px; }
-  .pv-vid-bar button { width: 28px; height: 28px; }
-  .pv-vid-bar svg { width: 14px; height: 14px; }
-  .pv-phone { border-radius: 24px; box-shadow: 4px 6px 0 var(--sh); }
-  .pv-phone-scr { border-radius: 19px; }
-  .pv-prop--accent { display: none; }
-  .pv-prop--cup { width: 62px; right: -12px; top: -18px; }
-  .pv-prop--card, .pv-review .pv-prop--card { width: 50px; right: auto; left: calc(50% - 30px); bottom: -10px; }
-  .pv-pts { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .pv-pts li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .pv-pts b { font-size: 14.5px; }
-  .pv-foot { justify-content: flex-start; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pv-cta, .pv-vid-play, .pv-vid-bar button { transition: none; }
+@media (max-width:900px){
+ .pd-grid{grid-template-columns:minmax(0,1fr);min-height:0}
+ .pd-media{order:-1;grid-template-columns:minmax(0,1fr) minmax(0,.36fr)}
+ .pd-phone{margin-top:-28%}
+ .pd-dots{min-height:120px}
 }
 
 /* ===== GOOD ORDER の注文画面（見本。OrderScreen.tsx）=====
    390px 幅の画面を基準に cqw で組む（1cqw = 3.9px）。実在の店名・写真は使わない */
-.pv-phone-scr { container-type: inline-size; }
+
 .os { height: 100%; background: #FFFDF8; color: #1B1B1F; font-family: var(--jp-body); overflow: hidden; }
 .os-bar { display: flex; align-items: center; justify-content: space-between; padding: 6cqw 5cqw 3cqw; }
 .os-store { font-family: var(--font-barlow), sans-serif; font-weight: 700; font-size: 4.6cqw; letter-spacing: .12em; line-height: 1; }

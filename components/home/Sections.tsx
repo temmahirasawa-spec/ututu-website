@@ -1,26 +1,33 @@
-/* トップの各節（ヒーローより下）。マークアップだけで、動きは
-   reveal.ts（現れる・数える）と CSS のスクロール連動（点灯・幅・積み重なり）。
-   CSS は home.css。
+/* トップの各節（ヒーローより後ろ）。どの節も座標の世界の「パネル」（[data-panel]）。
 
-   **書いてよいこと／いけないこと（2026-10-01 時点）**
+   パネルの置き方（lib/world/world.ts）
+     data-at      ひとつ前のパネルからのずらし。x は画面幅、y は画面高、z は奥行きの単位
+     data-from    top ＝前のパネルの上端から測る（奥へ並べるとき）。既定は下端から
+     data-transit 前のパネルからここへ渡る道のり（画面高の何倍のスクロールか）
+     data-bulge   渡るあいだにカメラが引く量。map なら全体が収まるまで引く（地図）
+     data-hold    読み終えてから次へ渡るまでの「間」
+     data-ground  地の色（paper / ink / shu / order / review）
+     data-mood    点のうねり：静脈, 塊, 粉, 速さ, 格子の波打ち
+   点の印：[data-stamp]（形）、文字の避け場所：[data-clear]、灯る段落：[data-light]
+
+   **書いてよいこと／いけないこと**（CLAUDE.md §0）
    - 特定の店名・ブランド名・運営会社名を出さない。実績は「期間を明記した過去形」で
    - 「自分たちの店」「直営」「この店が開発室」など、店を営んでいる前提の言い方をしない
-   - 天真さんの経歴の社名（サイバーエージェント／Adobe）は、プロフィールの全文の中にだけ置く。
-     見出しや一言には出さない（本人判断：前面に出しすぎない） */
+   - 天真さんの経歴の社名は、プロフィールの全文の中にだけ置く */
 
-import Link from 'next/link';
+import { Decode } from '@/components/site/Decode';
 import { Arrow, ExtIcon } from '@/components/site/Header';
 import { Mark } from '@/components/site/Mark';
 import { PRODUCT_URL } from '@/components/site/productLinks';
-import { Products } from '@/components/products/Products';
-import { Rise } from './Rise';
+import { TLink } from '@/components/site/TLink';
+import { OrderPanel, ReviewPanel } from '@/components/products/Products';
 
 function Label({ n, children }: { n: string; children: string }) {
-  return <p className="lbl rv"><b>({n})</b><i aria-hidden="true" />{children}</p>;
+  return <p className="lbl"><b>({n})</b><i aria-hidden="true" />{children}</p>;
 }
 
 /* ---------- (02) 宣言 ---------- */
-/* 一語ずつ灯る。区切りは意味の切れ目で。[文字, 強調] */
+/* 一語（文節）ずつ灯る。区切りは意味の切れ目で。[文字, 強調] */
 const MANIFESTO: [string, boolean?][][] = [
   [['ひとつのサービスをつくるのに、'], ['大きなチームと、'], ['長い時間が'], ['必要だった。']],
   [['いまは、'], ['違います。']],
@@ -30,101 +37,91 @@ const MANIFESTO: [string, boolean?][][] = [
 
 export function Manifesto() {
   return (
-    <section className="mf" id="why" aria-labelledby="mf-h">
-      <div className="mf-in">
-        <Label n="02">Why now</Label>
-        <h2 id="mf-h" className="sr">私たちが2人でつくる理由</h2>
-        <p className="mf-text">
+    <section
+      id="why" className="pn mf" aria-labelledby="mf-h"
+      data-panel="(02) WHY NOW" data-ground="ink" data-at="0.32,0.3,0" data-transit="1.05" data-bulge="0.55"
+      data-mood="1.15,0.35,1,0.9,0.6"
+    >
+      <Label n="02">Why now</Label>
+      <h2 id="mf-h" className="sr">私たちが2人でつくる理由</h2>
+      <div className="mf-grid">
+        <p className="mf-text" data-clear>
           {MANIFESTO.map((para, i) => (
-            <span className="mf-p" key={i}>
-              {para.map(([w, hl], j) => <span key={j} className={hl ? 'w hl' : 'w'}>{w}</span>)}
+            <span className="mf-p" key={i} data-light style={{ ['--n' as string]: para.length }}>
+              {para.map(([w, hl], j) => (
+                <span key={j} className={hl ? 'w hl' : 'w'} style={{ ['--i' as string]: j }}>{w}</span>
+              ))}
             </span>
           ))}
         </p>
+        <div className="mf-two" data-stamp="two" data-tint="" aria-hidden="true"><span>2</span></div>
       </div>
-      <div className="mq" aria-hidden="true">
-        <div className="mq-row">
-          {[0, 1].map((k) => (
-            <span className="mq-set" key={k}>
-              <span>Business</span><b>×</b><span>Craft</span><b>×</b><span>AI</span><b>=</b><span className="mq-two">Two</span><b>/</b>
-            </span>
-          ))}
-        </div>
+      <div className="mq" data-stamp="marquee" data-mode="marquee" data-fit="fill" data-e="0,0.03,0,0">
+        <span className="mq-txt">Business × Craft × AI = Two</span>
       </div>
     </section>
   );
 }
 
-/* ---------- (03) 原則 ---------- */
-const PRINCIPLES = [
+/* ---------- (03) 原則：見出し＋奥へ並ぶ3枚 ---------- */
+export function How() {
+  return (
+    <section
+      id="how" className="pn sec" aria-labelledby="how-h"
+      data-panel="(03) HOW WE WORK" data-ground="paper" data-at="1.25,-0.5,-0.25" data-transit="1.1" data-bulge="0.7"
+    >
+      <Label n="03">How we work</Label>
+      <div data-clear>
+        <Decode className="ttl" lines={['AI, WITHOUT', 'SHORTCUTS.']} />
+        <p className="ttl-jp" id="how-h">AIで、手を抜かない。</p>
+      </div>
+      <p className="sec-lead" data-clear>速さと精度は、両立できる。私たちの仕事の、3つの決まりごとです。<br />ここから先は、奥へ進みます。</p>
+    </section>
+  );
+}
+
+const CARDS = [
   {
-    en: 'Speed', jp: '資料より先に、動くもの。',
+    id: 'speed', en: 'Speed', jp: '資料より先に、動くもの。', ground: 'paper',
     body: '議論を重ねるより、まず触れる試作をつくる。試作と検証の回数が多いほど、仕上がりは良くなります。AIで縮めた時間は、その回数に回します。',
-    motif: 'speed',
+    stamp: { shape: 'speed', mode: 'speed', e: '0,0.45,0,0' }, mood: '0.85,0.4,1,2.6,0.75',
+    at: '0,0.3,0', from: 'bottom', transit: '0.85', bulge: '0.15',
   },
   {
-    en: 'Precision', jp: '最後の1ピクセルは、人が決める。',
+    id: 'precision', en: 'Precision', jp: '最後の1ピクセルは、人が決める。', ground: 'ink',
     body: 'AIが出したものを、そのまま出すことはしません。余白、文字の詰め、動きの間合い。品質を決める細部は、デザイナーの目でひとつずつ詰めていきます。',
-    motif: 'precision',
+    stamp: { shape: 'grid', mode: 'precision', e: '0,0,0,0' }, mood: '0.45,0.25,1,0.5,0.2',
+    at: '0,0,-1.25', from: 'top', transit: '1.0', bulge: '0',
   },
   {
-    en: 'Business', jp: 'つくって終わり、にしない。',
+    id: 'business', en: 'Business', jp: 'つくって終わり、にしない。', ground: 'paper',
     body: '売上につながるか。現場が回るか。続けられるか。事業を自分の手で回してきた目線で、何をつくるか、何をつくらないかから一緒に決めます。',
-    motif: 'business',
+    stamp: { shape: 'bars', mode: 'bars', e: '0,0,0,0' }, mood: '1,0.5,1,1,0.55',
+    at: '0,0,-1.25', from: 'top', transit: '1.0', bulge: '0',
   },
 ] as const;
 
-export function Principles() {
+export function Cards() {
   return (
-    <section className="pr" id="how" aria-labelledby="pr-h">
-      <div className="pr-head">
-        <Label n="03">How we work</Label>
-        <Rise className="sec-h" lines={['AIで、', '手を抜かない。']} />
-        <p className="sec-lead rv">速さと精度は、両立できる。私たちの仕事の、3つの決まりごとです。</p>
-      </div>
-      <ol className="pr-stack">
-        {PRINCIPLES.map((p, i) => (
-          <li className={`pr-card pr-card--${i + 1}`} key={p.en} style={{ ['--i' as string]: i }}>
-            <div className="pr-top">
-              <span className="pr-n">{String(i + 1).padStart(2, '0')} / 03</span>
-              <Motif kind={p.motif} />
+    <>
+      {CARDS.map((c, i) => (
+        <section
+          key={c.id} id={c.id} className={`pn card card--${c.id}`} aria-labelledby={`${c.id}-h`}
+          data-panel={`(03-${i + 1}) ${c.en.toUpperCase()}`} data-ground={c.ground} data-at={c.at} data-from={c.from}
+          data-transit={c.transit} data-bulge={c.bulge} data-hold="0.6" data-mood={c.mood}
+        >
+          <div className="card-in">
+            <p className="card-n">{String(i + 1).padStart(2, '0')} / 03 — How we work</p>
+            <Decode as="p" className="card-en" lines={[c.en.toUpperCase()]} />
+            <div className="card-body" data-clear>
+              <h3 id={`${c.id}-h`}>{c.jp}</h3>
+              <p>{c.body}</p>
             </div>
-            <p className="pr-en" aria-hidden="true">{p.en}</p>
-            <div className="pr-body">
-              <h3>{p.jp}</h3>
-              <p>{p.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-/* 原則ごとの小さな図。動きは CSS（home.css の .mo-*） */
-function Motif({ kind }: { kind: string }) {
-  if (kind === 'speed') {
-    return (
-      <svg className="mo mo-speed" viewBox="0 0 160 80" aria-hidden="true">
-        {[10, 24, 38, 52, 66].map((y, i) => <line key={y} x1="8" x2={150 - i * 14} y1={y} y2={y} style={{ ['--k' as string]: i }} />)}
-      </svg>
-    );
-  }
-  if (kind === 'precision') {
-    return (
-      <svg className="mo mo-prec" viewBox="0 0 160 80" aria-hidden="true">
-        <rect x="52" y="14" width="56" height="52" />
-        <line x1="80" x2="80" y1="2" y2="78" /><line x1="40" x2="120" y1="40" y2="40" />
-        <circle cx="80" cy="40" r="7" />
-        <text x="114" y="12">+1px</text>
-      </svg>
-    );
-  }
-  return (
-    <svg className="mo mo-biz" viewBox="0 0 160 80" aria-hidden="true">
-      {[0, 1, 2, 3, 4].map((i) => <rect key={i} x={14 + i * 28} y={70 - (i + 1) * 11} width="16" height={(i + 1) * 11} style={{ ['--k' as string]: i }} />)}
-      <polyline points="22,52 50,44 78,36 106,22 134,8" />
-    </svg>
+            <div className="card-fig" data-stamp={c.stamp.shape} data-mode={c.stamp.mode} data-e={c.stamp.e} data-fit={c.stamp.mode === 'speed' ? 'fill' : 'contain'} aria-hidden="true" />
+          </div>
+        </section>
+      ))}
+    </>
   );
 }
 
@@ -138,18 +135,23 @@ const SERVICES = [
 
 export function Services() {
   return (
-    <section className="sv" id="services" aria-labelledby="sv-h">
-      <div className="sv-head">
-        <Label n="04">Services</Label>
-        <Rise className="sec-h" lines={['まるごと、', '任せてください。']} />
-        <p className="sec-lead rv">一部分だけでも、最初から最後まででも。最初の相談から、公開したあとの改善まで、同じ2人が担当します。</p>
+    <section
+      id="services" className="pn sec sv" aria-labelledby="sv-h"
+      data-panel="(04) SERVICES" data-ground="paper" data-at="-1.15,0.35,2.5" data-transit="1.25" data-bulge="0.35"
+      data-mood="0.8,0.45,1,0.8,0.5"
+    >
+      <Label n="04">Services</Label>
+      <div data-clear>
+        <Decode className="ttl" lines={['LEAVE IT ALL', 'TO US.']} />
+        <p className="ttl-jp" id="sv-h">まるごと、任せてください。</p>
       </div>
+      <p className="sec-lead" data-clear>一部分だけでも、最初から最後まででも。最初の相談から、公開したあとの改善まで、同じ2人が担当します。</p>
       <ul className="sv-list">
         {SERVICES.map((s, i) => (
-          <li className="sv-row rv" key={s.en}>
+          <li className="sv-row" key={s.en} data-stamp="fill" data-mode="fill" data-on="hover" data-fit="fill" data-tint="">
             <span className="sv-n">{String(i + 1).padStart(2, '0')}</span>
-            <h3 className="sv-en">{s.en}</h3>
-            <div className="sv-txt">
+            <h3 className="sv-en" data-clear>{s.en}</h3>
+            <div className="sv-txt" data-clear>
               <p className="sv-jp">{s.jp}</p>
               <p className="sv-body">{s.body}</p>
               <p className="sv-tags">{s.tags.map((t) => <span key={t}>{t}</span>)}</p>
@@ -162,6 +164,41 @@ export function Services() {
 }
 
 /* ---------- (05) つくったもの ---------- */
+export function Work() {
+  return (
+    <section
+      id="work" className="pn sec" aria-labelledby="wk-h"
+      data-panel="(05) WORK" data-ground="paper" data-at="1.15,0.2,0" data-transit="0.95" data-bulge="0.3"
+    >
+      <Label n="05">Work</Label>
+      <div data-clear>
+        <Decode className="ttl" lines={['FIRST, WE BUILT', 'OUR OWN.']} />
+        <p className="ttl-jp" id="wk-h">最初の作品は、自分たちのプロダクト。</p>
+      </div>
+      <p className="sec-lead" data-clear>
+        店舗のためのプロダクト群「GOOD SERIES」。企画、ブランド、UI、開発、LP、映像まで、すべてを2人でつくっています。
+        ここから先は、横へ進みます。
+      </p>
+      <p className="wk-next" aria-hidden="true"><span>GOOD ORDER</span><i /><span>GOOD REVIEW</span><i /><span>→</span></p>
+    </section>
+  );
+}
+
+export function Products() {
+  return (
+    <>
+      <OrderPanel panel={{
+        'data-panel': '(05-A) GOOD ORDER', 'data-ground': 'order', 'data-from': 'top', 'data-at': '1.08,0.06,0',
+        'data-transit': '1.0', 'data-bulge': '0.12', 'data-hold': '0.35', 'data-mood': '0.7,0.4,0.9,1,0.5',
+      }} />
+      <ReviewPanel panel={{
+        'data-panel': '(05-B) GOOD REVIEW', 'data-ground': 'review', 'data-from': 'top', 'data-at': '1.08,-0.06,0',
+        'data-transit': '1.0', 'data-bulge': '0.12', 'data-hold': '0.35', 'data-mood': '0.7,0.4,0.9,1,0.5',
+      }} />
+    </>
+  );
+}
+
 /* 数はすべて GOOD SERIES の実物から数えたもの。足したら、ここも直すこと。
    **確認待ち：**「全部2人で」と言い切ってよいか（外注した部分が無いか）は本人確認 */
 const LEDGER: [number, string, string][] = [
@@ -171,50 +208,53 @@ const LEDGER: [number, string, string][] = [
   [2, 'Films', '映像'],
 ];
 
-export function Work() {
+export function Ledger() {
   return (
-    <section className="wk" id="work" aria-labelledby="wk-h">
-      <div className="wk-head">
-        <Label n="05">Work</Label>
-        <Rise className="sec-h" lines={['最初の作品は、', '自分たちのプロダクト。']} />
-        <p className="sec-lead rv">
-          店舗のためのプロダクト群「GOOD SERIES」。企画、ブランド、UI、開発、LP、映像まで、すべてを2人でつくっています。
-        </p>
+    <section
+      id="ledger" className="pn sec ld-pn" aria-labelledby="ld-h"
+      data-panel="(05-C) BUILT BY TWO" data-ground="paper" data-at="-0.55,0.3,-0.2" data-transit="1.0" data-bulge="0.4"
+    >
+      <p className="lbl"><b>—</b><i aria-hidden="true" />Built by two</p>
+      <div data-clear>
+        <Decode className="ttl" lines={['BUILT BY TWO.']} />
+        <p className="ttl-jp" id="ld-h">GOOD SERIES を、2人でつくりました。</p>
       </div>
-      <Products />
-      <div className="wk-ledger">
-        <p className="lbl rv"><b>—</b><i aria-hidden="true" />Built by two</p>
-        <dl className="ld">
+      <div className="ld-wrap">
+        <dl className="ld" data-clear>
           {LEDGER.map(([n, en, jp]) => (
-            <div className="ld-i rv" key={en}>
+            <div className="ld-i" key={en}>
               <dt><span>{en}</span><small>{jp}</small></dt>
               <dd data-count={n}>{String(n).padStart(2, '0')}</dd>
             </div>
           ))}
-          <div className="ld-i ld-sum rv">
+          <div className="ld-i ld-sum">
             <dt><span>People</span><small>つくった人数</small></dt>
             <dd data-count={2}>02</dd>
           </div>
         </dl>
+        <div className="ld-two" data-stamp="two" data-tint="" aria-hidden="true" />
       </div>
     </section>
   );
 }
 
 /* ---------- (06) ふたり ---------- */
-/* 3Dアバターの枠（.fd-ph）。headViewer.js がこの枠に canvas を差し込む。
-   data-cm は身長、data-tap はタップの反応（CLAUDE.md「Founders のアバター」） */
 export function Team() {
   return (
-    <section className="tm" id="team" aria-labelledby="tm-h">
-      <div className="tm-head">
-        <Label n="06">Team</Label>
-        <Rise className="sec-h" lines={['事業の人と、', 'つくる人。']} />
-        <p className="sec-lead rv">
-          売れる理由を知る人と、使われる形を知る人。片方だけでは、いいサービスはできません。
-          その2人が、最初から最後まで並んで走ります。
-        </p>
+    <section
+      id="team" className="pn sec tm" aria-labelledby="tm-h"
+      data-panel="(06) TEAM" data-ground="ink" data-at="-0.6,0.3,0" data-transit="1.1" data-bulge="0.65"
+      data-mood="1.3,0.4,1,1,0.7"
+    >
+      <Label n="06">Team</Label>
+      <div data-clear>
+        <Decode className="ttl" lines={['THE OPERATOR', '& THE MAKER.']} />
+        <p className="ttl-jp" id="tm-h">事業の人と、つくる人。</p>
       </div>
+      <p className="sec-lead" data-clear>
+        売れる理由を知る人と、使われる形を知る人。片方だけでは、いいサービスはできません。
+        その2人が、最初から最後まで並んで走ります。
+      </p>
       <div className="tm-duo">
         <Person
           head="yosuke" cm={173} tap="stumble" bio="yosuke"
@@ -241,14 +281,19 @@ function Person(p: {
   name: string; en: string; ex: string; tags: string[];
 }) {
   return (
-    <article className="fd rv">
-      <div className="fd-ph" data-head={p.head} data-cm={p.cm} data-tap={p.tap} aria-hidden="true">
-        <svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10" /><path d="M13 55 a19 19 0 0 1 38 0" /></svg>
+    <article className="fd">
+      <div className="fd-stage">
+        <div className="fd-floor" data-stamp="floor" data-mode="floor" data-fit="fill" data-tint="" aria-hidden="true" />
+        <div className="fd-ph" data-head={p.head} data-cm={p.cm} data-tap={p.tap} aria-hidden="true">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="23" r="10" /><path d="M13 55 a19 19 0 0 1 38 0" /></svg>
+        </div>
       </div>
-      <p className="fd-role" title={p.role}>{p.roleEn}</p>
-      <h3 className="fd-name">{p.name}<small>{p.en}</small></h3>
-      <p className="fd-ex">{p.ex}</p>
-      <p className="fd-tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</p>
+      <div className="fd-txt" data-clear>
+        <p className="fd-role" title={p.role}>{p.roleEn}</p>
+        <h3 className="fd-name">{p.name}<small>{p.en}</small></h3>
+        <p className="fd-ex">{p.ex}</p>
+        <p className="fd-tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</p>
+      </div>
       <button className="profile-btn" type="button" data-bio={p.bio}>Profile<i aria-hidden="true">+</i></button>
     </article>
   );
@@ -257,44 +302,48 @@ function Person(p: {
 /* ---------- (07) 締め ---------- */
 export function Contact() {
   return (
-    <section className="ct" id="contact-cta" aria-labelledby="ct-h">
+    <section
+      id="contact-cta" className="pn sec ct" aria-labelledby="ct-h"
+      data-panel="(07) CONTACT" data-ground="shu" data-at="0.45,0.45,0" data-transit="2.0" data-bulge="map"
+      data-mood="1.7,0.7,1,1.3,0.95" data-hold="0.3"
+    >
       <Label n="07">Contact</Label>
-      <h2 id="ct-h" className="ct-big" aria-label="Let's build.">
-        <span className="ct-l1">Let&apos;s</span>
-        <span className="ct-l2">build.</span>
-      </h2>
+      <div data-clear>
+        <Decode className="ttl ct-big" lines={["LET'S", 'BUILD.']} />
+        <p className="ttl-jp" id="ct-h">まだ形になっていない相談ほど、歓迎です。</p>
+      </div>
       <div className="ct-row">
-        <p className="ct-lead rv">
-          まだ形になっていない相談ほど、歓迎です。<br />
-          事業のアイデア、困っている業務、作り直したいサービス。まずは話してみてください。
-        </p>
-        <div className="ct-btns rv">
-          <Link className="btn" href="/company#contact">お問い合わせ<Arrow /></Link>
-          <Link className="btn btn--line" href="/company">会社概要</Link>
+        <p className="ct-lead" data-clear>事業のアイデア、困っている業務、作り直したいサービス。まずは話してみてください。</p>
+        <div className="ct-btns" data-clear>
+          <TLink className="btn" href="/company#contact">お問い合わせ<Arrow /></TLink>
+          <TLink className="btn btn--line" href="/company">会社概要</TLink>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------- フッター（トップと /company で共通） ---------- */
-export function Footer() {
+/* ---------- フッター（トップではパネル、/company ではふつうのフッター） ---------- */
+export function Footer({ panel = false }: { panel?: boolean }) {
+  const attrs = panel
+    ? { 'data-panel': '(08) UTUTU', 'data-ground': 'ink', 'data-at': '0,0.12,0', 'data-transit': '0.75', 'data-bulge': '0.2', 'data-hold': '0' }
+    : {};
   return (
-    <footer className="ft">
-      <div className="ft-cols">
+    <footer className={`ft${panel ? ' pn' : ''}`} id="foot" {...attrs}>
+      <div className="ft-cols" data-clear>
         <div>
           <p className="ft-h">Studio</p>
           <ul>
-            <li><Link href="/#services">できること</Link></li>
-            <li><Link href="/#work">つくったもの</Link></li>
-            <li><Link href="/#team">ふたり</Link></li>
+            <li><TLink href="/#services">できること</TLink></li>
+            <li><TLink href="/#work">つくったもの</TLink></li>
+            <li><TLink href="/#team">ふたり</TLink></li>
           </ul>
         </div>
         <div>
           <p className="ft-h">Company</p>
           <ul>
-            <li><Link href="/company">会社概要</Link></li>
-            <li><Link href="/company#contact">お問い合わせ</Link></li>
+            <li><TLink href="/company">会社概要</TLink></li>
+            <li><TLink href="/company#contact">お問い合わせ</TLink></li>
           </ul>
         </div>
         <div>
@@ -306,7 +355,7 @@ export function Footer() {
         </div>
         <p className="ft-note">株式会社UTUTU<br />Creative Studio for DX<br />Kobe, Japan</p>
       </div>
-      <div className="ft-mark" aria-hidden="true"><Mark /></div>
+      <div className="ft-mark" data-stamp="mark" data-fit="fill" aria-hidden="true"><Mark /></div>
       <p className="ft-copy"><span>© 2026 UTUTU Inc.</span><span>Made by two, with AI.</span></p>
     </footer>
   );

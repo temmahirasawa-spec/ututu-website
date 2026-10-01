@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Archivo, Barlow, Geist_Mono, Noto_Sans_JP, Zen_Kaku_Gothic_New } from 'next/font/google';
+import { DotField } from '@/components/dots/DotField';
 import { Header } from '@/components/site/Header';
 import './globals.css';
 
@@ -81,13 +82,16 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="ja"
+      data-ground="paper"
       suppressHydrationWarning
       className={`${archivo.variable} ${mono.variable} ${barlow.variable} ${notoSansJP.variable} ${zenKaku.variable}`}
     >
       <body>
         {/* 現れる動き（.rv / .rise）は JS があるときだけ隠しておく。描く前に付けること */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-        {/* ヘッダーはページをまたいで残す（遷移しても作り直さない） */}
+        {/* 点描とヘッダーはページをまたいで残す（遷移しても作り直さない）。
+            **DotField は子より先に置くこと。**effect がページより先に走り、点描が先に起動する */}
+        <DotField />
         <Header />
         {children}
       </body>
