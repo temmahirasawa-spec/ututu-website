@@ -177,6 +177,8 @@
 .pv-pts b { font-family: var(--jp-title); font-weight: 700; font-size: 15px; line-height: 1.5; letter-spacing: .02em; word-break: auto-phrase; text-wrap: balance; }
 
 .pv-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 16px; margin-top: 18px; }
+/* 実績が無いカード（2026-10-01 に REVIEW の実績を外した）でも、「公式サイトへ」は右端に（スマホは下の .pv-foot の指定で左寄せ） */
+.pv-foot--solo { justify-content: flex-end; }
 .pv-proof { margin: 0; display: flex; align-items: center; gap: 12px; font-size: 12.5px; line-height: 1.6; font-weight: 500; word-break: auto-phrase; }
 /* 「測定中」の判子（LPの実店舗検証と同じもの） */
 .pv-stamp {
