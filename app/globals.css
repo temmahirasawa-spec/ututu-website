@@ -1,320 +1,190 @@
-/* 原本 reference/legacy-index.html の <style> から、そのまま切り出したもの。
-   数値は実機で詰めた実測値です。意味が分からないまま書き換えないこと。
-   KV（映像区間）ぶんは components/hero/hero.css にあります。 */
+/* UTUTU — サイト共通（トークン・素の指定・ヘッダー・メニュー・プロフィールのモーダル・現れ方）
+   2026-10 のリニューアルで書き直し。トップの各節は components/home/home.css、
+   プロダクト節は components/products/products.css、/company は components/company/company.css。
 
-:root{--paper:#F3F1EC;--ink:#14161A;--sub:#7A7F87;--onfilm:#fff;--cream:#F7F3E8;
- --olive:#6E7D57;--line:rgba(20,22,26,.14);
- /* フォントは next/font（app/layout.tsx）が読み、変数で渡してくる。
-    先頭を Barlow にすると、和文グリフを持たないぶん日本語だけが次に落ちる */
- --jp-body:var(--font-barlow),var(--font-noto-jp),"Hiragino Sans",sans-serif;
- --jp-title:var(--font-barlow),var(--font-zen-kaku),"Hiragino Sans",sans-serif}
-*{box-sizing:border-box}html,body{margin:0}
-html{scroll-behavior:auto}
-/* Chrome の「スクロールアンカリング」を切る。
-   画面より上の中身の高さが変わると、Chrome は見た目を保とうとして
-   scrollY のほうを黙って動かす。**この機能があるのは Chrome だけで、
-   Safari には無い。**そのため「Chromeでだけ位置が飛ぶ・戻される」が起きた。
-   和文を preload せず swap で当てているため（app/layout.tsx）、遅れて届くと
-   #after の長い本文が一斉に組み直され、そこで Chrome が補正に入る。
-   和文を7秒遅らせ y=5200 で止めて無操作で観察：切る前 5200→5174、切ると動かず。
-   上へ中身を足す作り（無限スクロール）は無いので、切って失うものは無い */
-html{overflow-anchor:none}
-/* 映像区間のあいだは、OS標準のスクロールバーを消して独自の縦棒（#prog）だけにする。
-   クラスは <html> に付ける。スクロールバーは根の要素のものなので、
-   body のクラスからは指定できない */
-html.hide-sb{scrollbar-width:none;-ms-overflow-style:none}
-html.hide-sb::-webkit-scrollbar{width:0;height:0;display:none}
-body{background:var(--paper);color:var(--ink);
- /* 欧文は Barlow。和文グリフを持たないので、日本語は次の和文に落ちる。
-    本文は Noto Sans JP Regular、見出しは Zen Kaku Gothic New Bold 700（--jp-title）*/
- font-family:var(--jp-body);
- -webkit-font-smoothing:antialiased}
+   世界観：紙 ／ 墨 ／ 朱 1点。
+   朱は「ここが要点」「押せる」の印にだけ使う。面で使うのは締めの節（#contact）だけ。 */
 
+:root{
+ --paper:#ECE9E1;--paper-2:#E2DED3;--ink:#0E0E0D;--ink-2:#1A1A18;
+ --shu:#FF4D1F;--shu-ink:#C93A12;
+ --mut:#68665F;--mut-ink:#9A978E;
+ --line:rgba(14,14,13,.14);--line-ink:rgba(236,233,225,.16);
+ --gut:clamp(18px,3.4vw,48px);
+ --ease:cubic-bezier(.2,.7,.1,1);
+ /* 先頭に欧文を置くと、和文グリフを持たないぶん日本語だけが次に落ちる */
+ --f-disp:var(--font-archivo),var(--font-zen-kaku),"Hiragino Sans",sans-serif;
+ --f-mono:var(--font-mono),ui-monospace,monospace;
+ --jp-title:var(--font-archivo),var(--font-zen-kaku),"Hiragino Sans",sans-serif;
+ --jp-body:var(--font-archivo),var(--font-noto-jp),"Hiragino Sans",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+/* Chrome のスクロールアンカリングを切る。和文を swap で遅れて当てているので、
+   届いた瞬間に長い本文が組み直され、Chrome だけ scrollY を黙って動かす
+   （旧版で実測：切る前 5200→5174、切ると動かない）。**消さないこと** */
+html{overflow-anchor:none;scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--paper);color:var(--ink);font-family:var(--jp-body);
+ font-feature-settings:"palt";-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--shu);color:#fff}
+a{color:inherit}
+img,svg,video,canvas{max-width:100%}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
-/* ===== 共有の部品 ===== */
-/* 背景・ふちは NEXT ボタン（#nextBtn）と同じ値に揃えてある */
-.linkbtn{display:inline-flex;align-items:center;gap:9px;margin-top:26px;pointer-events:auto;
- padding:13px 22px;border:1px solid rgba(255,255,255,.28);border-radius:99px;
- color:#fff;text-decoration:none;font-size:12.5px;letter-spacing:.06em;font-weight:600;
- background:rgba(255,255,255,.12);backdrop-filter:blur(14px);
- transition:background .25s, border-color .25s}
-.linkbtn svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;
- stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
-.linkbtn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5)}
-.linkbtn:hover svg{transform:translate(2px,-2px)}
-.linkbtn:active{background:rgba(255,255,255,.26)}
+/* ===== 共通の部品 ===== */
+/* 節の番号つきラベル：(02) Why now */
+.lbl{display:flex;align-items:center;gap:.9em;margin:0 0 clamp(20px,3vw,34px);
+ font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+.lbl b{font-weight:500;color:var(--shu)}
+.lbl i{flex:0 0 clamp(28px,5vw,64px);height:1px;background:currentColor;opacity:.35}
 
-/* ===== ロゴ・メニュー（サイト共通） ===== */
-/* ロゴとハンバーガーは同じ文字高（--markCap）で、同じ中心線（--markY）に置く。
-   正式ロゴは 1160×149 の中に高さ133の文字が入っているので、SVGの箱は 149/133 倍 */
-:root{--markCap:17px;--markBox:calc(var(--markCap) * 149 / 133);--markY:41px}
-/* ロゴに影は付けない。
-   なお **CSSの filter:drop-shadow は動くものに使ってはいけません。**
-   適用範囲が外接矩形の±10%に固定され、文字が動いてそこから出た部分が消えます。
-   必要になったら SVG の <filter filterUnits="userSpaceOnUse"> で範囲を明示すること */
-#brand{position:fixed;z-index:7;left:50%;
- top:calc(var(--markY) - var(--markBox)/2);transform:translateX(-50%);
- line-height:0}
-#brand svg{display:block;height:var(--markBox);width:auto}
-#brand path{fill:#fff}
+/* 押せるもの。長丸＝ボタン。矢印は hover で進む */
+.btn{display:inline-flex;align-items:center;gap:.8em;padding:1.05em 1.7em;border-radius:99px;
+ background:var(--ink);color:var(--paper);text-decoration:none;border:0;cursor:pointer;
+ font-family:var(--jp-title);font-weight:700;font-size:14px;letter-spacing:.08em;
+ transition:background-color .3s ease,color .3s ease,transform .3s var(--ease)}
+.btn svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;
+ stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn:focus-visible{outline:2px solid var(--shu);outline-offset:3px}
+.btn--shu{background:var(--shu);color:#fff}
+.btn--shu:hover{background:var(--ink)}
+.btn--line{background:transparent;color:inherit;box-shadow:inset 0 0 0 1px currentColor}
+.btn--line:hover{background:var(--ink);color:var(--paper);box-shadow:none}
 
-/* ロゴは押せる。先頭に戻る */
-#brand{border:0;padding:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#brand:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:6px}
-
-/* ハンバーガーは Liquid Glass の丸ボタン（codepen.io/Mikhail-Bespalov/pen/MYwrMNy を移植）。
-   下地を SVG フィルター（SiteNav の #frosted）で屈折させ、白い輪で縁取る。
-   **SVG フィルターを backdrop-filter に使えるのは Chrome 系だけ。**Safari は
-   受け付けても描かないので、下の @supports で Safari だけ普通のぼかしに落とす */
-#menuBtn{position:fixed;z-index:7;right:18px;width:48px;height:48px;border-radius:50%;
- top:calc(var(--markY) - 24px);   /* 48pxの中心を --markY に合わせる */
- background:rgba(255,255,255,.08);border:2px solid transparent;
- box-shadow:0 0 0 1.5px rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.18);
- backdrop-filter:url(#frosted);
- cursor:pointer;display:grid;place-items:center;gap:0;outline:0;
- -webkit-tap-highlight-color:transparent;transition:box-shadow .3s ease,background .3s ease}
-#menuBtn:hover{background:rgba(255,255,255,.14)}
-#menuBtn:focus-visible{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 10px 24px rgba(0,0,0,.18)}
-@supports (background:-webkit-named-image(i)){
- #menuBtn{backdrop-filter:blur(6px) saturate(1.4)}
+/* ===== 現れ方 =====
+   語彙は4つだけ。**増やさないこと。**
+   1) 解像 … ヒーローの点が、ノイズから形に揃う（Hero / halftone.ts）
+   2) 点灯 … 宣言の文が、スクロールに合わせて一語ずつ灯る（.lit）
+   3) 立ち上がる … 見出しが行ごとに下から出る（.rise）。それ以外は静かに出る（.rv）
+   4) 積み重なる … 原則の3枚が、スクロールで重なっていく（position:sticky）
+   JS（components/home/reveal.ts）が画面に入ったものに .in を付ける。
+   ヘッドレスでは IntersectionObserver が凍るので、確認は ?reveal を付ける */
+.js .rv{opacity:0;transform:translateY(22px);
+ transition:opacity 1s var(--ease) var(--d,0s),transform 1s var(--ease) var(--d,0s)}
+.js .rv.in{opacity:1;transform:none}
+.rise{display:block}
+.rise>span{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+.rise>span>span{display:block}
+.js .rise>span>span{transform:translateY(108%);
+ transition:transform 1.1s var(--ease) calc(var(--d,0s) + var(--i,0) * .09s)}
+.js .rise.in>span>span{transform:none}
+/* .js は layout.tsx の小さなスクリプトが付ける。JS が無ければ最初から全部見える */
+@media (prefers-reduced-motion:reduce){
+ .js .rv,.js .rise>span>span{opacity:1;transform:none;transition:none}
 }
-.glass-defs{position:absolute;width:0;height:0;overflow:hidden}
-#menuBtn span{display:block;width:20px;height:1.5px;background:#fff;border-radius:2px;
- transition:transform .35s ease, opacity .25s ease}
-#menuBtn span{position:absolute}
-#menuBtn span:nth-child(1){transform:translateY(calc(var(--markCap)/-2 + .75px))}
-#menuBtn span:nth-child(2){transform:translateY(0)}
-#menuBtn span:nth-child(3){transform:translateY(calc(var(--markCap)/2 - .75px))}
-body.menu-open #menuBtn span:nth-child(1){transform:translateY(0) rotate(45deg)}
-body.menu-open #menuBtn span:nth-child(2){opacity:0}
-body.menu-open #menuBtn span:nth-child(3){transform:translateY(0) rotate(-45deg)}
-/* 紙の上ではハンバーガーを墨に。**開いている間は幕が墨なので白へ戻すこと。**
-   反転したままだと閉じるための×が地に沈んで見えなくなる */
-#menuBtn.on-paper{background:rgba(0,0,0,.04);
- box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 10px 24px rgba(0,0,0,.08)}
-#menuBtn.on-paper:hover{background:rgba(0,0,0,.07)}
-#menuBtn.on-paper span{background:var(--ink)}
-body.menu-open #menuBtn.on-paper{background:rgba(255,255,255,.08);
- box-shadow:0 0 0 1.5px rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.18)}
-body.menu-open #menuBtn.on-paper span{background:#fff}
 
-#menu{position:fixed;inset:0;z-index:6;background:rgba(14,16,20,.94);
- backdrop-filter:blur(16px);
- display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
-body.menu-open #menu{opacity:1;pointer-events:auto}
-.menu-main{list-style:none;margin:0;padding:0;text-align:center}
-.menu-main li{margin:0 0 26px}
-.menu-main a{color:#fff;text-decoration:none;font-size:clamp(22px,4vw,30px);font-weight:600;
- letter-spacing:.02em;opacity:.92;transition:opacity .25s ease}
-.menu-main a:hover{opacity:1}
-.menu-main small{display:block;font-size:10px;letter-spacing:.2em;opacity:.45;
- margin-top:6px;font-weight:400}
-/* COMPANY と CONTACT は同じページなので1行に並べる */
-.menu-pair{display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap}
-.menu-pair .sep{color:rgba(255,255,255,.28);font-weight:300;
- font-size:clamp(19px,3.2vw,26px)}
-.menu-pair small{flex-basis:100%}
-.menu-rule{width:40px;height:1px;border:0;background:rgba(255,255,255,.2);margin:2px auto 0}
+/* ===== ヘッダー（components/site/Header.tsx）=====
+   左にロゴ、右に MENU。**ヘッダー全体を mix-blend-mode:difference にしてある。**
+   白で描くと、紙の上では墨に、墨の上では紙に見える（節ごとに色を切り替える仕掛けが要らない）。
+   difference は「重なり順の文脈」の中でしか効かないので、子ではなく .hd 自体に掛けること
+   （position:fixed + z-index で文脈が閉じ、子に掛けても下の節と混ざらない。実際に白いまま残った）。
+   **朱の「相談する」は .hd の外（.hd-cta）に置くこと。**中に入れると補色の水色になる */
+:root{--hd-h:72px;--menu-w:86px}
+.hd{position:fixed;z-index:30;top:0;left:0;right:0;height:var(--hd-h);padding:0 var(--gut);
+ display:flex;align-items:center;justify-content:space-between;pointer-events:none;
+ mix-blend-mode:difference;color:#fff}
+.hd>*{pointer-events:auto}
+.hd-brand{display:block;line-height:0}
+.hd-brand svg{height:15px;width:auto;display:block}
+.hd-brand path{fill:currentColor}
+.hd-meta{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none;margin:0;
+ font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.hd-cta{position:fixed;z-index:31;top:calc(var(--hd-h) / 2 - 19px);right:calc(var(--gut) + var(--menu-w) + 6px);
+ display:inline-flex;align-items:center;gap:.6em;height:38px;padding:0 16px;border-radius:99px;
+ background:var(--shu);color:#fff;text-decoration:none;font-family:var(--jp-title);font-weight:700;
+ font-size:12.5px;letter-spacing:.08em;transition:background-color .3s ease,opacity .3s ease}
+.hd-cta:hover{background:var(--ink)}
+.hd-cta i{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 2.4s ease-in-out infinite}
+body.menu-open .hd-cta{opacity:0;pointer-events:none}
+@keyframes blink{50%{opacity:.25}}
+.hd-menu{height:38px;padding:0 0 0 12px;border:0;background:transparent;color:inherit;cursor:pointer;
+ display:inline-flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:11.5px;
+ letter-spacing:.1em;-webkit-tap-highlight-color:transparent}
+.hd-menu .bars{position:relative;width:22px;height:10px}
+.hd-menu .bars i{position:absolute;left:0;right:0;height:1.5px;background:currentColor;
+ transition:transform .45s var(--ease),top .45s var(--ease)}
+.hd-menu .bars i:first-child{top:0}.hd-menu .bars i:last-child{top:8.5px}
+body.menu-open .hd-menu .bars i:first-child{top:4.25px;transform:rotate(45deg)}
+body.menu-open .hd-menu .bars i:last-child{top:4.25px;transform:rotate(-45deg)}
+.hd-menu:focus-visible,.hd-brand:focus-visible{outline:2px solid #fff;outline-offset:4px}
+/* 朱の面（締め）の上では、白の差の合成が水色になる。朱で描けば差は0＝墨に見える */
+body.on-shu .hd{color:var(--shu)}
+body.on-shu .hd-cta{background:var(--ink)}
+@media (max-width:900px){.hd-meta{display:none}}
+@media (max-width:520px){
+ :root{--hd-h:64px;--menu-w:34px}
+ .hd-cta{height:34px;top:calc(var(--hd-h) / 2 - 17px);padding:0 13px;font-size:12px}
+ .hd-menu .lbl-t{display:none}
+}
+@media (prefers-reduced-motion:reduce){.hd-cta i{animation:none}}
 
-/* PRODUCTS は見出し。押せないので、TOP や COMPANY と同じ字では組まない。
-   小さく、字間を空けて、行き先ではないことを見た目で示す */
-.menu-prod{margin-top:22px}
-.menu-head{margin:0 0 14px;font-size:11px;letter-spacing:.24em;font-weight:600;
- color:rgba(255,255,255,.45)}
+/* ===== メニュー =====
+   並び：サイト内の行き先（大きく）→ PRODUCTS（見出し。**押せない**）→ 2つのLP（新タブの印つき）。
+   ORDER / REVIEW を同じ大きさで並べないこと。コーポレートの中に詳細ページがあるように見える */
+.mn{position:fixed;inset:0;z-index:25;background:var(--ink);color:var(--paper);
+ display:grid;grid-template-rows:1fr auto;padding:96px var(--gut) clamp(24px,4vw,40px);
+ clip-path:inset(0 0 100% 0);visibility:hidden;
+ transition:clip-path .7s var(--ease),visibility 0s linear .7s}
+body.menu-open .mn{clip-path:inset(0);visibility:visible;transition:clip-path .7s var(--ease)}
+body.menu-open{overflow:hidden}
+.mn-list{list-style:none;margin:0;padding:0;align-self:center}
+.mn-list li{border-top:1px solid var(--line-ink);overflow:hidden}
+.mn-list li:last-child{border-bottom:1px solid var(--line-ink)}
+.mn-list a{display:flex;align-items:baseline;gap:clamp(14px,2vw,28px);padding:clamp(8px,1.4vw,14px) 0;
+ text-decoration:none;transform:translateY(100%);transition:transform .8s var(--ease) calc(.08s * var(--i)),color .25s ease}
+body.menu-open .mn-list a{transform:none}
+.mn-list a:hover{color:var(--shu)}
+.mn-list .n{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--mut-ink);width:3em}
+.mn-list .en{font-family:var(--f-disp);font-weight:700;font-variation-settings:"wdth" 112;
+ font-size:clamp(34px,min(7.4vw,8.4vh),96px);line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
+ transition:font-variation-settings .5s var(--ease)}
+.mn-list a:hover .en{font-variation-settings:"wdth" 125}
+.mn-list .jp{margin-left:auto;font-family:var(--jp-title);font-weight:700;font-size:12px;
+ letter-spacing:.12em;color:var(--mut-ink)}
+.mn-foot{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 40px;
+ padding-top:28px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--mut-ink)}
+.mn-prod p{margin:0 0 10px;text-transform:uppercase}
+.mn-prod div{display:flex;gap:22px;flex-wrap:wrap}
+.mn-prod a{display:inline-flex;align-items:center;gap:8px;color:var(--paper);text-decoration:none;
+ font-family:var(--f-disp);font-weight:600;font-size:17px;letter-spacing:.04em}
+.mn-prod a:hover{color:var(--shu)}
+.mn-prod svg,.ext{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;
+ stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:reduce){.mn,.mn-list a{transition:none}}
 
-/* **見出しのすぐ下に、読める大きさで。**画面の下端に逃がすと別のかたまりに見え、
-   11pxまで落とすと注記に見える。ただし TOP や COMPANY と同じ大きさにもしない。
-   サイトの外なので、内部の詳細ページと同じ重さに見せたくない */
-.menu-ext{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
-.menu-ext a{display:inline-flex;align-items:center;gap:9px;color:rgba(255,255,255,.86);
- text-decoration:none;font-size:clamp(17px,2.9vw,22px);letter-spacing:.06em;font-weight:600;
- transition:color .25s ease}
-.menu-ext a:hover{color:#fff}
-.menu-ext svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;
- stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.6;
- transition:transform .25s ease,opacity .25s ease}
-.menu-ext a:hover svg{transform:translate(2px,-2px);opacity:1}
-.menu-ext .bar{width:1px;height:18px;background:rgba(255,255,255,.22)}
-
-/* ===== プロフィールのモーダル ===== */
-/* ---- プロフィールのモーダル。スマホは下からのシート、PCは中央のポップアップ。
-   モーダルは墨ゾーン（締めの周辺）でしか開かないので、色は墨で固定 ---- */
-#bioVeil{position:fixed;inset:0;z-index:20;background:rgba(10,11,13,.6);
+/* ===== プロフィールのモーダル（components/team/BioModal.tsx）=====
+   スマホは下からのシート、PCは中央。墨で固定 */
+#bioVeil{position:fixed;inset:0;z-index:40;background:rgba(8,8,7,.62);
  opacity:0;pointer-events:none;transition:opacity .35s ease}
 body.bio-open #bioVeil{opacity:1;pointer-events:auto}
-#bioModal{position:fixed;z-index:21;background:#17191D;color:#F3F1EC;
- border:1px solid rgba(243,241,236,.16)}
-#bioModal .grip{width:38px;height:4px;border-radius:2px;background:#9AA0A8;
+#bioModal{position:fixed;z-index:41;background:var(--ink-2);color:var(--paper);
+ border:1px solid var(--line-ink)}
+#bioModal .grip{width:38px;height:4px;border-radius:2px;background:var(--mut-ink);
  opacity:.5;margin:0 auto 22px}
-#bioClose{position:absolute;top:12px;right:12px;border:0;background:transparent;
- color:#9AA0A8;font-size:16px;line-height:1;padding:8px 10px;cursor:pointer}
-#bioClose:hover{color:#F3F1EC}
-#bioClose:focus-visible{outline:2px solid #93A878;outline-offset:2px}
-.bm-role{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;color:#93A878}
-.bm-name{margin:0;font-family:var(--jp-title);font-weight:700;
- font-size:clamp(23px,3vw,30px);letter-spacing:.1em}
-.bm-en{margin:4px 0 0;font-size:11.5px;letter-spacing:.2em;color:#9AA0A8;
- text-transform:uppercase;font-weight:500}
-.bm-bio{margin:18px 0 0;font-size:13px;line-height:2.1;color:#C9CCD2;
- text-align:justify;max-width:40em}
+#bioClose{position:absolute;top:14px;right:14px;border:0;background:transparent;
+ color:var(--mut-ink);font-size:16px;line-height:1;padding:8px 10px;cursor:pointer}
+#bioClose:hover{color:var(--paper)}
+#bioClose:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
+.bm-role{margin:0 0 10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--shu)}
+.bm-name{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(26px,3.4vw,34px);letter-spacing:.06em}
+.bm-en{margin:6px 0 0;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--mut-ink);text-transform:uppercase}
+.bm-bio{margin:22px 0 0;font-size:13.5px;line-height:2.1;color:#CFCCC3;text-align:justify;max-width:40em}
 @media (max-width:760px){
-  #bioModal{left:0;right:0;bottom:0;border-radius:14px 14px 0 0;max-height:78vh;
-   overflow:auto;padding:14px 24px calc(42px + env(safe-area-inset-bottom));
-   transform:translateY(103%);transition:transform .45s cubic-bezier(.32,.72,.28,1)}
-  body.bio-open #bioModal{transform:none}
+ #bioModal{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;max-height:80vh;overflow:auto;
+  padding:14px 24px calc(42px + env(safe-area-inset-bottom));
+  transform:translateY(103%);transition:transform .5s cubic-bezier(.32,.72,.28,1)}
+ body.bio-open #bioModal{transform:none}
 }
 @media (min-width:761px){
-  #bioModal .grip{display:none}
-  #bioModal{left:50%;top:50%;width:min(640px,92vw);max-height:80vh;overflow:auto;
-   border-radius:6px;padding:46px 50px;opacity:0;pointer-events:none;
-   transform:translate(-50%,-50%) scale(.97);
-   transition:opacity .3s ease,transform .3s ease}
-  body.bio-open #bioModal{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+ #bioModal .grip{display:none}
+ #bioModal{left:50%;top:50%;width:min(660px,92vw);max-height:82vh;overflow:auto;
+  border-radius:8px;padding:50px 54px;opacity:0;pointer-events:none;
+  transform:translate(-50%,-48%);transition:opacity .35s ease,transform .45s var(--ease)}
+ body.bio-open #bioModal{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
 }
 @media (prefers-reduced-motion:reduce){#bioModal,#bioVeil{transition:none}}
 
-/* ===== 映像を抜けたあとの紙のセクション =====
-   世界観：紙 #F3F1EC ／ 墨 ／ アクセントはオリーブ1点（映像のオリーブの木から採色）。
-   モーションの語彙は「静かに現れる」だけ。増やさないこと。
-   ただしプロダクト2節（.pv）は例外で、各サービスのトンマナに切り替えてある
-   （components/after/products.css）。あちらに紙のトークンは通していない */
-/* 色はすべてトークン経由。data-ink の節が画面中央に来ると #after に .inked が付き、
-   紙 → 墨 に反転する（inkSync）。個々の要素に直接色を書かないこと */
-#after{position:relative;z-index:3;
- --pg:#F3F1EC;--tx:#14161A;--mut:#7A7F87;--acc:#6E7D57;
- --ln:rgba(20,22,26,.14);--bd:rgba(20,22,26,.32);--bd-soft:rgba(20,22,26,.05);
- background:var(--pg);transition:background-color .9s ease;
- padding:clamp(96px,13vw,170px) clamp(24px,5vw,40px) 0}
-#after.inked{--pg:#17191D;--tx:#F3F1EC;--mut:#9AA0A8;--acc:#93A878;
- --ln:rgba(243,241,236,.16);--bd:rgba(243,241,236,.42);--bd-soft:rgba(243,241,236,.07)}
-#after .wrap{max-width:1040px;margin:0 auto}
-.af-sec{margin:0 0 clamp(96px,13vw,170px)}
-.sec-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;
- color:var(--acc);margin:0 0 16px;font-weight:500}
-#after h3{font-family:var(--jp-title);font-weight:700;color:var(--tx);
- font-size:clamp(23px,3.6vw,36px);letter-spacing:.08em;line-height:1.65;margin:0 0 18px}
-.lead{color:var(--mut);font-size:14.5px;line-height:2.05;margin:0;max-width:38em}
-
-/* 静かに現れる。JSが .in を付ける */
-.rv{opacity:0;transform:translateY(18px);
- transition:opacity .9s cubic-bezier(.4,0,.25,1),transform .9s cubic-bezier(.4,0,.25,1),
- color .9s ease,border-color .9s ease}
-.rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
-
-/* ---- 店から道具への橋・締め。宣言は一回り大きく組む ---- */
-/* 締め（#next）は全体を中央揃えに */
-#next{text-align:center}
-#next .lead{margin-left:auto;margin-right:auto}
-.af-bridge{border-left:2px solid var(--acc);padding-left:clamp(20px,3.4vw,32px);
- transition:border-color .9s ease}
-.af-stmt h3{font-size:clamp(26px,4.4vw,46px);line-height:1.55}
-/* 数字の帯（いまは未使用。実測値が揃ったら使う） */
-.stats{margin:clamp(30px,4.6vw,46px) 0 0;display:grid;
- grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 26px}
-.stat{border-left:1px solid var(--ln);padding-left:16px;transition:border-color .9s ease}
-.stat-n{display:block;font-size:clamp(30px,4vw,44px);font-weight:500;letter-spacing:.02em;
- color:var(--tx);font-variant-numeric:tabular-nums;line-height:1.1;transition:color .9s ease}
-.stat-n i{font-style:normal;font-size:.52em;margin-left:2px}
-.stat-l{display:block;margin-top:9px;font-size:11.5px;color:var(--mut);
- letter-spacing:.08em;transition:color .9s ease}
-/* ---- 二人（Founders）----
-   丸はローポリ3Dの受け皿（.fd-ph）。3Dができるまでは破線のプレースホルダ */
-.ava{width:56px;height:56px;border-radius:16px;border:1px dashed var(--mut);
- display:grid;place-items:center;transition:border-color .9s ease}
-.ava svg{width:52%;height:52%;fill:none;stroke:var(--mut);stroke-width:2;
- stroke-linecap:round;transition:stroke .9s ease}
-/* Founders は見出しも二人の中身もすべて中央揃え */
-#founders .sec-eyebrow,#founders h3{text-align:center}
-.fd-grid{margin:clamp(30px,4.6vw,48px) 0 0;display:grid;
- grid-template-columns:repeat(2,minmax(0,340px));justify-content:center;
- gap:clamp(30px,5vw,80px)}
-/* 全身を立たせるので縦長。生成待ちのプレースホルダも同じ枠 */
-.fd .ava{width:clamp(230px,26vw,270px);height:auto;aspect-ratio:5/8;margin-bottom:22px;
- position:relative;overflow:hidden}
-/* 3Dが載ったら枠と丸マスクをやめる。丸で切ると回転中に頭が見切れる。
-   線の太さぶんのレイアウトは残すので border-color だけ透明に。
-   GLBが無いスロットは破線のまま＝まだ空いている目印になる */
-.fd-ph.live{border-color:transparent;overflow:visible}
-.fd-ph canvas{position:absolute;inset:0;width:100%;height:100%;display:block;
- cursor:grab;touch-action:pan-y}
-.fd-ph canvas:active{cursor:grabbing}
-.fd-role{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;color:var(--acc);
- transition:color .9s ease}
-/* セクション見出しと同じ大きさだと釣り合わないので一段階下げる */
-.fd-name{margin:0;font-family:var(--jp-title);font-weight:700;color:var(--tx);
- font-size:clamp(20px,2.6vw,26px);letter-spacing:.1em;line-height:1.5;transition:color .9s ease}
-.fd-en{margin:4px 0 0;font-size:11.5px;letter-spacing:.2em;color:var(--mut);
- text-transform:uppercase;font-weight:500;transition:color .9s ease}
-/* 一言の行数が2人で違っても、ボタンは下端で揃える（.fd を縦flexにして
-   ボタンを margin-top:auto で底に送る。グリッドの行は等しく伸びる） */
-.fd{display:flex;flex-direction:column;align-items:center;text-align:center}
-.fd-ex{margin:14px auto 22px;font-size:12.5px;line-height:2;color:var(--mut);
- max-width:24em;transition:color .9s ease}
-.profile-btn{margin-top:auto;display:inline-flex;align-items:center;gap:8px;
- padding:11px 22px;border:1px solid var(--bd);border-radius:99px;background:transparent;
- color:var(--tx);font-size:11.5px;letter-spacing:.16em;font-weight:500;cursor:pointer;
- text-transform:uppercase;transition:color .9s ease,border-color .25s ease,background .25s ease}
-.profile-btn:hover{border-color:var(--tx);background:var(--bd-soft)}
-.profile-btn:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
-.next-line{margin:clamp(26px,4vw,38px) 0 0;font-size:12px;letter-spacing:.2em;
- color:var(--mut);font-weight:500;text-transform:uppercase;transition:color .9s ease}
-/* Founders の下から会社概要へ。
-   **.profile-btn と同じ形にしないこと。**同じ丸ボタンだと、二人の
-   PROFILE と同じ重さに見えて、ページを移る道だと分からない。
-   角を落とし、一回り大きく、矢印を付けて「先へ進む」形にする */
-.fd-more{margin:clamp(38px,5.4vw,58px) 0 0;text-align:center}
-.fd-more a{display:inline-flex;align-items:center;gap:14px;
- padding:19px 40px;border:1px solid var(--bd);border-radius:0;
- color:var(--tx);text-decoration:none;font-family:var(--jp-title);font-weight:700;
- font-size:14px;letter-spacing:.14em;
- transition:color .9s ease,border-color .25s ease,background .25s ease}
-.fd-more a svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;
- stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s ease}
-.fd-more a:hover{background:var(--bd-soft);border-color:var(--tx)}
-.fd-more a:hover svg{transform:translateX(4px)}
-.fd-more a:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
-
-/* トップの出口。塗りは紙⇄墨のトークンで反転に追従させる */
-.af-cta{margin:clamp(30px,4.6vw,44px) 0 0;display:flex;align-items:center;
- justify-content:center;gap:16px 26px;flex-wrap:wrap}
-.cta-main{display:inline-flex;align-items:center;gap:11px;
- padding:17px 34px;border-radius:99px;background:var(--tx);color:var(--pg);
- text-decoration:none;font-family:var(--jp-title);font-weight:700;
- font-size:14px;letter-spacing:.12em;
- transition:background-color .9s ease,color .9s ease,transform .25s ease,opacity .25s ease}
-.cta-main svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;
- stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s ease}
-.cta-main:hover{transform:translateY(-1px);opacity:.9}
-.cta-main:hover svg{transform:translateX(3px)}
-.cta-main:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
-.cta-sub{color:var(--mut);text-decoration:none;font-size:12px;letter-spacing:.14em;
- border-bottom:1px solid var(--ln);padding-bottom:3px;
- transition:color .3s ease,border-color .3s ease}
-.cta-sub:hover{color:var(--tx);border-color:var(--bd)}
-
-.next-line i{display:inline-block;width:8px;height:8px;border-radius:50%;
- background:var(--acc);margin-right:12px;vertical-align:1px;
- animation:lamp 2.8s ease-in-out infinite}
-@keyframes lamp{0%,100%{opacity:.25}50%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.next-line i{animation:none}}
-
-/* 旧プロダクト節（.prod-head / .linkbtn.onpaper）と
-   図解（.fig / .fg）のCSSは撤去済み（2026-08-20〜24）。
-   プロダクト2節は各サービスのトンマナに切り替え、実物の画面と
-   イラストで見せる形にしたためです（components/after/products.css）。
-   線引きの図解が再び要るときは、この時点のコミットから戻せます。 */
-
-/* ---- フッター ---- */
-#foot{border-top:1px solid var(--ln);margin-top:clamp(90px,12vw,150px);
- padding:26px 0 40px;display:flex;flex-wrap:wrap;gap:10px 26px;
- align-items:baseline;justify-content:space-between;
- font-size:11.5px;color:var(--mut);letter-spacing:.04em}
-#foot .pages{display:flex;gap:22px}
-#foot .pages a{color:inherit;text-decoration:none;transition:color .3s ease}
-#foot .pages a:hover{color:var(--tx)}
-
-
-@media (max-width:760px){
-  .fd-grid{grid-template-columns:minmax(0,340px);gap:44px}
-}
+/* 和文の見出しは文節で折り返す（Chrome 119+ の auto-phrase。BudouX と同じ辞書）。
+   Safari は未対応なので普通に折れるが、行の長さを揃える balance は効く */
+h1,h2,h3,.sec-lead,.ct-lead{word-break:auto-phrase;text-wrap:balance}

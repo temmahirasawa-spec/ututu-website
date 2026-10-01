@@ -1,16 +1,33 @@
 import type { Metadata, Viewport } from 'next';
-import { Barlow, Noto_Sans_JP, Zen_Kaku_Gothic_New } from 'next/font/google';
+import { Archivo, Barlow, Geist_Mono, Noto_Sans_JP, Zen_Kaku_Gothic_New } from 'next/font/google';
+import { Header } from '@/components/site/Header';
 import './globals.css';
 
-/* 欧文は Barlow、和文は見出し Zen Kaku Gothic New / 本文 Noto Sans JP。
-   font-family の先頭を Barlow にすれば、和文グリフを持たないぶん
-   日本語だけが次に落ちる（globals.css の --jp-title / --jp-body）。
+/* 書体の役割（2026-10 のリニューアルで組み直し）
+   - Archivo（可変：幅 62–125 / 太さ 100–900）… 欧文の見出し。幅の軸をスクロールで動かす
+   - Geist Mono … 番号・ラベル・時刻など、計器の文字
+   - Zen Kaku Gothic New 700/900 … 和文の見出し。トップの大見出しは 900
+   - Noto Sans JP 400/500 … 和文の本文
+   - Barlow … **プロダクト節（GOOD SERIES）専用。**LPと同じ書体なので残している
 
-   和文は容量が大きいので preload しない。先に読ませると KV の連番と
-   帯域を取り合う。表示は swap なので、遅れても文字は最初から見える。 */
+   和文は容量が大きいので preload しない（swap なので文字は最初から見える）。
+   遅れて届いたときの組み直しで Chrome がスクロール位置を動かさないよう、
+   globals.css で overflow-anchor を切ってある */
+const archivo = Archivo({
+  subsets: ['latin'],
+  axes: ['wdth'],
+  variable: '--font-archivo',
+  display: 'swap',
+});
+const mono = Geist_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 const barlow = Barlow({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['500', '600', '700'],
   variable: '--font-barlow',
   display: 'swap',
 });
@@ -21,53 +38,59 @@ const notoSansJP = Noto_Sans_JP({
   display: 'swap',
   preload: false,
 });
-/* **weight は 700 だけ。**500 はサイトのどこからも選択されない
-   （見出しは全部700。唯一の font:600 も、500と700からは700が選ばれる）。
-   和文は @font-face 宣言だけで weight あたり約90KB CSSが膨らむので、
-   使わない weight を足さないこと */
 const zenKaku = Zen_Kaku_Gothic_New({
   subsets: ['latin'],
-  weight: ['700'],
+  weight: ['700', '900'],
   variable: '--font-zen-kaku',
   display: 'swap',
   preload: false,
 });
 
+const TITLE = 'UTUTU — 2人で、全部つくる。';
 const DESC =
-  '飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。店の一日を基準に、要るものだけをかたちにしています。';
+  '事業をつくってきた人と、つくる手を持つ人。AIを道具に、企画・デザイン・開発・映像まで。神戸のクリエイティブスタジオ UTUTU は、事業のDXを短い時間と高い精度でかたちにします。';
 
 export const metadata: Metadata = {
-  /* 独自ドメインが決まったらここを差し替える（相対URLの解決先になる） */
+  /* 独自ドメインが決まったら NEXT_PUBLIC_SITE_URL で差し替える（相対URLの解決先になる） */
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ututu-website.vercel.app'),
-  title: 'UTUTU — 店舗に、いい一日を。',
+  title: TITLE,
   description: DESC,
   /* OGP。**画像はまだ無い。**public/ に og.png（1200×630）を置いたら
-     openGraph.images: ['/og.png'] を足すこと（残っている作業に記載あり） */
+     openGraph.images: ['/og.png'] を足すこと */
   openGraph: {
-    title: 'UTUTU — 店舗に、いい一日を。',
+    title: TITLE,
     description: DESC,
     siteName: 'UTUTU',
     locale: 'ja_JP',
     type: 'website',
   },
   twitter: { card: 'summary' },
-  /* まだ検索には出さない。公開してよくなったらこの2行を外す。
-     **robots.txt で拒否しないこと。**クロールを止めると noindex 自体を読めず、
-     外部リンク経由で逆に登録されてしまう。読ませたうえで noindex を伝える */
+  /* まだ検索には出さない。公開してよくなったらこの行を外す。
+     **robots.txt で拒否しないこと。**クロールを止めると noindex 自体を読めない */
   robots: { index: false, follow: false },
 };
 
-/* viewport-fit=cover。#nextBtn が safe-area-inset-bottom を使うため必須 */
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  themeColor: '#ECE9E1',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="ja" className={`${barlow.variable} ${notoSansJP.variable} ${zenKaku.variable}`}>
-      <body>{children}</body>
+    <html
+      lang="ja"
+      suppressHydrationWarning
+      className={`${archivo.variable} ${mono.variable} ${barlow.variable} ${notoSansJP.variable} ${zenKaku.variable}`}
+    >
+      <body>
+        {/* 現れる動き（.rv / .rise）は JS があるときだけ隠しておく。描く前に付けること */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* ヘッダーはページをまたいで残す（遷移しても作り直さない） */}
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }

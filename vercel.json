@@ -6,7 +6,7 @@
   ],
   "headers": [
     {
-      "source": "/(frames|frames_p|frames_lo|frames_lo_p|clips|models)/(.*)",
+      "source": "/(clips|models)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

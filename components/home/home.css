@@ -1,0 +1,259 @@
+/* トップの各節。地の色の並び：紙（ヒーロー）→ 墨（宣言）→ 紙（原則・できること・作品）
+   → 生成り（プロダクト節。GOOD SERIES の世界観）→ 墨（ふたり）→ 朱（締め）→ 墨（フッター）。
+   **朱を面で使うのは締め（.ct）だけ。**ほかで使うと、締めの強さが薄まる。
+
+   スクロールに連動する動き（点灯・幅の変化・左右からの寄り）は CSS の
+   animation-timeline で書いてある。メインスレッドを使わないので、スマホでも詰まらない。
+   対応していないブラウザでは @supports の外側（＝止まった完成形）がそのまま見える */
+
+.sec-h{margin:0;font-family:var(--jp-title);font-weight:900;
+ font-size:clamp(40px,7vw,112px);line-height:1.1;letter-spacing:-.01em}
+.sec-lead{margin:clamp(22px,2.6vw,34px) 0 0;max-width:34em;font-size:15px;line-height:2.05;color:var(--mut)}
+.sec-pad{padding:clamp(110px,14vw,210px) var(--gut)}
+
+/* ===================== (01) ヒーロー ===================== */
+.hero{position:relative;min-height:100svh;padding:clamp(96px,11vh,130px) var(--gut) 0;
+ display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
+.hero-cv{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
+/* 大見出しは2列ぶち抜き。説明は右の列で、1行目（短い）の右に重ねる */
+.hero-in{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);
+ grid-template-rows:auto 1fr;column-gap:clamp(24px,4vw,64px);align-content:center}
+.hero-kick{grid-column:1/-1;margin:0;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase}
+.hero-kick span{color:var(--mut)}
+.hero-h{grid-column:1/-1;grid-row:2;margin:clamp(16px,3vh,40px) 0 0;font-family:var(--jp-title);font-weight:900;
+ font-size:clamp(60px,12.2vw,212px);line-height:1.02;letter-spacing:-.035em;align-self:center}
+.hero-side{grid-column:2;grid-row:2;align-self:start;max-width:25em;margin-top:clamp(28px,5vh,64px);position:relative;z-index:1}
+.hero-side p{margin:0;font-size:14.5px;line-height:2.05}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.hero-cta .btn{font-size:13px}
+/* ロゴの置き場所。点描はこの箱を読んで描く（halftone.ts）。
+   **縦横比は字の外形（1144:133）に合わせること。**合わないと点描の位置がずれる */
+.hero-mark{position:relative;margin-top:clamp(28px,5vh,64px);width:100%;aspect-ratio:1144/133}
+.hero-mark svg{position:absolute;left:-.7%;top:-6%;width:101.4%;height:112%;display:block}
+.hero-mark path{fill:var(--ink)}
+/* WebGL が動いているあいだは SVG を見せない（読み上げ用には残す） */
+.hero.ht-live .hero-mark svg{opacity:0}
+.hero-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
+ padding:16px 0 20px;margin-top:clamp(14px,2vh,24px);border-top:1px solid var(--line);
+ font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.hero-clock{font-variant-numeric:tabular-nums}
+.hero-scroll{justify-self:end;display:inline-flex;align-items:center;gap:10px}
+.hero-scroll i{position:relative;width:1px;height:22px;background:var(--line);overflow:hidden}
+.hero-scroll i::after{content:"";position:absolute;left:0;top:0;width:1px;height:45%;background:var(--ink);
+ animation:drip 1.8s var(--ease) infinite}
+@keyframes drip{from{transform:translateY(-100%)}to{transform:translateY(240%)}}
+@media (max-width:900px){
+ /* スマホは下寄せ。親指の届く位置に見出しとボタンを置き、上は点の流れる余白にする */
+ .hero-in{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;align-content:end}
+ .hero-h{grid-column:1;grid-row:auto;font-size:clamp(54px,15.4vw,140px)}
+ .hero-side{grid-column:1;grid-row:auto;margin-top:clamp(22px,4vh,36px)}
+ .hero-bar{grid-template-columns:1fr auto}
+ .hero-bar>span:first-child{display:none}
+}
+@media (max-width:520px){ .hero-side p{font-size:13.5px} .hero-side br{display:none} }
+@media (prefers-reduced-motion:reduce){.hero-scroll i::after{animation:none}}
+
+/* ===================== (02) 宣言 ===================== */
+.mf{background:var(--ink);color:var(--paper);padding:clamp(110px,15vw,220px) 0 0}
+.mf .lbl{color:var(--mut-ink)}
+.mf-in{padding:0 var(--gut)}
+.mf-text{margin:0;max-width:21em;font-family:var(--jp-title);font-weight:700;
+ font-size:clamp(25px,3.9vw,62px);line-height:1.5;letter-spacing:.01em}
+.mf-p{display:block;margin-bottom:.55em}
+/* 一語（文節）ずつ inline-block にする。和文の折り返しが文節の切れ目に揃う */
+.mf-text .w{display:inline-block}
+.mf-text .hl{color:var(--shu)}
+@supports (animation-timeline:view()){
+ .mf-text .w{color:rgba(236,233,225,.16);animation:lit linear both;
+  animation-timeline:view();animation-range:entry 90% cover 40%}
+ .mf-text .hl{animation-name:lit-hl}
+}
+@keyframes lit{to{color:var(--paper)}}
+@keyframes lit-hl{to{color:var(--shu)}}
+
+/* 流れる帯：Business × Craft × AI = Two */
+.mq{overflow:hidden;padding:clamp(70px,9vw,140px) 0 clamp(40px,5vw,72px)}
+.mq-row{display:flex;width:max-content;animation:mq 34s linear infinite}
+.mq-set{display:flex;align-items:center;gap:.32em;padding-right:.32em;
+ font-family:var(--f-disp);font-weight:800;font-variation-settings:"wdth" 125;
+ font-size:clamp(54px,9.6vw,156px);line-height:1;letter-spacing:-.025em;text-transform:uppercase;white-space:nowrap}
+.mq-set b{font-weight:200;color:var(--shu)}
+.mq-set .mq-two{color:transparent;-webkit-text-stroke:1.5px var(--paper)}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mq-row{animation:none}}
+
+/* ===================== (03) 原則（積み重なる3枚） ===================== */
+.pr{padding:clamp(110px,14vw,210px) var(--gut) clamp(60px,8vw,120px)}
+.pr-head{margin-bottom:clamp(48px,7vw,104px)}
+.pr-stack{list-style:none;margin:0;padding:0}
+.pr-card{position:sticky;top:calc(84px + var(--i) * 26px);
+ min-height:min(76svh,700px);margin-bottom:clamp(18px,3vw,34px);overflow:hidden;
+ border-radius:clamp(18px,2.2vw,30px);padding:clamp(22px,3.2vw,46px);
+ display:grid;grid-template-rows:auto 1fr auto;gap:20px}
+.pr-card--1{background:var(--paper-2);color:var(--ink)}
+.pr-card--2{background:var(--ink);color:var(--paper)}
+.pr-card--3{background:var(--shu);color:var(--ink)}
+.pr-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.pr-n{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em}
+.pr-en{margin:0;align-self:center;font-family:var(--f-disp);font-weight:800;text-transform:uppercase;
+ font-size:clamp(46px,12vw,206px);line-height:.86;letter-spacing:-.035em;font-variation-settings:"wdth" 112;white-space:nowrap}
+@supports (animation-timeline:view()){
+ .pr-en{animation:widen linear both;animation-timeline:view();animation-range:entry 10% cover 50%}
+}
+@keyframes widen{from{font-variation-settings:"wdth" 62;letter-spacing:.01em}to{font-variation-settings:"wdth" 112;letter-spacing:-.035em}}
+.pr-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px clamp(24px,4vw,64px);align-items:end}
+.pr-body h3{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(24px,2.9vw,44px);line-height:1.35}
+.pr-body p{margin:0;font-size:14.5px;line-height:2.05;max-width:30em}
+.pr-card--1 .pr-body p{color:var(--mut)}
+.pr-card--2 .pr-body p{color:#BDBAB1}
+@media (max-width:760px){
+ .pr-card{top:calc(72px + var(--i) * 16px);min-height:min(78svh,620px)}
+ .pr-body{grid-template-columns:minmax(0,1fr)}
+}
+
+/* 原則の小さな図 */
+.mo{width:clamp(96px,12vw,170px);height:auto;fill:none;stroke:currentColor;stroke-width:1.4;overflow:visible}
+.mo-speed line{stroke-linecap:round;animation:streak 1.9s var(--ease) infinite;animation-delay:calc(var(--k) * .12s)}
+@keyframes streak{0%{transform:translateX(-24px);opacity:0}35%{opacity:1}100%{transform:translateX(18px);opacity:0}}
+.mo-prec rect{stroke-dasharray:3 4}
+.mo-prec circle{fill:var(--shu);stroke:none;transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-in-out infinite}
+.mo-prec text{font-family:var(--f-mono);font-size:10px;fill:currentColor;stroke:none}
+@keyframes pulse{50%{transform:scale(.55)}}
+.mo-biz rect{fill:currentColor;stroke:none;transform-box:fill-box;transform-origin:bottom;
+ animation:grow 2.8s var(--ease) infinite;animation-delay:calc(var(--k) * .1s)}
+.mo-biz polyline{stroke-width:1.6}
+@keyframes grow{0%{transform:scaleY(.2)}45%,100%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.mo *{animation:none!important}}
+
+/* ===================== (04) できること ===================== */
+.sv{padding:clamp(80px,10vw,150px) var(--gut) clamp(110px,14vw,200px)}
+.sv-head{margin-bottom:clamp(44px,6vw,88px)}
+.sv-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.sv-row{position:relative;isolation:isolate;display:grid;
+ grid-template-columns:4.2em minmax(0,1.15fr) minmax(0,1fr);gap:14px clamp(20px,3vw,48px);
+ align-items:baseline;padding:clamp(24px,3vw,44px) 0;border-bottom:1px solid var(--line)}
+.sv-row::before{content:"";position:absolute;z-index:-1;inset:0 calc(var(--gut) * -1);background:var(--shu);
+ transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease)}
+.sv-n{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em}
+.sv-en{margin:0;font-family:var(--f-disp);font-weight:700;text-transform:uppercase;
+ font-size:clamp(36px,5.6vw,92px);line-height:.95;letter-spacing:-.025em;
+ font-variation-settings:"wdth" 100;transition:font-variation-settings .6s var(--ease)}
+.sv-jp{margin:0 0 8px;font-family:var(--jp-title);font-weight:700;font-size:17px;letter-spacing:.04em}
+.sv-body{margin:0;font-size:14px;line-height:1.95;color:var(--mut);transition:color .4s ease}
+.sv-tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.sv-tags span{font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;transition:border-color .4s ease}
+@media (hover:hover){
+ .sv-row:hover::before{transform:scaleY(1)}
+ .sv-row:hover .sv-en{font-variation-settings:"wdth" 125}
+ .sv-row:hover .sv-body{color:var(--ink)}
+ .sv-row:hover .sv-tags span{border-color:rgba(14,14,13,.4)}
+}
+@media (max-width:760px){
+ .sv-row{grid-template-columns:2.6em minmax(0,1fr)}
+ .sv-txt{grid-column:2}
+}
+
+/* ===================== (05) つくったもの ===================== */
+.wk{padding-top:0}
+.wk-head{padding:0 var(--gut) clamp(48px,6vw,88px)}
+/* プロダクト節（products.css）は全幅で敷く。旧版のはみ出し指定は、ここでは効かない（親が全幅） */
+.wk .pv{margin:0}
+.wk-ledger{padding:clamp(64px,8vw,120px) var(--gut) clamp(110px,14vw,200px)}
+.ld{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.25fr);margin:0;border-top:1px solid var(--ink)}
+.ld-i{padding:16px 16px 0 0;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.ld-i+.ld-i{padding-left:16px;border-left:1px solid var(--line)}
+.ld dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.ld dt small{display:block;margin-top:4px;font-family:var(--jp-body);font-size:11.5px;letter-spacing:.04em;color:var(--mut);text-transform:none}
+.ld dd{margin:0;font-family:var(--f-disp);font-weight:800;font-variation-settings:"wdth" 75;
+ font-size:clamp(70px,10vw,170px);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.ld-sum{background:var(--ink);color:var(--paper);margin-top:-1px;padding:16px 18px 18px!important;border-radius:0 0 14px 14px}
+.ld-sum dt small{color:var(--mut-ink)}
+.ld-sum dd{color:var(--shu)}
+@media (max-width:900px){
+ .ld{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ld-i{padding:16px 12px 20px 0}
+ .ld-i+.ld-i{padding-left:12px}
+ .ld-i:nth-child(odd){border-left:0;padding-left:0}
+ .ld-i:nth-child(n+3){border-top:1px solid var(--line)}
+ .ld-sum{grid-column:1/-1;flex-direction:row;align-items:flex-end;border-radius:14px;margin-top:12px;padding-left:18px!important}
+}
+
+/* ===================== (06) ふたり ===================== */
+.tm{background:var(--ink);color:var(--paper);padding:clamp(110px,14vw,210px) var(--gut)}
+.tm .lbl{color:var(--mut-ink)}
+.tm .sec-lead{color:var(--mut-ink)}
+.tm-head{margin-bottom:clamp(56px,7vw,110px)}
+.tm-duo{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:clamp(12px,3vw,48px);
+ max-width:1180px;margin:0 auto;align-items:start}
+.tm-x{align-self:center;font-family:var(--f-disp);font-weight:200;color:var(--shu);
+ font-size:clamp(56px,9vw,150px);line-height:1;margin-top:-12%}
+.fd{display:flex;flex-direction:column;align-items:center;text-align:center}
+/* 3Dの枠。読み込むまでは線画のプレースホルダ。足元に点描の床（ヒーローの点と同じ文法） */
+.fd-ph{position:relative;width:min(100%,340px);aspect-ratio:5/8;margin-bottom:26px;
+ display:grid;place-items:center;border:1px dashed var(--line-ink);border-radius:14px}
+.fd-ph::before{content:"";position:absolute;left:4%;right:4%;bottom:-3%;height:16%;
+ background:radial-gradient(circle,rgba(236,233,225,.5) 1.1px,transparent 1.6px) 0 0/7px 7px;
+ -webkit-mask:radial-gradient(closest-side,#000 25%,transparent);mask:radial-gradient(closest-side,#000 25%,transparent)}
+.fd-ph svg{width:28%;fill:none;stroke:var(--mut-ink);stroke-width:1.6;stroke-linecap:round}
+.fd-ph.live{border-color:transparent}
+.fd-ph canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+.fd-ph canvas:active{cursor:grabbing}
+.fd-role{margin:0 0 12px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--shu);text-transform:uppercase}
+.fd-name{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(30px,3.6vw,50px);letter-spacing:.06em;line-height:1.2}
+.fd-name small{display:block;margin-top:10px;font-family:var(--f-mono);font-weight:400;font-size:11px;letter-spacing:.14em;color:var(--mut-ink);text-transform:uppercase}
+.fd-ex{margin:20px auto 0;max-width:24em;font-size:14px;line-height:2;color:#BDBAB1}
+.fd-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:18px 0 26px}
+.fd-tags span{font-size:11.5px;padding:4px 10px;border:1px solid var(--line-ink);border-radius:99px;color:#CFCCC3}
+.profile-btn{margin-top:auto;display:inline-flex;align-items:center;gap:14px;padding:12px 14px 12px 22px;
+ border:1px solid rgba(236,233,225,.4);border-radius:99px;background:transparent;color:var(--paper);cursor:pointer;
+ font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+ transition:background-color .3s ease,color .3s ease,border-color .3s ease}
+.profile-btn i{font-style:normal;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+ background:var(--shu);color:#fff;font-size:14px;line-height:1;transition:transform .4s var(--ease)}
+.profile-btn:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.profile-btn:hover i{transform:rotate(90deg)}
+.profile-btn:focus-visible{outline:2px solid var(--shu);outline-offset:3px}
+@media (max-width:760px){
+ .tm-duo{grid-template-columns:minmax(0,1fr)}
+ .tm-x{margin:0;justify-self:center;font-size:64px}
+ .fd-ph{width:min(78%,300px)}
+}
+
+/* ===================== (07) 締め ===================== */
+.ct{background:var(--shu);color:var(--ink);padding:clamp(100px,13vw,190px) var(--gut) clamp(90px,11vw,160px);overflow:hidden}
+.ct .lbl b{color:var(--ink)}
+.ct-big{margin:0;font-family:var(--f-disp);font-weight:800;text-transform:uppercase;
+ font-size:clamp(80px,17vw,300px);line-height:.84;letter-spacing:-.045em;font-variation-settings:"wdth" 112}
+.ct-big span{display:block;white-space:nowrap}
+.ct-l2{padding-left:clamp(40px,18vw,360px)}
+@supports (animation-timeline:view()){
+ .ct-l1{animation:from-l linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+ .ct-l2{animation:from-r linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+}
+@keyframes from-l{from{transform:translateX(-14%)}}
+@keyframes from-r{from{transform:translateX(14%)}}
+.ct-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:28px 40px;margin-top:clamp(40px,6vw,88px)}
+.ct-lead{margin:0;max-width:31em;font-family:var(--jp-title);font-weight:700;font-size:clamp(16px,1.6vw,21px);line-height:1.9}
+.ct-btns{display:flex;flex-wrap:wrap;gap:10px}
+.ct .btn{background:var(--ink);color:var(--paper)}
+.ct .btn:hover{background:var(--paper);color:var(--ink)}
+.ct .btn--line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.ct .btn--line:hover{background:var(--ink);color:var(--paper)}
+.ct .btn:focus-visible{outline-color:var(--ink)}
+
+/* ===================== フッター ===================== */
+.ft{background:var(--ink);color:var(--paper);padding:clamp(72px,9vw,120px) var(--gut) 22px;overflow:hidden}
+.ft-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.2fr);gap:32px 24px}
+.ft-h{margin:0 0 14px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--mut-ink);text-transform:uppercase}
+.ft ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ft ul a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:14.5px;transition:color .25s ease}
+.ft ul a:hover{color:var(--shu)}
+.ft-note{margin:0;justify-self:end;text-align:right;font-family:var(--f-mono);font-size:11px;line-height:1.9;letter-spacing:.08em;color:var(--mut-ink);text-transform:uppercase}
+.ft-mark{margin-top:clamp(64px,9vw,140px);line-height:0}
+.ft-mark svg{width:100%;height:auto;display:block}
+.ft-mark path{fill:var(--paper)}
+.ft-copy{display:flex;justify-content:space-between;gap:12px;margin:18px 0 0;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--mut-ink);text-transform:uppercase}
+@media (max-width:760px){
+ .ft-cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ft-note{grid-column:1/-1;justify-self:start;text-align:left}
+}

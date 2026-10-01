@@ -1,25 +1,18 @@
 #!/bin/sh
-# デプロイ直後にエッジのキャッシュを温める。
-#
-# Vercelのエッジは初回アクセスで初めて素材を取りに行く。連番は1,180件あるので、
-# 何もしないと「デプロイ後の最初の1人」だけが12秒ほど待たされる。
-# 一度なめておけば以降は数百ミリ秒で返る。
+# デプロイ直後にエッジのキャッシュを温める（映像・3Dモデル）。
+# 2026-10 のリニューアルで KV の連番（1,180件）が無くなったので、対象はわずか。
 #
 #   sh scripts/warm.sh                         … 本番
 #   sh scripts/warm.sh https://xxx.vercel.app  … プレビュー
 set -e
 BASE=${1:-https://ututu-website.vercel.app}
-# 版番号と枚数は heroConfig.ts が唯一の出どころ。ここに書き写さないこと
-CFG="$(dirname "$0")/../components/hero/heroConfig.ts"
-VER=$(sed -n "s/.*ver: '\([^']*\)'.*/\1/p" "$CFG" | head -1)
-FILES=$(sed -n 's/.*files: \([0-9]*\).*/\1/p' "$CFG" | head -1)
-echo "温めます: $BASE (v=$VER / ${FILES}枚)"
-seq 1 "$FILES" | awk -v b="$BASE" -v v="$VER" '{
-  printf "%s/frames/f_%04d.webp?v=%s\n",      b, $1, v
-  printf "%s/frames_p/f_%04d.webp?v=%s\n",    b, $1, v
-  printf "%s/frames_lo/f_%04d.webp?v=%s\n",   b, $1, v
-  printf "%s/frames_lo_p/f_%04d.webp?v=%s\n", b, $1, v
-}' | xargs -P 12 -I{} curl -s -o /dev/null {}
-curl -s -o /dev/null "$BASE/clips/good-order-clip.mp4?v=$VER"
-curl -s -o /dev/null "$BASE/clips/good-review-clip.mp4?v=$VER"
+# 版番号は ProductVideo.tsx / headViewer.js が唯一の出どころ。ここに書き写さないこと
+DIR="$(dirname "$0")/.."
+VV=$(sed -n "s/^const VER = '\([^']*\)'.*/\1/p" "$DIR/components/products/ProductVideo.tsx" | head -1)
+MV=$(sed -n "s/^const VER = '\([^']*\)'.*/\1/p" "$DIR/lib/three/headViewer.js" | head -1)
+echo "温めます: $BASE (映像 v=$VV / モデル v=$MV)"
+for s in order-wide order-tall review-wide review-tall; do
+  curl -s -o /dev/null "$BASE/clips/products/$s.mp4?v=$VV"
+done
+for m in temma yosuke; do curl -s -o /dev/null "$BASE/models/$m.glb?v=$MV"; done
 echo "完了"
