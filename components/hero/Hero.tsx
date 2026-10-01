@@ -71,12 +71,12 @@ export function Hero() {
         <div className="copy mid"><p className="eyebrow">Ututu</p><div className="rule" />
           <h2>店舗に、いい一日を。</h2>
           <p className="entitle">GOOD TOOL, GREAT DAY!</p>
-          <p>飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。私たちは自分たちでも店を営んでいて、毎日の営業のなかで使い、要らなかった機能を削り、残ったものだけをかたちにする。現場が忙しいことを知っている人間が、つくっています。</p>
+          <p>飲食店をはじめとする店舗のために、お客様のスマホで完結するソフトウェアをつくっています。現場が忙しいことを知っている人間が、使われ方から逆算して、要らない機能を削り、残ったものだけをかたちにしています。</p>
         </div>
         <div className="copy mid"><p className="eyebrow">Welcome</p><div className="rule" />
-          <h2>この店が、開発室です。</h2>
-          <p className="entitle">BUILT IN A REAL RESTAURANT</p>
-          <p>新しい機能は、まずこの店で使います。ピークタイムに耐えられるか、スタッフが覚えずに使えるか、お客様が迷わないか。ここで残らなかったものは、よそのお店にもお渡ししません。</p>
+          <h2>店の一日から、考える。</h2>
+          <p className="entitle">DESIGNED FOR THE REAL FLOOR</p>
+          <p>ピークタイムに耐えられるか、スタッフが覚えずに使えるか、お客様が迷わないか。私たちは、店の一日を基準に道具をつくっています。</p>
         </div>
         <div className="copy"><p className="eyebrow">Good Order</p><div className="rule" />
           <h2>埋もれる一品を、なくす。</h2>
@@ -85,9 +85,9 @@ export function Hero() {
           <a className="linkbtn" href={PRODUCT_URL.order} target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
         </div>
         <div className="copy"><p className="eyebrow">Good Review</p><div className="rule" />
-          <h2>ほめ言葉は外、苦言は内。</h2>
+          <h2>黙って帰っていた人の、クチコミが増える。</h2>
           <p className="entitle">EVERY VOICE FINDS ITS PLACE</p>
-          <p>卓上のQRから、5段階の評価にひとつ答えるだけ。高い評価はAIの下書きでGoogleマップへ。低い評価は店内向けのアンケートに分かれ、公開の場には出ません。</p>
+          <p>卓上の二次元コードから、★だけでも。書くかどうかも、届け先も、お客様が選べます。評価によって誘い方を変えることはありません。</p>
           <a className="linkbtn" href={PRODUCT_URL.review} target="_blank" rel="noopener">公式サイトへ <ArrowOut /></a>
         </div>
       </div>

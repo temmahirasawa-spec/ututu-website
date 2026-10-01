@@ -202,29 +202,6 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
 
-/* ---- 私たちがつくった店 ----
-   写真は左右いっぱいの帯にして、外観・内装・ブランディングをゆっくり流す。
-   語彙は3つ目になるが、この節だけに限定して使う（他では流さないこと） */
-#after{overflow-x:clip}   /* 帯の全幅はみ出しを刈る */
-.band{margin:clamp(34px,5vw,54px) calc(50% - 50vw) 0;
- display:flex;flex-direction:column;gap:10px}
-/* 帯は同じ組を2つ並べ、-50% までの移動をループさせて切れ目なく流す。
-   組と組の間隔は .set の padding-right で作る（row に gap を書くと計算が狂う）。
-   ここの秒数は仮置きで、実際の速さは bandSpeed() が画素/秒で決め直す
-   （%基準のままだと、幅の細いモバイルでは同じ秒数でも半分の速さになる） */
-.band-row{display:flex;width:max-content;animation:drift 40s linear infinite}
-.band-row .set{display:flex;gap:10px;padding-right:10px}
-.band-row.rev{animation-duration:64s;animation-direction:reverse}
-.band-row img{height:clamp(150px,21vw,230px);width:auto;display:block;border-radius:2px}
-@keyframes drift{to{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){.band-row{animation:none}}
-.stores{margin:clamp(22px,3.4vw,36px) 0 0;padding:0;list-style:none;
- display:flex;flex-wrap:wrap;gap:12px 38px}
-.stores .nm{margin:0;font-size:14px;letter-spacing:.1em;font-weight:500;color:var(--tx)}
-.stores .tp{margin:3px 0 0;font-size:11.5px;color:var(--mut);letter-spacing:.05em}
-.stores .nm,.stores .tp{transition:color .9s ease}
-.stores li.soon{opacity:.55}
-
 /* ---- 店から道具への橋・締め。宣言は一回り大きく組む ---- */
 /* 締め（#next）は全体を中央揃えに */
 #next{text-align:center}
@@ -232,7 +209,7 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 .af-bridge{border-left:2px solid var(--acc);padding-left:clamp(20px,3.4vw,32px);
  transition:border-color .9s ease}
 .af-stmt h3{font-size:clamp(26px,4.4vw,46px);line-height:1.55}
-/* 数字の帯。値はサンプル。実測値が来たら差し替える */
+/* 数字の帯（いまは未使用。実測値が揃ったら使う） */
 .stats{margin:clamp(30px,4.6vw,46px) 0 0;display:grid;
  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 26px}
 .stat{border-left:1px solid var(--ln);padding-left:16px;transition:border-color .9s ease}

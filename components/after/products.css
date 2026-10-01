@@ -227,7 +227,7 @@
   .pv-fd { inset: 10px; }
   .pv-logo { --lu: .3px; }
   .pv-kind { font-size: 12.5px; }
-  /* 判子の横に並べると本文の欄が狭すぎて「〈YORKYS BRUNCH〉／で」と折れる。判子は上に */
+  /* 判子の横に並べると本文の欄が狭すぎて本文が細かく折れる。判子は上に */
   .pv-proof:not(.pv-proof--rc) { flex-direction: column; align-items: flex-start; gap: 8px; }
   .pv-proof br { display: none; }
   .pv-hd .main { font-size: clamp(24px, 7.2vw, 30px); }

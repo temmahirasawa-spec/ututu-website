@@ -128,9 +128,9 @@ export function holdRange(i: number): [number, number] {
    コマ数のわりに時間が進むため） */
 export const COPY_AT: [number, number][] = [
   [1, 150], // 店舗に、いい一日を。（最初から表示）
-  [230, 395], // この店が、開発室です。
+  [230, 395], // 店の一日から、考える。
   [holdRange(0)[0] - 30, holdRange(0)[1] + 73], // 埋もれる一品を、なくす。
-  [holdRange(1)[0] - 40, holdRange(1)[1] - 30], // ほめ言葉は外、苦言は内。
+  [holdRange(1)[0] - 40, holdRange(1)[1] - 30], // 黙って帰っていた人の、クチコミが増える。
 ];
 
 /* 出入りにかける時間（秒）。**コマ数で決めないこと。**

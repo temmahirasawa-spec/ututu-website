@@ -34,39 +34,14 @@ export function After() {
       {/* A 受け：映像の余韻を引き取り、紙の世界に切り替える */}
       <div className="af-sec">
         <p className="sec-eyebrow rv">Ututu</p>
-        <h3 className="rv">店の中から、つくっています。</h3>
-        <p className="lead rv">私たちは、店をつくる会社であり、店のための道具をつくる会社です。ふたつは別の仕事ではありません。自分たちの店で毎日使うために道具をつくり、その道具が、また店を強くしています。</p>
+        <h3 className="rv">店の一日から、つくっています。</h3>
+        <p className="lead rv">私たちは、店のための道具をつくる会社です。ピークタイムの慌ただしさも、スタッフが覚えられる量も、お客様が迷う場所も知っている。その手ざわりから逆算して、要るものだけをかたちにしています。</p>
       </div>
 
-      {/* B 私たちがつくった店：当事者性の証拠。業態の表記は要確認 */}
-      <div className="af-sec">
-        <p className="sec-eyebrow rv">Our Stores</p>
-        <h3 className="rv">私たちがつくった店。</h3>
-        <p className="lead rv">企画から内装、メニュー、日々の運営まで。ここに並ぶのは、私たちが立ち上げて、いまも動かしている店。写真には、いま仕込んでいる次の店も混ざっています。</p>
-    <div className="band rv">
-          <div className="band-row"><div className="set"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="YORKYS BRUNCH の店内" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="FROMA のサイン" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="YORKYS CREPERIE の店舗" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="PIECE OF BAKE の内装" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="FROMA の内装" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="YORKYS BRUNCH のカップ" loading="lazy" decoding="async" /></div><div className="set" aria-hidden="true"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /></div></div>
-          <div className="band-row rev"><div className="set"><img src="/img/brands/creperie-products.webp" width="480" height="480" alt="YORKYS CREPERIE のクレープ" loading="lazy" decoding="async" /><img src="/img/brands/bake-glass.webp" width="480" height="480" alt="PIECE OF BAKE のガラス面" loading="lazy" decoding="async" /><img src="/img/brands/froma-kitchen.webp" width="818" height="480" alt="FROMA のキッチン" loading="lazy" decoding="async" /><img src="/img/brands/mc-04.webp" width="861" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async" /><img src="/img/brands/brunch-exterior.webp" width="480" height="480" alt="YORKYS BRUNCH の外観" loading="lazy" decoding="async" /><img src="/img/brands/creperie-counter.webp" width="975" height="480" alt="YORKYS CREPERIE のカウンター" loading="lazy" decoding="async" /><img src="/img/brands/bake-donuts.webp" width="480" height="480" alt="PIECE OF BAKE のドーナツ" loading="lazy" decoding="async" /></div><div className="set" aria-hidden="true"><img src="/img/brands/creperie-products.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-glass.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-kitchen.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/mc-04.webp" width="861" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/brunch-exterior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/creperie-counter.webp" width="975" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-donuts.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /></div></div>
-        </div>
-        <ul className="stores">
-          <li className="rv"><p className="nm">YORKYS BRUNCH</p><p className="tp">ブランチレストラン</p></li>
-          <li className="rv"><p className="nm">YORKYS CREPERIE</p><p className="tp">クレープリー</p></li>
-          <li className="rv"><p className="nm">FROMA</p><p className="tp">チーズブランド</p></li>
-          <li className="rv"><p className="nm">PIECE OF BAKE</p><p className="tp">ドーナツブランド</p></li>
-          <li className="rv soon"><p className="nm">AND NEXT</p><p className="tp">準備中の店がひとつ</p></li>
-        </ul>
-      </div>
-
-      {/* 橋：店から道具へ */}
+      {/* 橋：現場から道具へ */}
       <div className="af-sec af-bridge af-stmt" data-ink>
         <h3 className="rv">既製品は、現場に合いませんでした。</h3>
-        <p className="lead rv">だから自分たちでつくり、自分たちの店で毎日使っています。ピークタイムに耐えられなかった機能は、直すか、捨てる。ここから先に並ぶのは、その繰り返しを生き残ったものだけです。</p>
-        {/* 数字はすべてサンプル。実測値が来たら差し替える */}
-        <div className="stats rv">
-          <div className="stat"><b className="stat-n">4</b><span className="stat-l">直営ブランド</span></div>
-          <div className="stat"><b className="stat-n">3</b><span className="stat-l">導入店舗</span></div>
-          <div className="stat"><b className="stat-n">3.9<i>倍</i></b><span className="stat-l">月のクチコミ件数</span></div>
-          <div className="stat"><b className="stat-n">+18<i>%</i></b><span className="stat-l">注文点数</span></div>
-        </div>
+        <p className="lead rv">だから、自分たちでつくることにしました。ピークタイムに耐えられない機能は、直すか、捨てる。ここから先に並ぶのは、その繰り返しを生き残ったものだけです。</p>
       </div>
       <Products />
 
@@ -80,7 +55,7 @@ export function After() {
             <p className="fd-role">共同創業者 / ビジネスプロデューサー</p>
             <p className="fd-name">板倉 洋輔</p>
             <p className="fd-en">Yosuke Itakura</p>
-            <p className="fd-ex">「YORKYS BRUNCH」から複数ブランドを立ち上げ、関西・関東へ。2026年、3ブランドの全国フランチャイズ展開を開始。</p>
+            <p className="fd-ex">神戸・阪神間で10年以上、飲食店の経営と出店に携わる。現場と数字の両方から、事業を設計する。</p>
             <button className="profile-btn" type="button" data-bio="yosuke">Profile　＋</button>
           </div>
           <div className="fd rv">
@@ -103,8 +78,8 @@ export function After() {
       {/* 締め */}
       <div className="af-sec af-stmt" data-ink id="next">
         <p className="sec-eyebrow rv">And Next</p>
-        <h3 className="rv">検証は、今日も営業中。</h3>
-        <p className="lead rv">私たちの店は、これからも実験台です。使いながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべてはこの店の一日から始まります。</p>
+        <h3 className="rv">道具づくりは、まだ途中。</h3>
+        <p className="lead rv">使われながら直し、直しては削る。プロダクトの改善も、次の道具の仕込みも、すべては店の一日から始まります。</p>
         <p className="next-line rv"><i></i>Next product — Reservation System and more</p>
         {/* トップの出口。ここまで読んだ人を問い合わせへ送る */}
         <div className="af-cta rv">

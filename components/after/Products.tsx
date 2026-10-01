@@ -126,7 +126,7 @@ export function Products() {
               ['RECOMMEND', '“もう一品”が、自然に増える。'],
             ]}
             /* **数字は出さないこと。**LPでも客単価・注文点数は検証中（ピンクの「測定中」の判子） */
-            proof={<p className="pv-proof"><span className="pv-stamp">測定中</span><span>神戸のカフェ〈YORKYS BRUNCH〉で<br />実運用テスト中です。</span></p>}
+            proof={<p className="pv-proof"><span className="pv-stamp">測定中</span><span>効果は、いま<br />測定しています。</span></p>}
             screen={{ src: '/img/products/order-screen.webp', w: 520, h: 1128, alt: 'GOOD ORDER の注文画面。上部にカテゴリのタブ、その下に写真の大きなおすすめメニューが並んでいる' }}
             props={{
               cup: { src: '/img/products/props/order-latte.webp', w: 240, h: 240 },
@@ -148,9 +148,8 @@ export function Products() {
               ['BY TOPIC', '話題ごとに、書ける。'],
               ['YOUR CHOICE', '届け先は、お客様が選ぶ。'],
             ]}
-            /* LPの冒頭と同じ実測（FROMA 神戸三宮店・導入後3か月）。盛らないこと。
-               ★3.00→★4.29 もLPにはあるが、ここでは件数だけに絞っている */
-            proof={<p className="pv-proof pv-proof--rc"><small>FROMA 神戸三宮店 ／ 導入後3か月の実測</small><span>クチコミ <b>7</b>件 → <b>42</b>件</span></p>}
+            /* 実証の数字。**店名は出さないこと。期間を明記した過去形で。**盛らないこと */
+            proof={<p className="pv-proof pv-proof--rc"><small>神戸市内の飲食店 ／ 2026年6〜8月の実証期間</small><span>クチコミ <b>7</b>件 → <b>42</b>件</span></p>}
             screen={{ src: '/img/products/review-screen.webp', w: 480, h: 697, alt: 'GOOD REVIEW のアンケートの画面。「この感想を、どうしますか？」の下に「Googleにも投稿する」と「お店にだけ届ける」の2つが並んでいる' }}
             props={{
               cup: { src: '/img/products/props/review-latte.webp', w: 240, h: 240 },
