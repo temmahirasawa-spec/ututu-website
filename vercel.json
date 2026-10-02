@@ -23,5 +23,15 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/v2",
+      "destination": "https://ututu-website-git-claude-re-452d4f-temmahirasawa-1946s-projects.vercel.app/v2"
+    },
+    {
+      "source": "/v2/:path*",
+      "destination": "https://ututu-website-git-claude-re-452d4f-temmahirasawa-1946s-projects.vercel.app/v2/:path*"
+    }
   ]
 }
