@@ -11,9 +11,10 @@
 同日、**アクセント色を朱 #FF4D1F から緑 #12D695 に差し替えた**（本人指定。§3「色と地」）。
 
 ```
-本番  : https://ututu-website.vercel.app （main に push すると自動デプロイ）
+新サイト: https://ututu-design.co.jp/v2 （2026-10-02 から。このブランチのプレビューを main が中継している。§8）
+本番  : https://ututu-design.co.jp ／ https://ututu-website.vercel.app （main。旧サイトのまま。push すると自動デプロイ）
 GitHub: temmahirasawa-spec/ututu-website （Public ← 非公開にすることを推奨。§0）
-作業中: ブランチ claude/resume-8910ks（Vercel のプレビューURLで見られる。main には未反映）
+作業中: ブランチ claude/resume-8910ks（push すると /v2 にそのまま出る。プレビューURLは …vercel.app/v2）
 旧版  : コミット 38caf2a 以前（KVの連番・ホモグラフィ・reference/ の原本もそこにある）
 第1版 : コミット 12339cf（紙の節を縦に積む版。点描はヒーローだけだった）
 ```
@@ -589,8 +590,6 @@ npm run build    # 本番ビルド
 
 - **本番（main）への反映**。YORKYS を外す外科的修正（9256df6・cf8e72c）は、リニューアルと
   切り離して先に main に入れられる
-- **`ututu-design.co.jp/v2` で見せるかどうか**（本人の発案）。このVercelプロジェクトの本番ドメインなので、
-  /v2 に置くには main を変える必要がある（basePath か書き換え）。返事待ち。いまはプレビューURLで見る
 - **実機での確認**。点描の膜は重いので、古めのスマホ（とくに Android の中位機）でのなめらかさと発熱、
   iOS Safari でのスクロールの手触りを確かめる。重ければ升目を大きくする（field.ts の `cell`）
 - **各LP（good-order-lp / good-review-website）の同じ修正**。REVIEW の映像の字幕と冒頭の実測、
@@ -647,3 +646,21 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+---
+
+## 8. ututu-design.co.jp/v2 での公開（2026-10-02 本人依頼）
+
+ututu-design.co.jp は Vercel の `ututu-website` プロジェクトの本番ドメインで、本番（main）はまだ**旧サイト**。
+新サイトは **main を入れ替えずに** /v2 に出している：
+
+1. このブランチは `basePath: '/v2'`（`lib/base.ts` の `BASE`。next.config.ts もここを読む）。
+   **public/ の素材の URL は必ず `asset()` を通すこと**（`<img src>`・`<video>`・`fetch`・GLTFLoader には basePath が付かない）。
+   vercel.json のキャッシュの source も `/v2/...`
+2. main の `vercel.json` の `rewrites` が、`/v2` と `/v2/:path*` を
+   このブランチのプレビュー（`ututu-website-git-claude-resume-8910ks-temmahirasawa-1946s-projects.vercel.app/v2/...`）へ中継する。
+   **このブランチに push すれば /v2 も更新される**（main を触る必要はない）
+3. noindex のまま（layout.tsx）。プレビューの応答にも Vercel が `x-robots-tag: noindex` を付ける
+
+**新サイトを / に移す日**：`BASE` を `''` にし、vercel.json の source から `/v2` を外して、このブランチを main に入れ、
+main の rewrites を消す（旧サイトは 38caf2a に残る）。そのあと「公開の日にやること」（§7）

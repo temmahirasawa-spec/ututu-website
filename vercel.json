@@ -6,7 +6,7 @@
   ],
   "headers": [
     {
-      "source": "/(clips|models)/(.*)",
+      "source": "/v2/(clips|models)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "source": "/img/(.*)",
+      "source": "/v2/img/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

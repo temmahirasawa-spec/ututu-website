@@ -27,6 +27,7 @@ import { Mark } from '@/components/site/Mark';
 import { PRODUCT_URL } from '@/components/site/productLinks';
 import { TLink } from '@/components/site/TLink';
 import { BRANDS, BRAND_PICKS } from '@/components/works/data';
+import { asset } from '@/lib/base';
 
 export function Label({ n, children }: { n: string; children: string }) {
   return <p className="lbl"><b>({n})</b><i aria-hidden="true" />{children}</p>;
@@ -127,8 +128,8 @@ export function WorksOverview() {
         <TLink className="wo-card wo-card--saas" href="/works#saas">
           <p className="wo-k" data-clear><b>(B)</b>SaaS</p>
           <div className="wo-saas">
-            <span className="wo-logo"><img src="/img/logos/good-order.svg" width={584} height={57} alt="GOOD ORDER" /></span>
-            <span className="wo-logo"><img src="/img/logos/good-review.svg" width={631} height={67} alt="GOOD REVIEW" /></span>
+            <span className="wo-logo"><img src={asset('/img/logos/good-order.svg')} width={584} height={57} alt="GOOD ORDER" /></span>
+            <span className="wo-logo"><img src={asset('/img/logos/good-review.svg')} width={631} height={67} alt="GOOD REVIEW" /></span>
           </div>
           <div className="wo-txt" data-clear>
             <h3>店舗のための自社プロダクト</h3>

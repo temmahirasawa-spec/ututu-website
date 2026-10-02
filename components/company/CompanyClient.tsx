@@ -15,6 +15,7 @@ import { dots } from '@/lib/dots/field';
 import { flowScene } from '@/lib/dots/flowScene';
 import '@/components/home/home.css';
 import './company.css';
+import { asset } from '@/lib/base';
 
 /* 会社概要の中身。**確定していない項目はここに足さないこと。**
    所在地は登記のまま（移転は弁護士の確認を経てから。登記が変わったら更新する）。
@@ -96,7 +97,7 @@ function ContactForm() {
     };
     setState('sending');
     try {
-      const r = await fetch('/api/contact', {
+      const r = await fetch(asset('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

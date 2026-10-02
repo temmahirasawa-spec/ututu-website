@@ -23,6 +23,7 @@ import { PRODUCT_URL } from '@/components/site/productLinks';
 import { OrderScreen } from './OrderScreen';
 import { ProductVideo } from './ProductVideo';
 import './products.css';
+import { asset } from '@/lib/base';
 
 type PanelAttrs = Record<`data-${string}`, string>;
 
@@ -80,7 +81,7 @@ export function OrderPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
       slug="order" n="B-1" name="GOOD ORDER"
-      logo={{ src: '/img/logos/good-order.svg', w: 584.2, h: 56.6 }}
+      logo={{ src: asset('/img/logos/good-order.svg'), w: 584.2, h: 56.6 }}
       kind="モバイルオーダー"
       sub="いいデザインは、" main="売上に効く。"
       intro="UIデザインの精度でメニューの取りこぼしを防ぎ、客単価とお客様の満足度を一緒に育てるモバイルオーダーです。"
@@ -103,7 +104,7 @@ export function ReviewPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
       slug="review" n="B-2" name="GOOD REVIEW"
-      logo={{ src: '/img/logos/good-review.svg', w: 631.2, h: 66.7 }}
+      logo={{ src: asset('/img/logos/good-review.svg'), w: 631.2, h: 66.7 }}
       kind="クチコミ獲得ツール"
       sub="黙って帰っていた人の、" main="クチコミが増える。"
       intro="卓上の二次元コードから、★だけでも。書くかどうかも、届け先も、お客様が選べるクチコミ獲得ツールです。"
@@ -114,7 +115,7 @@ export function ReviewPanel({ panel }: { panel: PanelAttrs }) {
       ]}
       /* 実証の数字。**店名は出さないこと。期間を明記した過去形で。**盛らないこと */
       proof={<p className="pd-proof pd-proof--n"><small>神戸市内の飲食店 ／ 2026年6〜8月の実証期間</small><span>クチコミ <b>7</b>件 → <b>42</b>件</span></p>}
-      screen={<img src="/img/products/review-screen.webp" width={480} height={697} alt="GOOD REVIEW の画面。「この感想を、どうしますか？」の下に「Googleにも投稿する」と「お店にだけ届ける」の2つが並んでいる" loading="lazy" decoding="async" />}
+      screen={<img src={asset('/img/products/review-screen.webp')} width={480} height={697} alt="GOOD REVIEW の画面。「この感想を、どうしますか？」の下に「Googleにも投稿する」と「お店にだけ届ける」の2つが並んでいる" loading="lazy" decoding="async" />}
       stamp={{ shape: 'stars', mode: 'stars', e: '5,0,0,0', hint: 'TAP — 星の数が変わります' }}
       href={PRODUCT_URL.review}
       panel={panel}
