@@ -104,7 +104,7 @@ export function WorldRoot({ children }: { children: ReactNode }) {
     }
 
     /* ---- 3Dアバター ----
-       座標の世界では「ふたり」の節が初めて見えたとき、縦並びでは近づいたときに読む */
+       座標の世界では「チーム」の節が初めて見えたとき、縦並びでは近づいたときに読む */
     const team = r.querySelector<HTMLElement>('#team');
     let stopViewer: (() => void) | null = null;
     let dead = false;

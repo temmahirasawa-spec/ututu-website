@@ -7,6 +7,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://ututu-website.vercel.a
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${BASE}/`, changeFrequency: 'monthly', priority: 1 },
+    { url: `${BASE}/works`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/company`, changeFrequency: 'monthly', priority: 0.7 },
   ];
 }

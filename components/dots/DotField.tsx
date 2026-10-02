@@ -26,7 +26,8 @@ export function DotField() {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       if (!alive) return;
       const hash = decodeURIComponent(location.hash.slice(1));
-      if (hash && path !== '/') document.getElementById(hash)?.scrollIntoView({ block: 'start' });
+      /* 座標の世界のページ（トップ・/works）は World が自分で運ぶ。ふつうのページだけ素直にスクロール */
+      if (hash && !document.documentElement.classList.contains('world')) document.getElementById(hash)?.scrollIntoView({ block: 'start' });
       setTimeout(() => { void dots.coverOut({}); }, 240);
     }));
     return () => { alive = false; };

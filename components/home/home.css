@@ -64,7 +64,7 @@ html[data-at=top] .hud-scroll{display:inline-flex}
 /* ===================== パネル共通 ===================== */
 .pn{position:relative}
 .sec{padding:calc(var(--hd-h) + clamp(24px,4vw,56px)) var(--gut) clamp(64px,8vw,120px)}
-.sec-lead{margin:clamp(20px,2.4vw,32px) 0 0;max-width:34em;font-size:15px;line-height:2.05;color:var(--mut)}
+.sec-lead{margin:clamp(20px,2.4vw,32px) 0 0;max-width:36em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:color-mix(in srgb,var(--fg) 80%,var(--g))}
 
 /* ===================== (01) ヒーロー ===================== */
 .hero{min-height:100svh;padding:calc(var(--hd-h) + clamp(18px,4vh,48px)) var(--gut) clamp(56px,8vh,84px);
@@ -78,9 +78,9 @@ html[data-at=top] .hud-scroll{display:inline-flex}
 /* 和訳は見出しのすぐ下の左、説明は右。見出しと重ねないこと（大きな欧文に食い込んだ） */
 .hero-jp{grid-column:1;grid-row:3;align-self:start;font-size:clamp(18px,2.3vw,34px);margin-top:clamp(16px,2.6vh,30px)}
 .hero-side{grid-column:2;grid-row:3;align-self:start;max-width:25em;margin-top:clamp(18px,2.8vh,32px);position:relative;z-index:1}
-.hero-side p{margin:0;font-size:14.5px;line-height:2.05}
+.hero-side p{margin:0;font-size:var(--body);line-height:var(--body-lh);font-weight:500}
 .hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
-.hero-cta .btn{font-size:13px}
+.hero-cta .btn{font-size:14px}
 /* ロゴの置き場所。点描はこの箱を読む。**縦横比は字の外形（1144:133）に合わせること** */
 .hero-mark{position:relative;margin-top:clamp(24px,5vh,60px);width:100%;aspect-ratio:1144/133}
 .hero-mark svg{position:absolute;left:-.7%;top:-6%;width:101.4%;height:112%;display:block;transition:opacity .4s ease}
@@ -103,13 +103,13 @@ html.world .hero-bar{display:none}
  .hero-bar{grid-template-columns:1fr auto}
  .hero-bar>span:first-child{display:none}
 }
-@media (max-width:520px){.hero-side p{font-size:13.5px}.hero-side br{display:none}}
+@media (max-width:520px){.hero-side br{display:none}}
 
 /* ===================== (02) 宣言 ===================== */
 .mf{padding:calc(var(--hd-h) + clamp(24px,4vw,56px)) 0 clamp(40px,5vw,80px)}
 .mf>.lbl{padding:0 var(--gut)}
 .mf-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.7fr);gap:clamp(20px,4vw,72px);padding:0 var(--gut);align-items:center}
-.mf-text{margin:0;font-family:var(--jp-title);font-weight:700;font-size:clamp(21px,3.6vw,58px);line-height:1.5;letter-spacing:.01em}
+.mf-text{margin:0;font-family:var(--jp-title);font-weight:700;font-size:clamp(20px,3vw,48px);line-height:1.5;letter-spacing:.01em}
 .mf-p{display:block;margin-bottom:.55em}
 /* 一語（文節）ずつ inline-block。和文の折り返しが文節の切れ目に揃い、語ごとに揺らせる */
 .mf-text .w{display:inline-block;animation:sway 3.6s ease-in-out infinite;animation-delay:calc(var(--i) * -.37s)}
@@ -122,17 +122,17 @@ html.world .mf-text .w{opacity:clamp(.16,calc((var(--lp,0) * (var(--n) + 2.5) - 
   animation-timeline:view(),auto;animation-range:entry 90% cover 40%,normal;animation-delay:0s,calc(var(--i) * -.37s)}
 }
 @keyframes lit{to{opacity:1}}
-.mf-two{position:relative;aspect-ratio:440/560;width:100%;max-height:70svh;justify-self:center;
- display:grid;place-items:center}
-.mf-two span{font-family:var(--f-disp);font-weight:800;font-size:clamp(160px,26vw,420px);line-height:1;color:var(--acc)}
-html.dots-live:not(.flow) .mf-two span{opacity:0}
+.mf-x{position:relative;aspect-ratio:1;width:88%;max-height:60svh;justify-self:center;
+ display:grid;place-items:center;cursor:pointer}
+.mf-x span{font-family:var(--f-disp);font-weight:200;font-size:clamp(160px,24vw,400px);line-height:1;color:var(--acc)}
+html.dots-live:not(.flow) .mf-x span{opacity:0}
 .mq{position:relative;height:clamp(84px,13vw,210px);margin-top:clamp(40px,6vw,96px);display:grid;place-items:center;overflow:hidden}
 .mq-txt{font-family:var(--f-disp);font-weight:800;font-size:clamp(46px,9vw,150px);text-transform:uppercase;white-space:nowrap;letter-spacing:-.02em}
 html.dots-live:not(.flow) .mq-txt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media (max-width:760px){
  .mf-grid{grid-template-columns:minmax(0,1fr)}
  .mf-text{font-size:5.8vw}
- .mf-two{width:56%;justify-self:end;margin-top:-10px}
+ .mf-x{width:46%;justify-self:end;margin-top:-10px}
 }
 /* 動きを止める設定では、灯り終わった形（全部灯った状態）で見せる */
 @media (prefers-reduced-motion:reduce){.mf-text .w{animation:none!important;opacity:1!important}}
@@ -147,7 +147,7 @@ html.dots-live:not(.flow) .mq-txt{position:absolute;width:1px;height:1px;overflo
  font-size:clamp(56px,14vw,250px);line-height:.84;letter-spacing:-.04em;font-variation-settings:"wdth" 110;white-space:nowrap}
 .card-body{grid-column:1;align-self:end;max-width:32em}
 .card-body h3{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(22px,2.6vw,40px);line-height:1.35}
-.card-body p{margin:14px 0 0;font-size:14.5px;line-height:2.05;color:var(--mut)}
+.card-body p{margin:16px 0 0;font-size:var(--body);line-height:var(--body-lh);color:color-mix(in srgb,var(--fg) 80%,var(--g))}
 .card-fig{grid-column:2;grid-row:2/4;align-self:stretch;min-height:200px}
 .card--speed .card-fig{margin-top:auto;height:60%;align-self:end}
 @media (max-width:760px){
@@ -165,10 +165,10 @@ html.dots-live:not(.flow) .mq-txt{position:absolute;width:1px;height:1px;overflo
 .sv-en{margin:0;font-family:var(--f-disp);font-weight:700;text-transform:uppercase;
  font-size:clamp(34px,5.4vw,90px);line-height:.95;letter-spacing:-.025em;
  font-variation-settings:"wdth" 100;transition:font-variation-settings .6s var(--ease)}
-.sv-jp{margin:0 0 8px;font-family:var(--jp-title);font-weight:700;font-size:17px;letter-spacing:.04em}
-.sv-body{margin:0;font-size:14px;line-height:1.95;color:var(--mut)}
+.sv-jp{margin:0 0 10px;font-family:var(--jp-title);font-weight:700;font-size:clamp(18px,1.6vw,23px);letter-spacing:.04em}
+.sv-body{margin:0;font-size:var(--body);line-height:var(--body-lh);color:color-mix(in srgb,var(--fg) 80%,var(--g))}
 .sv-tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
-.sv-tags span{font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:color-mix(in srgb,var(--g) 80%,transparent)}
+.sv-tags span{font-size:12.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:color-mix(in srgb,var(--g) 80%,transparent)}
 @media (hover:hover){.sv-row:hover .sv-en{font-variation-settings:"wdth" 125}}
 @media (max-width:760px){
  .sv-row{grid-template-columns:2.6em minmax(0,1fr)}
@@ -180,7 +180,7 @@ html.dots-live:not(.flow) .mq-txt{position:absolute;width:1px;height:1px;overflo
  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em}
 .wk-next i{flex:0 0 clamp(24px,4vw,56px);height:1px;background:currentColor;opacity:.4}
 .ld-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.32fr);gap:clamp(20px,3vw,48px);align-items:end;margin-top:clamp(36px,5vw,64px)}
-.ld{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.2fr);margin:0;border-top:1.5px solid var(--fg)}
+.ld{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:clamp(36px,5vw,64px) 0 0;border-top:1.5px solid var(--fg)}
 .ld-i{padding:16px 16px 0 0;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
 .ld-i+.ld-i{padding-left:16px;border-left:1px solid var(--line)}
 .ld dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
@@ -216,9 +216,9 @@ html.dots-live:not(.flow) .mq-txt{position:absolute;width:1px;height:1px;overflo
 .fd-role{margin:0 0 12px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
 .fd-name{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(30px,3.6vw,50px);letter-spacing:.06em;line-height:1.2}
 .fd-name small{display:block;margin-top:10px;font-family:var(--f-mono);font-weight:400;font-size:11px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
-.fd-ex{margin:20px auto 0;max-width:24em;font-size:14px;line-height:2;color:var(--mut)}
+.fd-ex{margin:20px auto 0;max-width:26em;font-size:var(--body);line-height:var(--body-lh);color:color-mix(in srgb,var(--fg) 80%,var(--g))}
 .fd-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:18px 0 26px}
-.fd-tags span{font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px}
+.fd-tags span{font-size:12.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px}
 .profile-btn{margin-top:auto;display:inline-flex;align-items:center;gap:14px;padding:12px 14px 12px 22px;
  border:1.5px solid var(--fg);border-radius:99px;background:transparent;color:var(--fg);cursor:pointer;
  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
@@ -247,7 +247,7 @@ html.world .ft{padding-bottom:64px}
 .ft-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.2fr);gap:32px 24px}
 .ft-h{margin:0 0 14px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
 .ft ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.ft ul a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:14.5px;transition:color .25s ease}
+.ft ul a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:16px;transition:color .25s ease}
 .ft ul a:hover{color:var(--acc)}
 .ft-note{margin:0;justify-self:end;text-align:right;font-family:var(--f-mono);font-size:11px;line-height:1.9;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
 .ft-mark{position:relative;margin-top:clamp(56px,8vw,120px);aspect-ratio:1144/133;width:100%}

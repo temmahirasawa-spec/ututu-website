@@ -2,6 +2,8 @@
 
 /* ヒーロー（座標の世界の原点）。
    大見出しは**英語、その下に小さく和訳**（本人判断：和文の超大見出しは「2」だけが浮いた）。
+   打ち出しは「ビジネス×クリエイティブの掛け算」（2026-10-02 本人判断：「2人で」を押し出しすぎない）。
+   脇の文で**何をする会社か**を最初に言い切る（抽象的な「AIで何でも」に見せない）。
    ロゴは点で描く（.hero-mark が点描の印の置き場所。最初は粒が飛んできて組み上がる）。
    WebGL が無ければ、.hero-mark の SVG がそのまま見える。 */
 
@@ -20,18 +22,17 @@ export function Hero() {
       <div className="hero-in">
         <p className="hero-kick" data-clear>A creative studio building DX<span> — Kobe, Japan / Est. 2026</span></p>
         <div className="hero-h" data-clear>
-          <Decode as="h1" className="ttl ttl-hero" lines={['TWO OF US,', 'ALL OF IT.']} delay={250} />
+          <Decode as="h1" className="ttl ttl-hero" lines={['BUSINESS', '× CREATIVE.']} delay={250} />
         </div>
-        <p className="ttl-jp hero-jp" data-clear>2人で、全部つくる。</p>
+        <p className="ttl-jp hero-jp" data-clear>事業をつくる力と、デザインの力を、掛け合わせる。</p>
         <div className="hero-side" data-clear>
           <p>
-            事業をつくってきた人と、つくる手を持つ人。<br />
-            AIを道具に、企画からデザイン、開発、映像まで。<br />
-            短い時間で、高い精度で、かたちにします。
+            店舗・事業のプロデュースと、ブランド、Webサイト・アプリ、映像の制作。
+            飲食ブランドを立ち上げてきた事業の目と、デザイナーの手で、企画から運用までを一緒に進めます。
           </p>
           <div className="hero-cta">
             <TLink className="btn btn--acc" href="/company#contact">相談する<Arrow /></TLink>
-            <a className="btn btn--line" href="#work">つくったものを見る</a>
+            <TLink className="btn btn--line" href="/works">実績を見る</TLink>
           </div>
         </div>
       </div>

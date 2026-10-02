@@ -431,7 +431,7 @@ export class World {
       case MODE.floor: s.e[0] += 1; break;
       default: s.scatter = 1;
     }
-    if (s.shape === 'two') {                                         // 「2」に触れると、色が突然反転する
+    if (s.shape === 'cross') {                                       // 「×」に触れると、色が突然反転する
       dots.invert(true);
       setTimeout(() => dots.invert(false), 1600);
     }
@@ -490,7 +490,7 @@ export class World {
       const fz = p.pos.z - focusZ;
       let o = 1;
       if (rz > 0) o = 1 - smooth(0.1 * P, 0.48 * P, rz);
-      else if (fz < 0) o = 1 - 0.9 * smooth(0.1 * P, 1.0 * P, -fz);
+      else if (fz < 0) o = 1 - 0.96 * smooth(0.1 * P, 0.9 * P, -fz);
       const vis = o > 0.01 && tx < W + 40 && ty < H + 40 && tx + W * sc > -40 && ty + p.h * sc > -40;
       this.apply(p, vis, tx, ty, sc, o, Math.round(2000 + rz / 10));
     }

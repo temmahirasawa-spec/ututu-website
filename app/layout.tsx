@@ -47,9 +47,9 @@ const zenKaku = Zen_Kaku_Gothic_New({
   preload: false,
 });
 
-const TITLE = 'UTUTU — 2人で、全部つくる。';
+const TITLE = 'UTUTU — Business × Creative';
 const DESC =
-  '事業をつくってきた人と、つくる手を持つ人。AIを道具に、企画・デザイン・開発・映像まで。神戸のクリエイティブスタジオ UTUTU は、事業のDXを短い時間と高い精度でかたちにします。';
+  '事業をつくる力と、デザインの力を掛け合わせる、神戸のクリエイティブスタジオ。店舗・事業のプロデュースから、ブランディング、Webサイト・アプリ、映像、店舗のDXまで。飲食ブランドを立ち上げてきた経験と、店舗のための自社プロダクト GOOD SERIES を持っています。';
 
 export const metadata: Metadata = {
   /* 独自ドメインが決まったら NEXT_PUBLIC_SITE_URL で差し替える（相対URLの解決先になる） */

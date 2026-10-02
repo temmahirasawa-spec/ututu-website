@@ -4,13 +4,13 @@
 .cp{padding-top:clamp(110px,14vh,160px)}
 .cp-sec{padding:0 var(--gut) clamp(100px,13vw,190px)}
 .cp-ttl{font-size:clamp(56px,12vw,210px)}
-.cp-lead{margin:clamp(20px,2.4vw,30px) 0 0;max-width:30em;font-size:14.5px;line-height:2.05;color:var(--mut)}
+.cp-lead{margin:clamp(20px,2.4vw,30px) 0 0;max-width:32em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:color-mix(in srgb,var(--fg) 80%,var(--g))}
 
 /* ---- 会社概要：罫線だけの表 ---- */
 .cp-dl{margin:clamp(40px,6vw,90px) 0 0;border-top:1.5px solid var(--fg)}
 .cp-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:8px 32px;
  padding:clamp(18px,2.2vw,28px) 0;border-bottom:1px solid var(--line);align-items:baseline}
-.cp-row dt{font-family:var(--jp-title);font-weight:700;font-size:14px;letter-spacing:.06em}
+.cp-row dt{font-family:var(--jp-title);font-weight:700;font-size:15px;letter-spacing:.06em}
 .cp-row dt span{display:block;margin-bottom:4px;font-family:var(--f-mono);font-weight:400;font-size:11px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
 .cp-row dd{margin:0;font-size:clamp(16px,1.6vw,21px);line-height:1.7;letter-spacing:.02em}
 @media (max-width:640px){.cp-row{grid-template-columns:minmax(0,1fr)}}

@@ -13,7 +13,9 @@
 
    スマホでは縦に積む（横スライドは操作しにくかった。本人指摘）。映像は横長だけを使う。
 
-   訴求はLPの今の版に合わせる（CLAUDE.md §5）。**店名は出さないこと。** */
+   置き場所は /works の (B) SaaS（2026-10-02 にトップから移した。トップには概要だけ）。
+
+   訴求はLPの今の版に合わせる（CLAUDE.md §5）。**実証の数字に店名は出さないこと。** */
 
 import type { ReactNode } from 'react';
 import { ExtIcon } from '@/components/site/Header';
@@ -77,7 +79,7 @@ function Product(p: Props) {
 export function OrderPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
-      slug="order" n="05-A" name="GOOD ORDER"
+      slug="order" n="B-1" name="GOOD ORDER"
       logo={{ src: '/img/logos/good-order.svg', w: 584.2, h: 56.6 }}
       kind="モバイルオーダー"
       sub="いいデザインは、" main="売上に効く。"
@@ -100,7 +102,7 @@ export function OrderPanel({ panel }: { panel: PanelAttrs }) {
 export function ReviewPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
-      slug="review" n="05-B" name="GOOD REVIEW"
+      slug="review" n="B-2" name="GOOD REVIEW"
       logo={{ src: '/img/logos/good-review.svg', w: 631.2, h: 66.7 }}
       kind="クチコミ獲得ツール"
       sub="黙って帰っていた人の、" main="クチコミが増える。"

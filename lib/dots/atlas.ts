@@ -3,8 +3,8 @@
 
    形と意味：
    - mark     … UTUTU のロゴ（ヒーロー／フッター）
-   - two      … 「2」。2人であること（宣言／数え上げ）
-   - marquee  … BUSINESS × CRAFT × AI = TWO の帯（流れる文字）
+   - cross    … 「×」。ビジネス×クリエイティブの掛け算（宣言）。触れると色が反転する
+   - marquee  … BUSINESS × CREATIVE × AI の帯（流れる文字）
    - speed    … 速さの線（原則 01）
    - grid     … 照準と升目（原則 02 精度）
    - bars     … 棒グラフ（原則 03 事業）
@@ -19,7 +19,7 @@
 import qrcode from 'qrcode-generator';
 import { PRODUCT_URL } from '@/components/site/productLinks';
 
-export type ShapeName = 'mark' | 'two' | 'marquee' | 'speed' | 'grid' | 'bars' | 'qr' | 'stars' | 'floor' | 'fill';
+export type ShapeName = 'mark' | 'cross' | 'marquee' | 'speed' | 'grid' | 'bars' | 'qr' | 'stars' | 'floor' | 'fill';
 export type UV = [number, number, number, number];
 
 /* 置き場所は 2048 四方の座標で書き、実際の絵は半分（1024 四方）で描く。
@@ -32,7 +32,7 @@ const SLOTS: Record<ShapeName, [number, number, number, number]> = {
   marquee: [0, 0, 2048, 220],
   mark: [0, 240, 1144, 133],
   stars: [1160, 240, 880, 180],
-  two: [0, 400, 440, 560],
+  cross: [0, 400, 440, 440],
   qr: [460, 400, 500, 500],
   grid: [980, 440, 520, 520],
   bars: [1520, 440, 500, 400],
@@ -44,7 +44,7 @@ const SLOTS: Record<ShapeName, [number, number, number, number]> = {
 const GLYPH_U = 'M0 0V57A76 76 0 0 0 152 57V0H130V57A54 54 0 0 1 22 57V0Z';
 const GLYPH_T = 'M0 0H152V22H87V133H65V22H0Z';
 
-export const MARQUEE_TEXT = 'BUSINESS × CRAFT × AI = TWO — ';
+export const MARQUEE_TEXT = 'BUSINESS × CREATIVE × AI — ';
 
 /* QR の周りの余白（モジュールの数）。読み取りには最低2〜4が要る */
 const QR_QUIET = 2;
@@ -184,15 +184,17 @@ export function drawAtlas(withText: boolean): ImageData {
 
   slot('fill', (w, h) => { c.fillRect(0, 0, w, h); }, 0);
 
+  /* 「×」。書体に頼らず、2本の棒を45°に組む（書体が届く前から描ける） */
+  slot('cross', (w, h) => {
+    c.translate(w / 2, h / 2);
+    c.rotate(Math.PI / 4);
+    const t = w * 0.16, L = w * 1.05;
+    c.fillRect(-L / 2, -t / 2, L, t);
+    c.fillRect(-t / 2, -L / 2, t, L);
+  });
+
   if (withText) {
     const fam = displayFamily();
-    /* 「2」 */
-    slot('two', (w, h) => {
-      c.font = `800 ${Math.round(h * 1.02)}px ${fam}`;
-      c.textAlign = 'center';
-      c.textBaseline = 'alphabetic';
-      c.fillText('2', w / 2, h * 0.88);
-    });
     /* 流れる帯。1周ぶんで割り付け、端で切れ目なくつながるようにする */
     slot('marquee', (w, h) => {
       let px = h * 0.78;

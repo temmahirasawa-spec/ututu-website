@@ -20,11 +20,11 @@
 .pd-hd .sub{display:block;font-size:clamp(17px,1.8vw,24px);font-weight:700}
 .pd-hd .main{position:relative;display:inline-block;margin-top:4px;font-size:clamp(32px,4.2vw,64px)}
 .pd-pen{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.3em;fill:var(--acc);pointer-events:none}
-.pd-intro{margin:clamp(18px,2vw,26px) 0 0;max-width:30em;font-size:14.5px;line-height:2;word-break:auto-phrase}
+.pd-intro{margin:clamp(18px,2vw,26px) 0 0;max-width:32em;font-size:var(--body);line-height:var(--body-lh);word-break:auto-phrase}
 .pd-pts{list-style:none;margin:clamp(18px,2vw,26px) 0 0;padding:0;border-top:1.5px solid var(--fg);max-width:34em}
 .pd-pts li{display:grid;grid-template-columns:8.6em minmax(0,1fr);gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line)}
 .pd-pts span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em}
-.pd-pts b{font-family:var(--jp-title);font-weight:700;font-size:15px;line-height:1.5;word-break:auto-phrase}
+.pd-pts b{font-family:var(--jp-title);font-weight:700;font-size:clamp(16px,1.3vw,19px);line-height:1.5;word-break:auto-phrase}
 .pd-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 18px;margin-top:clamp(18px,2vw,26px);max-width:34em}
 .pd-proof{margin:0;display:flex;align-items:center;gap:12px;font-size:12.5px;line-height:1.6;font-weight:500}
 .pd-stamp{display:inline-grid;place-items:center;padding:4px 10px;border:2px solid var(--acc);border-radius:6px;color:var(--acc);

@@ -16,8 +16,8 @@ import { TLink } from './TLink';
 const LINKS: { href: string; en: string; jp: string }[] = [
   { href: '/#top', en: 'Studio', jp: 'スタジオ' },
   { href: '/#services', en: 'Services', jp: 'できること' },
-  { href: '/#work', en: 'Work', jp: 'つくったもの' },
-  { href: '/#team', en: 'Team', jp: 'ふたり' },
+  { href: '/works', en: 'Works', jp: '実績' },
+  { href: '/#team', en: 'Team', jp: 'チーム' },
   { href: '/company', en: 'Company', jp: '会社概要' },
   { href: '/company#contact', en: 'Contact', jp: 'お問い合わせ' },
 ];

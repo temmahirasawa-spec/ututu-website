@@ -19,6 +19,7 @@ export const transit = { pending: false, used: false };
 const WORDS: Record<string, string> = {
   '/': 'STUDIO', '/#top': 'STUDIO', '/#services': 'SERVICES', '/#work': 'WORK', '/#team': 'TEAM',
   '/#contact-cta': 'CONTACT', '/company': 'COMPANY', '/company#contact': 'CONTACT',
+  '/works': 'WORKS', '/works#branding': 'BRANDS', '/works#saas': 'SAAS',
 };
 
 type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string; word?: string };
