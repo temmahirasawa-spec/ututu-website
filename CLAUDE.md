@@ -658,7 +658,7 @@ ututu-design.co.jp は Vercel の `ututu-website` プロジェクトの本番ド
    **public/ の素材の URL は必ず `asset()` を通すこと**（`<img src>`・`<video>`・`fetch`・GLTFLoader には basePath が付かない）。
    vercel.json のキャッシュの source も `/v2/...`
 2. main の `vercel.json` の `rewrites` が、`/v2` と `/v2/:path*` を
-   このブランチのプレビュー（`ututu-website-git-claude-resume-8910ks-temmahirasawa-1946s-projects.vercel.app/v2/...`）へ中継する。
+   このブランチのプレビュー（ブランチの固定URL `ututu-website-git-claude-re-452d4f-temmahirasawa-1946s-projects.vercel.app/v2/...`。名前が長いので Vercel が短くしたもの）へ中継する。
    **このブランチに push すれば /v2 も更新される**（main を触る必要はない）
 3. noindex のまま（layout.tsx）。プレビューの応答にも Vercel が `x-robots-tag: noindex` を付ける
 
