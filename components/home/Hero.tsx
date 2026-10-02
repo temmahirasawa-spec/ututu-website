@@ -4,6 +4,7 @@
    大見出しは**英語、その下に小さく和訳**（本人判断：和文の超大見出しは「2」だけが浮いた）。
    打ち出しは「ビジネス×クリエイティブの掛け算」（2026-10-02 本人判断：「2人で」を押し出しすぎない）。
    脇の文で**何をする会社か**を最初に言い切る（抽象的な「AIで何でも」に見せない）。
+   ここだけは点の世界ではなく、なめらかな世界（2つの細胞）。抜けるときに点の世界へ切り替わる（lib/world/kv.ts）。
    ロゴは点で描く（.hero-mark が点描の印の置き場所。最初は粒が飛んできて組み上がる）。
    WebGL が無ければ、.hero-mark の SVG がそのまま見える。 */
 
@@ -17,10 +18,10 @@ export function Hero() {
   return (
     <section
       id="top" className="pn hero" aria-label="UTUTU"
-      data-panel="(01) STUDIO" data-ground="paper" data-mood="1.3,0.45,1,1,0.65" data-hold="0.12"
+      data-panel="(01) STUDIO" data-ground="paper" data-mood="1.3,0.45,1,1,0.65" data-hold="0.55"
     >
       <div className="hero-in">
-        <p className="hero-kick" data-clear>A creative studio building DX<span> — Kobe, Japan / Est. 2026</span></p>
+        <p className="hero-kick" data-clear>A creative studio building DX<span> — Kobe - Tokyo, Japan / Est. 2026</span></p>
         <div className="hero-h" data-clear>
           <Decode as="h1" className="ttl ttl-hero" lines={['BUSINESS', '× CREATIVE.']} delay={250} />
         </div>
@@ -36,6 +37,9 @@ export function Hero() {
           </div>
         </div>
       </div>
+      {/* キービジュアルの細胞の置き場所（lib/world/kv.ts）。細胞そのものは点描のキャンバスが描く。
+          名札は World が画面の上に複製して、細胞に付いて動かす */}
+      <div className="hero-cells" aria-hidden="true"><span data-kv="b">Business</span><span data-kv="c">Creative</span></div>
       <div className="hero-mark" data-stamp="mark" data-fit="fill"><Mark title="UTUTU" /></div>
       <div className="hero-bar" aria-hidden="true">
         <span>Kobe 34.69°N 135.19°E</span>

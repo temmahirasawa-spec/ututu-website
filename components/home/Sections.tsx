@@ -67,7 +67,7 @@ export function Services() {
   return (
     <section
       id="services" className="pn sec sv" aria-labelledby="sv-h"
-      data-panel="(02) SERVICES" data-ground="paper" data-at="1.12,0.08,0" data-from="top" data-transit="1.1" data-bulge="0.3"
+      data-panel="(02) SERVICES" data-ground="paper" data-at="1.12,0.08,0" data-from="top" data-transit="1.4" data-bulge="0.3"
       data-mood="0.8,0.45,1,0.8,0.5"
     >
       <Label n="02">Services</Label>
@@ -214,7 +214,7 @@ export function Manifesto() {
   return (
     <section
       id="why" className="pn mf" aria-labelledby="mf-h"
-      data-panel="(05) MESSAGE" data-ground="ink" data-at="-0.6,0.3,0" data-transit="1.05" data-bulge="0.55"
+      data-panel="(05) MESSAGE" data-ground="ink" data-at="-0.6,0.3,0" data-transit="1.05" data-bulge="0.55" data-hold="0.6"
       data-mood="1.15,0.35,1,0.9,0.6"
     >
       <Label n="05">Message</Label>
@@ -334,15 +334,22 @@ export function Footer({ panel = false }: { panel?: boolean }) {
     <footer className={`ft${panel ? ' pn' : ''}`} id="foot" {...attrs}>
       <div className="ft-cols" data-clear>
         <div>
-          <p className="ft-h">Studio</p>
+          <p className="ft-h"><TLink href="/#top">Studio</TLink></p>
           <ul>
             <li><TLink href="/#services">できること</TLink></li>
-            <li><TLink href="/works">実績</TLink></li>
             <li><TLink href="/#team">チーム</TLink></li>
+            <li><TLink href="/#why">メッセージ</TLink></li>
           </ul>
         </div>
         <div>
-          <p className="ft-h">Company</p>
+          <p className="ft-h"><TLink href="/works">Works</TLink></p>
+          <ul>
+            <li><TLink href="/works#branding">飲食ブランド</TLink></li>
+            <li><TLink href="/works#saas">SaaS</TLink></li>
+          </ul>
+        </div>
+        <div>
+          <p className="ft-h"><TLink href="/company">Company</TLink></p>
           <ul>
             <li><TLink href="/company">会社概要</TLink></li>
             <li><TLink href="/company#contact">お問い合わせ</TLink></li>
@@ -355,7 +362,7 @@ export function Footer({ panel = false }: { panel?: boolean }) {
             <li><a href={PRODUCT_URL.review} target="_blank" rel="noopener">GOOD REVIEW<ExtIcon /></a></li>
           </ul>
         </div>
-        <p className="ft-note">株式会社UTUTU<br />Creative Studio for DX<br />Kobe, Japan</p>
+        <p className="ft-note">株式会社UTUTU<br />Creative Studio for DX<br />Kobe - Tokyo, Japan</p>
       </div>
       <div className="ft-mark" data-stamp="mark" data-fit="fill" aria-hidden="true"><Mark /></div>
       <p className="ft-copy"><span>© 2026 UTUTU Inc.</span><span>Business × Creative, with AI.</span></p>

@@ -17,7 +17,7 @@ let lastPt = { x: -1, y: -1 };
 export const transit = { pending: false, used: false };
 
 const WORDS: Record<string, string> = {
-  '/': 'STUDIO', '/#top': 'STUDIO', '/#services': 'SERVICES', '/#work': 'WORK', '/#team': 'TEAM',
+  '/': 'STUDIO', '/#top': 'STUDIO', '/#services': 'SERVICES', '/#work': 'WORK', '/#team': 'TEAM', '/#why': 'MESSAGE',
   '/#contact-cta': 'CONTACT', '/company': 'COMPANY', '/company#contact': 'CONTACT',
   '/works': 'WORKS', '/works#branding': 'BRANDS', '/works#saas': 'SAAS',
 };

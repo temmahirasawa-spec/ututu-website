@@ -14,7 +14,8 @@
    ネイティブのスクロールはそのまま（奪わない）。ホイールの段差だけ少しなめらかにする。
    動きを止める設定では使わない（ふつうの縦並びのまま。World.tsx が判断する） */
 
-import { dots, MODE, type Mood, type Scene, type Stamp, type ThemeName, type Zone } from '@/lib/dots/field';
+import { kvState } from './kv';
+import { dots, MODE, type KV, type Mood, type Scene, type Stamp, type ThemeName, type Zone } from '@/lib/dots/field';
 import { aspectOf, qrModules, type ShapeName } from '@/lib/dots/atlas';
 
 type V3 = { x: number; y: number; z: number };
@@ -94,6 +95,12 @@ export class World {
   private dirty = true;
   /** ヒーローのロゴは、群れが組み終わるまで点の印を出さない */
   heroArmed = false;
+  /** キービジュアルの細胞（トップだけ。lib/world/kv.ts）。置き場所は .hero-cells、オープニングの起点 */
+  private kvLocal: Rect | null = null;
+  private kvRect: Rect | null = null;
+  private kvLabels: HTMLElement[] = [];
+  private kvSmooth = false;
+  kvT0 = -1e9;
 
   constructor(private root: HTMLElement, private spacer: HTMLElement, private probe: HTMLElement) {}
 
@@ -132,7 +139,9 @@ export class World {
     this.offs = [];
     cancelAnimationFrame(this.ownRaf);
     if (dots.ok) dots.setScene(null);
-    document.documentElement.classList.remove('world');
+    document.documentElement.classList.remove('world', 'kv-smooth');
+    this.kvLabels.forEach((l) => l.remove());
+    this.kvLabels = [];
     this.panels.forEach((p) => {
       p.el.style.transform = '';
       p.el.style.opacity = '';
@@ -220,6 +229,23 @@ export class World {
       prev = p;
       this.measure(p);
     }
+
+    /* キービジュアルの細胞の置き場所（ヒーローの中の .hero-cells） */
+    const kvEl = this.panels[0]?.el.querySelector<HTMLElement>('.hero-cells');
+    if (kvEl && dots.ok) {
+      const pr = this.panels[0].el.getBoundingClientRect(), r = kvEl.getBoundingClientRect();
+      this.kvLocal = { x: r.left - pr.left, y: r.top - pr.top, w: r.width, h: r.height };
+      if (!this.kvLabels.length) {
+        this.kvLabels = Array.from(kvEl.querySelectorAll<HTMLElement>('[data-kv]')).map((src) => {
+          const l = document.createElement('span');
+          l.className = `kv-lb kv-lb--${src.dataset.kv}`;
+          l.textContent = src.textContent;
+          l.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(l);
+          return l;
+        });
+      }
+    } else this.kvLocal = null;
 
     /* 世界の外接（地図のため） */
     const xs = this.panels.flatMap((p) => [p.pos.x, p.pos.x + W]);
@@ -512,9 +538,11 @@ export class World {
     /* 段落が灯る（画面の下から上へ） */
     for (const p of this.panels) {
       if (!p.vis || !p.lights.length) continue;
+      /* 節に着いてからの「間」をスクロールするあいだにも灯る（下の段落が画面の下に残ったままでも、最後まで灯る） */
+      const stay = Math.min(1, Math.max(0, (this.sSmooth - p.sStart) / Math.max(1, p.sEnd - p.sStart)));
       for (const l of p.lights) {
         const y = p.ty + (l.y + l.h * 0.5) * p.sc;
-        const v = Math.min(1, Math.max(0, (H * 0.86 - y) / (H * 0.5)));
+        const v = Math.min(1, Math.max(0, (H * 0.86 - y) / (H * 0.5), stay * 1.15));
         l.el.style.setProperty('--lp', v.toFixed(3));
       }
     }
@@ -583,12 +611,42 @@ export class World {
     stamps.sort((a, b) => b.w * b.h - a.w * a.h);
     /* 文字の避け場所は 12 個まで（シェーダの配列の大きさ）。いまいる節の文字を先に守る */
     zones.sort((a, b) => b.w - a.w);
+    const kv = this.kvScene();
     return {
+      kv,
       stamps,
       zones: zones.slice(0, 12).map((x) => x.z),
       mood,
       lattice: { x: -this.cam.x * 0.32, y: -this.cam.y * 0.32, scale: 1 / (1 + this.bulgeNow * 0.45) },
     };
+  }
+
+  /** キービジュアルの細胞。ヒーローから「できること」に着くまでの道のりで、合わさって弾ける */
+  private kvScene(): KV | undefined {
+    const html = document.documentElement;
+    const hero = this.panels[0], next = this.panels[1];
+    if (!this.kvLocal || !hero || !next) return undefined;
+    const p = Math.min(1, Math.max(0, this.sSmooth / Math.max(1, next.sStart)));
+    if (p >= 0.999) {
+      if (this.kvSmooth) { this.kvSmooth = false; html.classList.remove('kv-smooth'); }
+      this.kvLabels.forEach((l) => { l.style.opacity = '0'; });
+      return undefined;
+    }
+    if (hero.vis || !this.kvRect) this.kvRect = this.screenRect(hero, this.kvLocal);
+    const now = performance.now();
+    const out = kvState({
+      rect: this.kvRect, W: this.W, H: this.H, p,
+      tOpen: (now - this.kvT0) / 1000, time: now / 1000, ptr: this.ptr,
+    });
+    out.labels.forEach((q, i) => {
+      const l = this.kvLabels[i];
+      if (!l) return;
+      l.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translateX(-50%)`;
+      l.style.opacity = q.a.toFixed(3);
+    });
+    const smooth = out.kv.smooth > 0.5;
+    if (smooth !== this.kvSmooth) { this.kvSmooth = smooth; html.classList.toggle('kv-smooth', smooth); }
+    return out.kv;
   }
 
   /* ------------------------------------------------ 座標の表示と地図 */
@@ -603,13 +661,11 @@ export class World {
     if (y) y.textContent = f(cam.y);
     if (z) z.textContent = f(cam.z);
     if (camEl) {
-      const zoom = this.P / (this.P + Math.max(-this.P * 0.8, cam.z - (this.panels[this.panelAt(this.sSmooth)]?.pos.z ?? 0)));
-      const w = (this.W / zoom) * this.mapScale, h = (this.H / zoom) * this.mapScale;
-      const mx = (cam.x + this.W / 2 - this.W / 2 / zoom) * this.mapScale + this.mapOff.x;
-      const my = (cam.y + this.H / 2 - this.H / 2 / zoom) * this.mapScale + this.mapOff.y;
+      /* いまいる場所：渡っているあいだは、前後の点のあいだを動く */
+      const cx = cam.x + this.W / 2, cy = cam.y + this.H / 2;
+      const k = Math.max(0.4, 1 + cam.z / (this.P * 4));
+      const mx = cx * k * this.mapScale + this.mapOff.x, my = cy * k * this.mapScale + this.mapOff.y;
       camEl.style.transform = `translate(${mx.toFixed(1)}px,${my.toFixed(1)}px)`;
-      camEl.style.width = `${Math.max(3, w).toFixed(1)}px`;
-      camEl.style.height = `${Math.max(3, h).toFixed(1)}px`;
     }
   }
 
@@ -617,27 +673,34 @@ export class World {
     const svg = this.hudEls.map;
     if (!svg || !this.panels.length) return;
     const box = svg.getBoundingClientRect();
-    const bw = box.width || 132, bh = box.height || 96;
-    const { x: cxw, y: cyw, w, h } = this.center;
-    this.mapScale = Math.min((bw - 8) / w, (bh - 8) / h);
-    this.mapOff = { x: bw / 2 - cxw * this.mapScale, y: bh / 2 - cyw * this.mapScale };
+    const bw = box.width || 96, bh = box.height || 64;
+    const pts = this.panels.map((p) => this.mapPoint(p));
+    const xs = pts.map((q) => q.x), ys = pts.map((q) => q.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    this.mapScale = Math.min((bw - 10) / Math.max(1, x1 - x0), (bh - 10) / Math.max(1, y1 - y0));
+    this.mapOff = { x: bw / 2 - ((x0 + x1) / 2) * this.mapScale, y: bh / 2 - ((y0 + y1) / 2) * this.mapScale };
     const ns = 'http://www.w3.org/2000/svg';
     svg.replaceChildren();
+    const line = document.createElementNS(ns, 'polyline');
+    line.setAttribute('points', pts.map((q) => `${(q.x * this.mapScale + this.mapOff.x).toFixed(1)},${(q.y * this.mapScale + this.mapOff.y).toFixed(1)}`).join(' '));
+    svg.appendChild(line);
     this.panels.forEach((p, i) => {
-      const r = document.createElementNS(ns, 'rect');
-      const depth = Math.max(0.35, 1 + p.pos.z / (this.P * 4));
-      r.setAttribute('x', (p.pos.x * this.mapScale + this.mapOff.x).toFixed(1));
-      r.setAttribute('y', (p.pos.y * this.mapScale + this.mapOff.y).toFixed(1));
-      r.setAttribute('width', Math.max(2, this.W * this.mapScale * depth).toFixed(1));
-      r.setAttribute('height', Math.max(2, p.h * this.mapScale * depth).toFixed(1));
-      r.setAttribute('data-i', String(i));
-      r.setAttribute('class', `g-${p.ground}`);
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', (pts[i].x * this.mapScale + this.mapOff.x).toFixed(1));
+      c.setAttribute('cy', (pts[i].y * this.mapScale + this.mapOff.y).toFixed(1));
+      c.setAttribute('r', '1.6');
       const t = document.createElementNS(ns, 'title');
       t.textContent = p.label;
-      r.appendChild(t);
-      r.addEventListener('click', () => this.travelTo(i));
-      svg.appendChild(r);
+      c.appendChild(t);
+      c.addEventListener('click', () => this.travelTo(i));
+      svg.appendChild(c);
     });
+  }
+
+  /** 地図の上の点の位置（世界の座標。奥にあるものほど、少し中心へ寄せて奥行きを残す） */
+  private mapPoint(p: Panel) {
+    const k = Math.max(0.4, 1 + p.pos.z / (this.P * 4));
+    return { x: (p.pos.x + this.W / 2) * k, y: (p.pos.y + Math.min(p.h, this.H) / 2) * k };
   }
 }
 

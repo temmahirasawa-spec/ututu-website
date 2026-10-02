@@ -4,7 +4,7 @@
 .cp{padding-top:clamp(110px,14vh,160px)}
 .cp-sec{padding:0 var(--gut) clamp(100px,13vw,190px)}
 .cp-ttl{font-size:clamp(56px,12vw,210px)}
-.cp-lead{margin:clamp(20px,2.4vw,30px) 0 0;max-width:32em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:color-mix(in srgb,var(--fg) 80%,var(--g))}
+.cp-lead{margin:clamp(20px,2.4vw,30px) 0 0;max-width:32em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:var(--tx)}
 
 /* ---- 会社概要：罫線だけの表 ---- */
 .cp-dl{margin:clamp(40px,6vw,90px) 0 0;border-top:1.5px solid var(--fg)}

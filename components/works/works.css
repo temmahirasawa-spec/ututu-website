@@ -24,7 +24,7 @@
 .wo-logo{display:inline-flex;justify-self:start;padding:10px 14px;background:#fff;border:2px solid #0E0E0D;border-radius:10px}
 .wo-logo img{display:block;height:clamp(18px,1.6vw,26px);width:auto}
 .wo-txt h3{margin:0;font-family:var(--jp-title);font-weight:900;font-size:clamp(20px,1.9vw,28px);line-height:1.4}
-.wo-txt p{margin:10px 0 0;font-size:var(--body);line-height:var(--body-lh);color:color-mix(in srgb,var(--fg) 80%,var(--g))}
+.wo-txt p{margin:10px 0 0;font-size:var(--body);line-height:var(--body-lh);color:var(--tx)}
 .wo-names{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--f-disp);font-weight:700;font-size:clamp(13px,1vw,15px)!important;letter-spacing:.02em;text-transform:uppercase;color:var(--fg)!important}
 @media (max-width:900px){
  .wo-grid{grid-template-columns:minmax(0,1fr)}
@@ -66,7 +66,7 @@
 .bp-grid{flex:1;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,64px);align-items:center}
 .bp-ttl{font-size:clamp(46px,6.6vw,118px)}
 .bp-txt .ttl-jp small{display:block;margin-top:6px;font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.1em;color:var(--acc)}
-.bp-note{margin:clamp(16px,2vw,24px) 0 0;max-width:28em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:color-mix(in srgb,var(--fg) 80%,var(--g))}
+.bp-note{margin:clamp(16px,2vw,24px) 0 0;max-width:28em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:var(--tx)}
 .bp-roles{display:flex;gap:14px;align-items:baseline;margin:clamp(18px,2vw,26px) 0 0;padding-top:14px;border-top:1px solid var(--line)}
 .bp-roles dt{flex:none;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 .bp-roles dd{margin:0;display:flex;flex-wrap:wrap;gap:6px}

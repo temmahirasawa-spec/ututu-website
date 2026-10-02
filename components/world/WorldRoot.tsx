@@ -4,7 +4,7 @@
    - 動きを止める設定、または ?flow のときは、ふつうの縦並びのまま（各節が地を塗り、点描は止まった地紋）
    - 右下の地図と左下の座標は、いまどこにいるかの表示。地図の四角を押すとそこへ飛ぶ
    - 3Dアバターは #team が近づいてから読む（three.js は重い）
-   - 初回だけ、ヒーローのロゴを粒が組み上げる */
+   - 初回だけ、キービジュアルの2つの細胞が両端から入ってくる（lib/world/kv.ts） */
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import { BioModal } from '@/components/team/BioModal';
@@ -51,33 +51,13 @@ export function WorldRoot({ children }: { children: ReactNode }) {
       /* ---- 座標の世界 ---- */
       const w = new World(r, sp, pr);
       w.attachHud({ x: hx.current, y: hy.current, z: hz.current, at: hat.current, cam: hcam.current, map: hmap.current });
+      /* 初回（ページ遷移で来たのではなく、いちばん上から開いたとき）だけ、細胞が両端から入ってくる */
       const first = !transit.used;
-      if (first && dots.ok && window.scrollY < 10 && !location.hash) w.heroArmed = true;
+      if (first && dots.ok && window.scrollY < 10 && !location.hash) w.kvT0 = performance.now() + 250;
       w.start();
       offs.push(() => w.stop());
       /* 確認用（開発中だけ）。window.__world.stops() で各節の位置が取れる */
       if (process.env.NODE_ENV !== 'production') (window as unknown as { __world: World }).__world = w;
-
-      /* 初回：粒が飛んできて、ヒーローのロゴを組む。組み終わったら膜の点に引き継ぐ */
-      if (w.heroArmed) {
-        const mark = r.querySelector<HTMLElement>('.hero-mark');
-        const rect = mark?.getBoundingClientRect();
-        let done = false;
-        const handoff = () => {
-          if (done) return;
-          done = true;
-          w.heroArmed = false;
-          dots.fadeSwarm(520);
-        };
-        if (rect && rect.width > 0) {
-          const t = setTimeout(() => {
-            void dots.assemble('mark', { x: rect.left, y: rect.top, w: rect.width, h: rect.height }, THEMES.paper.fg).then(handoff);
-          }, 350);
-          const onScroll = () => { if (window.scrollY > 40) handoff(); };
-          window.addEventListener('scroll', onScroll, { passive: true });
-          offs.push(() => { clearTimeout(t); window.removeEventListener('scroll', onScroll); handoff(); });
-        } else handoff();
-      }
     }
 
     /* ---- 数え上げ ---- */

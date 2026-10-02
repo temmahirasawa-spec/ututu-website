@@ -5,6 +5,9 @@
              うねり（静脈のような筋）・印（ロゴ・数字・QR…）・文字の避け場所・ポインタ・波紋はここ
       pass2：画面の1画素ごとに「どの升目の点の中か」を引いて丸を描く。
              格子そのものを波打たせる（＝うねうね）のと、地の色の塗り替え（網点の幕）はここ
+      キービジュアルの「細胞」（ビジネスとクリエイティブの2つ）も pass2 に重ねて描く。
+      細胞はなめらかな世界（点ではない）。スクロールで2つが1つになり、膨らんで、点に変わって弾ける。
+      その弾けた点が、そのまま膜の世界につながる（pass1 に細胞の形の点を足す）
    2) 覆い（cover）… ページ遷移で画面を網点で塗りつぶす／剥がす
    3) 群れ（swarm）… 粒が飛んできて形を組む。遷移の文字、ヒーローのロゴ
 
@@ -42,6 +45,9 @@ uniform vec4 u_se[6];      // 種類ごとの値
 uniform vec4 u_zone[12];   // 文字の避け場所：x0, y0, x1, y1
 uniform float u_zsoft;
 uniform sampler2D u_atlas;
+uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2（css px）
+uniform vec4 u_kr;         // 半径1, 半径2, （pass2 用）, 細胞を点で描く量
+uniform float u_kb;        // 弾ける進み
 ${NOISE}
 void main(){
   vec2 ij = floor(gl_FragCoord.xy);
@@ -121,6 +127,22 @@ void main(){
   r = mix(r, min(r, 0.075), z);
   warp = min(warp, 1.0 - 0.8*z);
 
+  /* キービジュアルの細胞が点に変わる。なめらかな世界の等高線が、そのまま点の輪になり、
+     弾けるときは輪が外へ流れていく。文字の上では少し小さく（箱の形に抜けると硬く見える） */
+  if (u_kr.w > 0.001) {
+    vec2 k1 = p - u_kc.xy, k2 = p - u_kc.zw;
+    float b1 = u_kr.x*u_kr.x/(dot(k1, k1) + 1.0), b2 = u_kr.y*u_kr.y/(dot(k2, k2) + 1.0);
+    float a1 = b1*b1, a2 = b2*b2;
+    float F = a1 + a2;
+    float cov = smoothstep(0.6, 1.3, F);
+    float lu = log2(max(F, 1e-4))*1.2 - u_time*0.1 + u_kb*3.0;
+    float ring = pow(1.0 - abs(fract(lu) - 0.5)*2.0, 3.0);
+    float rk = cov * (0.1 + 0.5*ring + 0.12*vnoise(ij*0.4 + u_time*1.4)) * u_kr.w * mix(1.0, 0.5, z);
+    r = max(r, rk);
+    tint = max(tint, cov * u_kr.w * step(hash(ij + 3.7), a2/(F + 1e-4)));
+    warp = max(warp, cov * u_kr.w * (1.0 - z));
+  }
+
   /* ポインタ。点がふくらみ、朱になる */
   vec2 dp = p - u_ptr.xy;
   float L = exp(-dot(dp, dp)/(u_lensR*u_lensR)) * u_ptr.z;
@@ -166,10 +188,17 @@ uniform vec3 u_g, u_fg, u_acc, u_tint;
 uniform vec4 u_wipe;       // x, y, 進み, 有効
 uniform vec3 u_wc;         // 塗り替える色
 uniform float u_dotA;
+uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2
+uniform vec4 u_kr;         // 半径1, 半径2, なめらかな世界の量（1 = 細胞だけ、0 = 点の世界）, （pass1 用）
+uniform vec4 u_kx;         // 細胞の濃さ, 弾ける進み, 弾ける中心 x, y
+uniform float u_kn;        // 核の見え方
 ${NOISE}
 void main(){
-  vec2 frag = vec2(gl_FragCoord.x, u_view.y*u_dpr - gl_FragCoord.y) / u_dpr;
+  vec2 frag0 = vec2(gl_FragCoord.x, u_view.y*u_dpr - gl_FragCoord.y) / u_dpr;
   float t = u_time;
+  /* 弾けるあいだは、点の格子ごと中心から外へ押し広げる（山なりに戻る） */
+  float zb = u_kx.y*(1.0 - u_kx.y)*4.0*0.42;
+  vec2 frag = u_kx.zw + (frag0 - u_kx.zw)*(1.0 - zb);
   vec2 g0 = (frag - u_origin)/u_cell + 2.0;
   float ws = texture2D(u_cells, g0/u_grid).a;
 
@@ -223,6 +252,40 @@ void main(){
     if (cov > 0.999) aw = 1.0;
     if (cov < 0.01) aw = 0.0;
     o = mix(o, u_wc, aw);
+  }
+
+  /* キービジュアル：なめらかな世界の2つの細胞（メタボール）。
+     縁は細い線、中は等高線とうっすらした色、真ん中に核。点はひとつも描かない */
+  if (u_kr.z > 0.001) {
+    vec2 p = frag0;
+    vec3 sm = u_g;
+    vec2 d1 = p - u_kc.xy, d2 = p - u_kc.zw;
+    float q1 = dot(d1, d1) + 1.0, q2 = dot(d2, d2) + 1.0;
+    /* 場は (r²/d²)²。2乗の場だと裾が長く、離れていてもつながって見える */
+    float b1 = u_kr.x*u_kr.x/q1, b2 = u_kr.y*u_kr.y/q2;
+    float a1 = b1*b1, a2 = b2*b2;
+    float F0 = a1 + a2;
+    float F = F0 * (1.0 + 0.08*(vnoise(p*0.009 + vec2(t*0.21, -t*0.17)) - 0.5));
+    vec2 gF = -4.0*(a1*d1/q1 + a2*d2/q2);
+    float gl = max(length(gF), 1e-5);
+    float sd = (F - 1.0)/gl;
+    float share = a2/(F0 + 1e-5);
+    vec3 cc = mix(u_fg, u_acc, smoothstep(0.3, 0.7, share));
+    float inside = smoothstep(-0.8, 0.8, sd);
+    float rim = 1.0 - smoothstep(0.55, 1.5, abs(sd));
+    float lu = log2(max(F, 1e-4))*1.2 - t*0.1;
+    float lg = gl/(max(F, 1e-4)*0.6931)*1.2;
+    float ld = abs(fract(lu) - 0.5)/max(lg, 1e-5);
+    float lines = (1.0 - smoothstep(0.3, 0.95, ld)) * (0.32*inside + 0.1*(1.0 - inside)*smoothstep(0.3, 0.75, F));
+    float n1 = 1.0 - smoothstep(-0.8, 0.8, sqrt(q1) - u_kr.x*0.06);
+    float n2 = 1.0 - smoothstep(-0.8, 0.8, sqrt(q2) - u_kr.y*0.06);
+    float al = u_kx.x;
+    sm = mix(sm, cc, inside*0.07*al);
+    sm = mix(sm, cc, lines*al);
+    sm = mix(sm, cc, rim*0.92*al);
+    sm = mix(sm, u_fg, n1*al*u_kn);
+    sm = mix(sm, u_acc, n2*al*u_kn);
+    o = mix(o, sm, u_kr.z);
   }
   gl_FragColor = vec4(o, 1.0);
 }`;

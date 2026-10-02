@@ -17,25 +17,27 @@
  --f-mono:var(--font-mono),ui-monospace,monospace;
  --jp-title:var(--font-archivo),var(--font-zen-kaku),"Hiragino Sans",sans-serif;
  --jp-body:var(--font-archivo),var(--font-noto-jp),"Hiragino Sans",sans-serif;
- --g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);
+ --g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);--tx:#26251F;
  /* 本文の大きさ。締めの節の文（.ct-lead）と同じくらいまで上げてある（2026-10-02 本人判断：小さくて読まれない）。
     **読ませる本文は、これより小さくしないこと**（注記・タグ・ラベルは別） */
  --body:clamp(15.5px,1.38vw,20px);--body-lh:1.95}
-/* 本文の色は地の色と文字の色の間（color-mix で直に書く）。**変数にしないこと**：:root で解決されて、
-   縦並びで節ごとに地を塗ったとき、墨の節でも紙の地の色のまま残る（実際に読めなくなった） */
+/* 本文の色は --tx（地ごとに**値を直に**持つ）。墨の地では真っ白（2026-10-02 本人指摘：グレーだと点の上で読めない）。
+   **--fg や --g から計算した値にしないこと**：:root で解決されて、縦並びで節ごとに地を塗ったとき
+   墨の節でも紙の地の色のまま残る（実際に読めなくなった）。
+   本文には地の色の縁取り（text-shadow）を付けて、後ろでうねる点から文字を浮かせる（.tx-halo） */
 
 /* ---- 地 ---- */
-html[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16)}
-html[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#9A978E;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(236,233,225,.18)}
-html[data-ground=shu]{--g:#FF4D1F;--fg:#0E0E0D;--mut:#5C1C08;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24)}
-html[data-ground=order]{--g:#FAC03D;--fg:#222460;--mut:#4E5080;--acc:#FA3524;--on-acc:#fff;--line:rgba(34,36,96,.22)}
-html[data-ground=review]{--g:#34CA9B;--fg:#233029;--mut:#24453A;--acc:#E53A0A;--on-acc:#fff;--line:rgba(35,48,41,.24)}
+html[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);--tx:#26251F}
+html[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
+html[data-ground=shu]{--g:#FF4D1F;--fg:#0E0E0D;--mut:#5C1C08;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24);--tx:#0E0E0D}
+html[data-ground=order]{--g:#FAC03D;--fg:#222460;--mut:#4E5080;--acc:#FA3524;--on-acc:#fff;--line:rgba(34,36,96,.22);--tx:#222460}
+html[data-ground=review]{--g:#34CA9B;--fg:#233029;--mut:#24453A;--acc:#E53A0A;--on-acc:#fff;--line:rgba(35,48,41,.24);--tx:#1B2620}
 /* 反転（「2」に触れたとき）。地と文字が入れ替わる */
-html.inverted[data-ground=paper]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#9A978E;--line:rgba(236,233,225,.18)}
-html.inverted[data-ground=ink]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--line:rgba(14,14,13,.16)}
-html.inverted[data-ground=shu]{--g:#0E0E0D;--fg:#FF4D1F;--mut:#C4502E;--on-acc:#0E0E0D}
-html.inverted[data-ground=order]{--g:#222460;--fg:#FAC03D;--mut:#C9A648}
-html.inverted[data-ground=review]{--g:#233029;--fg:#34CA9B;--mut:#5FAE93}
+html.inverted[data-ground=paper]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
+html.inverted[data-ground=ink]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--line:rgba(14,14,13,.16);--tx:#26251F}
+html.inverted[data-ground=shu]{--g:#0E0E0D;--fg:#FF4D1F;--mut:#C4502E;--on-acc:#0E0E0D;--tx:#FF4D1F}
+html.inverted[data-ground=order]{--g:#222460;--fg:#FAC03D;--mut:#C9A648;--tx:#FAC03D}
+html.inverted[data-ground=review]{--g:#233029;--fg:#34CA9B;--mut:#5FAE93;--tx:#34CA9B}
 
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -157,7 +159,7 @@ body.menu-open .hd-menu .bars i:last-child{top:4.25px;transform:rotate(-45deg)}
 @media (prefers-reduced-motion:reduce){.hd-cta i{animation:none}}
 
 /* ===== メニュー =====
-   並び：サイト内の行き先（大きく）→ PRODUCTS（見出し。**押せない**）→ 2つのLP（新タブの印つき）。
+   並び：ページ（大きく）＋そのページの中の節（小さく）→ PRODUCTS（見出し。**押せない**）→ 2つのLP（新タブの印つき）。
    ORDER / REVIEW を同じ大きさで並べないこと。コーポレートの中に詳細ページがあるように見える */
 .mn{position:fixed;inset:0;z-index:25;background:#0E0E0D;color:#ECE9E1;
  display:grid;grid-template-rows:1fr auto;padding:96px var(--gut) clamp(24px,4vw,40px);
@@ -172,14 +174,27 @@ body.menu-open{overflow:hidden}
  text-decoration:none;transform:translateY(100%);transition:transform .8s var(--ease) calc(.08s * var(--i)),color .25s ease}
 body.menu-open .mn-list a{transform:none}
 .mn-list a:hover{color:var(--shu)}
-.mn-list .n{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#9A978E;width:3em}
+.mn-list .n{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#C9C6BD;width:3em;white-space:nowrap}
 .mn-list .en{font-family:var(--f-disp);font-weight:700;font-variation-settings:"wdth" 112;
- font-size:clamp(34px,min(7.4vw,8.4vh),96px);line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
+ font-size:clamp(34px,min(7vw,8vh),92px);line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
  transition:font-variation-settings .5s var(--ease)}
 .mn-list a:hover .en{font-variation-settings:"wdth" 125}
-.mn-list .jp{margin-left:auto;font-family:var(--jp-title);font-weight:700;font-size:12px;letter-spacing:.12em;color:#9A978E}
+.mn-list .jp{margin-left:auto;font-family:var(--jp-title);font-weight:700;font-size:12px;letter-spacing:.12em;color:#C9C6BD}
+/* いま開いているページ */
+.mn-list a[aria-current=page] .n{color:var(--shu)}
+.mn-list a[aria-current=page] .n::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;background:var(--shu);vertical-align:.1em}
+/* ページの中の節。大きな行の下に小さく並べる */
+.mn-sub{list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;margin:0;padding:0 0 clamp(10px,1.4vw,16px) calc(3em + clamp(14px,2vw,28px));
+ opacity:0;transition:opacity .6s ease calc(.25s + .08s * var(--i))}
+body.menu-open .mn-sub{opacity:1}
+.mn-sub li{border:0!important;overflow:visible}
+.mn-sub a{display:inline-flex;align-items:baseline;gap:8px;padding:3px 0;transform:none!important;text-decoration:none;color:#ECE9E1}
+.mn-sub a span{font-family:var(--f-disp);font-weight:600;font-size:clamp(14px,1.3vw,18px);letter-spacing:.02em}
+.mn-sub a span::before{content:"— ";color:#7D7A72}
+.mn-sub small{font-family:var(--jp-title);font-weight:700;font-size:11px;letter-spacing:.1em;color:#C9C6BD}
+.mn-sub a:hover,.mn-sub a:hover small{color:var(--shu)}
 .mn-foot{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 40px;
- padding-top:28px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#9A978E}
+ padding-top:28px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#C9C6BD}
 .mn-prod p{margin:0 0 10px;text-transform:uppercase}
 .mn-prod div{display:flex;gap:22px;flex-wrap:wrap}
 .mn-prod a{display:inline-flex;align-items:center;gap:8px;color:#ECE9E1;text-decoration:none;
@@ -220,3 +235,11 @@ body.bio-open #bioVeil{opacity:1;pointer-events:auto}
 /* 和文の見出しは文節で折り返す（Chrome 119+ の auto-phrase。BudouX と同じ辞書）。
    Safari は未対応なので普通に折れるが、行の長さを揃える balance は効く */
 h1,h2,h3,.ttl-jp,.sec-lead,.ct-lead{word-break:auto-phrase;text-wrap:balance}
+
+/* ===== 本文を点から浮かせる（2026-10-02）=====
+   点を減らしたり、文字の後ろに板を敷いたりはしない（世界観が崩れる）。
+   代わりに、本文を --tx（墨の地では真っ白）で、少し太く、地の色でぼかした縁取りを付ける */
+.sec-lead,.hero-side p,.card-body p,.sv-body,.fd-ex,.pd-intro,.cp-lead,.wo-txt p,.bp-note,.ct-lead,
+.ttl-jp,.mf-text,.sv-jp,.fd-name,.card-body h3,.pd-pts b,.cp-row dd,.bi-facts dd{
+ text-shadow:0 0 2px var(--g),0 0 7px var(--g),0 0 14px var(--g)}
+.card-body p,.sv-body,.fd-ex,.pd-intro,.wo-txt p,.bp-note{font-weight:500}
