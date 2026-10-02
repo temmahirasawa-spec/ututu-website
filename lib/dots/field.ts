@@ -19,9 +19,9 @@ export type ThemeName = 'paper' | 'ink' | 'shu' | 'order' | 'review';
 type Theme = { g: string; fg: string; acc: string; tint: string };
 /* CSS 側の同じ値は globals.css の html[data-ground=…]。**片方だけ変えないこと** */
 export const THEMES: Record<ThemeName, Theme> = {
-  paper: { g: '#ECE9E1', fg: '#0E0E0D', acc: '#FF4D1F', tint: '#FF4D1F' },
-  ink: { g: '#0E0E0D', fg: '#ECE9E1', acc: '#FF4D1F', tint: '#FF4D1F' },
-  shu: { g: '#FF4D1F', fg: '#0E0E0D', acc: '#ECE9E1', tint: '#0E0E0D' },
+  paper: { g: '#ECE9E1', fg: '#0E0E0D', acc: '#12D695', tint: '#12D695' },
+  ink: { g: '#0E0E0D', fg: '#ECE9E1', acc: '#12D695', tint: '#12D695' },
+  shu: { g: '#12D695', fg: '#0E0E0D', acc: '#ECE9E1', tint: '#0E0E0D' },
   order: { g: '#FAC03D', fg: '#222460', acc: '#FA3524', tint: '#222460' },
   review: { g: '#34CA9B', fg: '#233029', acc: '#E53A0A', tint: '#FFBC11' },
 };
@@ -57,19 +57,13 @@ export type KV = {
   c: [number, number, number, number];
   /** 半径 */
   r: [number, number];
-  /** なめらかな世界の量（1 = 細胞だけ、0 = 点の世界） */
-  smooth: number;
-  /** 細胞の形を点で描く量 */
+  /** 細胞を点で描く量（出てくるときと、弾け終わるときに 0） */
   dots: number;
+  /** 文字の上で細胞の点を小さくする量（ヒーローで止まっているあいだ 1、動き出すと 0） */
+  clear: number;
   /** 弾ける進み 0..1 と、その中心 */
   burst: number;
   bx: number; by: number;
-  /** 細胞の濃さ（出てくるとき） */
-  alpha: number;
-  /** 核の見え方 */
-  nucleus: number;
-  /** オープニングの進み（線が核から外へ描き込まれる） */
-  open: number;
   /** 膜（うねる網点）の量。弾け終わるまでは 0 */
   membrane: number;
 };
@@ -479,7 +473,7 @@ class Field {
     gl.uniform1f(uC.u_zsoft, cell * 2.2);
     const kv = sc.kv;
     gl.uniform4f(uC.u_kc, kv?.c[0] ?? 0, kv?.c[1] ?? 0, kv?.c[2] ?? 0, kv?.c[3] ?? 0);
-    gl.uniform4f(uC.u_kr, kv?.r[0] ?? 0, kv?.r[1] ?? 0, kv?.smooth ?? 0, kv?.dots ?? 0);
+    gl.uniform4f(uC.u_kr, kv?.r[0] ?? 0, kv?.r[1] ?? 0, kv?.clear ?? 1, kv?.dots ?? 0);
     gl.uniform1f(uC.u_kb, kv?.burst ?? 0);
     gl.uniform1f(uC.u_km, kv ? kv.membrane : 1);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -528,11 +522,7 @@ class Field {
     gl.uniform4f(uD.u_wipe, this.wipe?.x ?? 0, this.wipe?.y ?? 0, wipeP, wipeOn);
     gl.uniform3fv(uD.u_wc, wc);
     gl.uniform1f(uD.u_dotA, this.dotA);
-    gl.uniform4f(uD.u_kc, kv?.c[0] ?? 0, kv?.c[1] ?? 0, kv?.c[2] ?? 0, kv?.c[3] ?? 0);
-    gl.uniform4f(uD.u_kr, kv?.r[0] ?? 0, kv?.r[1] ?? 0, kv?.smooth ?? 0, kv?.dots ?? 0);
-    gl.uniform4f(uD.u_kx, kv?.alpha ?? 0, kv?.burst ?? 0, kv?.bx ?? this.W / 2, kv?.by ?? this.H / 2);
-    gl.uniform1f(uD.u_kn, kv?.nucleus ?? 0);
-    gl.uniform1f(uD.u_ko, kv?.open ?? 1);
+    gl.uniform3f(uD.u_kx, kv?.burst ?? 0, kv?.bx ?? this.W / 2, kv?.by ?? this.H / 2);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     return !!this.wipe || this.dotA < 1 || intro < 1 || !!kv;
@@ -640,7 +630,7 @@ function uniformsCells(gl: WebGLRenderingContext, p: WebGLProgram) {
   return uniforms(gl, p, ['u_origin', 'u_cell', 'u_time', 'u_mood', 'u_intro', 'u_ptr', 'u_lensR', 'u_rip[0]', 'u_sr[0]', 'u_su[0]', 'u_sp[0]', 'u_se[0]', 'u_zone[0]', 'u_zsoft', 'u_atlas', 'u_kc', 'u_kr', 'u_kb', 'u_km'] as const);
 }
 function uniformsDots(gl: WebGLRenderingContext, p: WebGLProgram) {
-  return uniforms(gl, p, ['u_cells', 'u_grid', 'u_cell', 'u_origin', 'u_view', 'u_dpr', 'u_time', 'u_warp', 'u_ptr', 'u_pull', 'u_lensR', 'u_rip[0]', 'u_g', 'u_fg', 'u_acc', 'u_tint', 'u_wipe', 'u_wc', 'u_dotA', 'u_kc', 'u_kr', 'u_kx', 'u_kn', 'u_ko'] as const);
+  return uniforms(gl, p, ['u_cells', 'u_grid', 'u_cell', 'u_origin', 'u_view', 'u_dpr', 'u_time', 'u_warp', 'u_ptr', 'u_pull', 'u_lensR', 'u_rip[0]', 'u_g', 'u_fg', 'u_acc', 'u_tint', 'u_wipe', 'u_wc', 'u_dotA', 'u_kx'] as const);
 }
 function uniformsCover(gl: WebGLRenderingContext, p: WebGLProgram) {
   return uniforms(gl, p, ['u_view', 'u_dpr', 'u_time', 'u_size', 'u_cov', 'u_col'] as const);

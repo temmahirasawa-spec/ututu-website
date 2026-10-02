@@ -17,9 +17,9 @@ html.world .w-spacer{display:block}
 
 /* ふつうの縦並び：パネルが自分の地を塗る（値は globals.css の html[data-ground] と同じ） */
 html:not(.world) .pn{background:var(--g);color:var(--fg)}
-html:not(.world) .pn[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);--tx:#26251F}
-html:not(.world) .pn[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
-html:not(.world) .pn[data-ground=shu]{--g:#FF4D1F;--fg:#0E0E0D;--mut:#5C1C08;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24);--tx:#0E0E0D}
+html:not(.world) .pn[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#12D695;--on-acc:#0E0E0D;--line:rgba(14,14,13,.16);--tx:#26251F}
+html:not(.world) .pn[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--acc:#12D695;--on-acc:#0E0E0D;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
+html:not(.world) .pn[data-ground=shu]{--g:#12D695;--fg:#0E0E0D;--mut:#0B4A35;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24);--tx:#0E0E0D}
 html:not(.world) .pn[data-ground=order]{--g:#FAC03D;--fg:#222460;--mut:#4E5080;--acc:#FA3524;--on-acc:#fff;--line:rgba(34,36,96,.22);--tx:#222460}
 html:not(.world) .pn[data-ground=review]{--g:#34CA9B;--fg:#233029;--mut:#24453A;--acc:#E53A0A;--on-acc:#fff;--line:rgba(35,48,41,.24);--tx:#1B2620}
 /* 動きを止める設定・?flow のときは、点描のキャンバスが節の地の下に隠れて見えない（JS が描くのも止める）。
@@ -78,15 +78,13 @@ html[data-at=top] .hud-scroll{display:inline-flex}
 .hero-side p{margin:0;font-size:var(--body);line-height:var(--body-lh);font-weight:500}
 .hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
 .hero-cta .btn{font-size:14px}
-/* 大きなロゴ。色は #12D695（本人指定）。点では描かない（キービジュアルは細胞の線の世界なので） */
+/* 大きなロゴ。色はアクセントの #12D695（本人指定）。点では描かない（細胞の点と混ざる） */
 .hero-mark{position:relative;margin-top:clamp(24px,5vh,60px);width:100%;aspect-ratio:1144/133}
 .hero-mark svg{position:absolute;left:-.7%;top:-6%;width:101.4%;height:112%;display:block;transition:opacity .4s ease}
-.hero-mark path{fill:#12D695}
+.hero-mark path{fill:var(--shu);stroke:var(--g);stroke-width:7px;paint-order:stroke;vector-effect:non-scaling-stroke}
 
-/* キービジュアルの2つの細胞の置き場所（lib/world/kv.ts がこの箱を読む）。
-   PC は見出しの右上の空き、スマホは下の空き。文字に少しかかってよい（細胞は線と薄い色だけ） */
-.hero-cells{position:absolute;right:var(--gut);top:calc(var(--hd-h) + 1svh);width:min(54%,820px);height:54svh;pointer-events:none}
-@media (max-width:900px){.hero-cells{left:0;right:0;width:auto;top:calc(var(--hd-h) + 1svh);height:24svh}}
+/* キービジュアルの細胞がある印（lib/world/world.ts が探す）。細胞そのものは点描のキャンバスが画面いっぱいに描く */
+.hero-cells{display:none}
 .hero-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
  padding:16px 0 0;margin-top:clamp(14px,2vh,24px);border-top:1px solid var(--line);
  font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}

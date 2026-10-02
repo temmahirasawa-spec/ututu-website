@@ -9,7 +9,7 @@
    値は lib/dots/field.ts の THEMES と同じ。**片方だけ変えないこと。** */
 
 :root{
- --paper:#ECE9E1;--ink:#0E0E0D;--shu:#FF4D1F;
+ --paper:#ECE9E1;--ink:#0E0E0D;--shu:#12D695;
  --gut:clamp(18px,3.4vw,48px);
  --ease:cubic-bezier(.2,.7,.1,1);
  /* 先頭に欧文を置くと、和文グリフを持たないぶん日本語だけが次に落ちる */
@@ -17,7 +17,7 @@
  --f-mono:var(--font-mono),ui-monospace,monospace;
  --jp-title:var(--font-archivo),var(--font-zen-kaku),"Hiragino Sans",sans-serif;
  --jp-body:var(--font-archivo),var(--font-noto-jp),"Hiragino Sans",sans-serif;
- --g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);--tx:#26251F;
+ --g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#12D695;--on-acc:#0E0E0D;--line:rgba(14,14,13,.16);--tx:#26251F;
  /* 本文の大きさ。締めの節の文（.ct-lead）と同じくらいまで上げてある（2026-10-02 本人判断：小さくて読まれない）。
     **読ませる本文は、これより小さくしないこと**（注記・タグ・ラベルは別） */
  --body:clamp(15.5px,1.38vw,20px);--body-lh:1.95}
@@ -27,15 +27,15 @@
    本文には地の色の縁取り（text-shadow）を付けて、後ろでうねる点から文字を浮かせる（.tx-halo） */
 
 /* ---- 地 ---- */
-html[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(14,14,13,.16);--tx:#26251F}
-html[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--acc:#FF4D1F;--on-acc:#fff;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
-html[data-ground=shu]{--g:#FF4D1F;--fg:#0E0E0D;--mut:#5C1C08;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24);--tx:#0E0E0D}
+html[data-ground=paper]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--acc:#12D695;--on-acc:#0E0E0D;--line:rgba(14,14,13,.16);--tx:#26251F}
+html[data-ground=ink]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--acc:#12D695;--on-acc:#0E0E0D;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
+html[data-ground=shu]{--g:#12D695;--fg:#0E0E0D;--mut:#0B4A35;--acc:#ECE9E1;--on-acc:#0E0E0D;--line:rgba(14,14,13,.24);--tx:#0E0E0D}
 html[data-ground=order]{--g:#FAC03D;--fg:#222460;--mut:#4E5080;--acc:#FA3524;--on-acc:#fff;--line:rgba(34,36,96,.22);--tx:#222460}
 html[data-ground=review]{--g:#34CA9B;--fg:#233029;--mut:#24453A;--acc:#E53A0A;--on-acc:#fff;--line:rgba(35,48,41,.24);--tx:#1B2620}
 /* 反転（「2」に触れたとき）。地と文字が入れ替わる */
 html.inverted[data-ground=paper]{--g:#0E0E0D;--fg:#ECE9E1;--mut:#C9C6BD;--line:rgba(236,233,225,.18);--tx:#FFFFFF}
 html.inverted[data-ground=ink]{--g:#ECE9E1;--fg:#0E0E0D;--mut:#68665F;--line:rgba(14,14,13,.16);--tx:#26251F}
-html.inverted[data-ground=shu]{--g:#0E0E0D;--fg:#FF4D1F;--mut:#C4502E;--on-acc:#0E0E0D;--tx:#FF4D1F}
+html.inverted[data-ground=shu]{--g:#0E0E0D;--fg:#12D695;--mut:#4FB58F;--on-acc:#0E0E0D;--tx:#12D695}
 html.inverted[data-ground=order]{--g:#222460;--fg:#FAC03D;--mut:#C9A648;--tx:#FAC03D}
 html.inverted[data-ground=review]{--g:#233029;--fg:#34CA9B;--mut:#5FAE93;--tx:#34CA9B}
 

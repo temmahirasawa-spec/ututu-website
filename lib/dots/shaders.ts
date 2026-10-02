@@ -5,9 +5,8 @@
              うねり（静脈のような筋）・印（ロゴ・数字・QR…）・文字の避け場所・ポインタ・波紋はここ
       pass2：画面の1画素ごとに「どの升目の点の中か」を引いて丸を描く。
              格子そのものを波打たせる（＝うねうね）のと、地の色の塗り替え（網点の幕）はここ
-      キービジュアルの「細胞」（ビジネスとクリエイティブの2つ）も pass2 に重ねて描く。
-      細胞はなめらかな世界（点ではない）。スクロールで2つが1つになり、膨らんで、点に変わって弾ける。
-      その弾けた点が、そのまま膜の世界につながる（pass1 に細胞の形の点を足す）
+      キービジュアルの「細胞」（ビジネスとクリエイティブの2つ）も pass1 で点として描く。
+      スクロールで2つが1つになり、膨らんで、点の輪が外へ流れて弾け、膜の世界につながる
    2) 覆い（cover）… ページ遷移で画面を網点で塗りつぶす／剥がす
    3) 群れ（swarm）… 粒が飛んできて形を組む。遷移の文字、ヒーローのロゴ
 
@@ -46,7 +45,7 @@ uniform vec4 u_zone[12];   // 文字の避け場所：x0, y0, x1, y1
 uniform float u_zsoft;
 uniform sampler2D u_atlas;
 uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2（css px）
-uniform vec4 u_kr;         // 半径1, 半径2, （pass2 用）, 細胞を点で描く量
+uniform vec4 u_kr;         // 半径1, 半径2, 文字の上で点を小さくする量, 細胞を点で描く量
 uniform float u_kb;        // 弾ける進み
 uniform float u_km;        // 膜（うねる網点）の量。キービジュアルが弾け終わるまでは 0（細胞の点だけにする）
 ${NOISE}
@@ -128,20 +127,45 @@ void main(){
   r = mix(r, min(r, 0.075), z);
   warp = min(warp, 1.0 - 0.8*z);
 
-  /* キービジュアルの細胞が点に変わる。なめらかな世界の等高線が、そのまま点の輪になり、
-     弾けるときは輪が外へ流れていく。文字の上では少し小さく（箱の形に抜けると硬く見える） */
+  /* キービジュアルの細胞（粒子だけで描く。2026-10-02 本人判断）。
+     墨＝ビジネス、緑＝クリエイティブ。場は (r²/d²)²（2乗の場だと裾が長く、離れていてもつながって見えた）。
+     座標をノイズでねじってから場を測るので、縁がうねうね動く。中身は
+       ・膜：縁の帯に大きな点が密に並ぶ（2重）
+       ・細胞質：細かい粒の上を、静脈のような筋と、外へ流れる輪が通る
+       ・核：場の濃い所（中心から半径の 3 割強）に、詰まった点の塊と、その縁
+     弾けるときは輪が外へ流れていく（u_kb）。文字の上ではうんと小さく */
   if (u_kr.w > 0.001) {
-    vec2 k1 = p - u_kc.xy, k2 = p - u_kc.zw;
+    float tk = u_time;
+    float rs = u_kr.x + u_kr.y;
+    vec2 wq = p/(0.55*rs + 120.0);
+    vec2 ww = vec2(vnoise(wq + vec2(tk*0.21, -tk*0.16)), vnoise(wq + vec2(4.1 - tk*0.18, 2.3 + tk*0.2))) - 0.5;
+    vec2 pw = p + ww*rs*0.12;
+    vec2 k1 = pw - u_kc.xy, k2 = pw - u_kc.zw;
     float b1 = u_kr.x*u_kr.x/(dot(k1, k1) + 1.0), b2 = u_kr.y*u_kr.y/(dot(k2, k2) + 1.0);
     float a1 = b1*b1, a2 = b2*b2;
     float F = a1 + a2;
-    float cov = smoothstep(0.6, 1.3, F);
-    float lu = log2(max(F, 1e-4))*1.2 - u_time*0.1 + u_kb*3.0;
-    float ring = pow(1.0 - abs(fract(lu) - 0.5)*2.0, 3.0);
-    float rk = cov * (0.1 + 0.5*ring + 0.12*vnoise(ij*0.4 + u_time*1.4)) * u_kr.w * mix(1.0, 0.5, z);
+    float L = log2(max(F, 1e-4));                  // 縁で 0、内側ほど大きい
+    float cov = smoothstep(-0.25, 0.1, L);
+    float rim = exp(-pow((L - 0.12)*5.5, 2.0)) + 0.7*exp(-pow((L - 0.62)*9.0, 2.0));
+    /* 細胞質の筋（膜の静脈と同じ作り。細胞の中だけで、少し速く） */
+    vec2 cq = pw/150.0;
+    vec2 cw = vec2(vnoise(cq*0.9 + vec2(tk*0.16, -tk*0.11)), vnoise(cq*0.9 + vec2(3.3 - tk*0.13, 1.1 + tk*0.12)));
+    float cn = vnoise(cq*1.5 + 2.6*cw + vec2(0.0, tk*0.07));
+    float cv = smoothstep(0.8, 0.98, 1.0 - abs(2.0*cn - 1.0));
+    float lu = L*2.4 - tk*0.32 + u_kb*4.0;
+    float ring = pow(1.0 - abs(fract(lu) - 0.5)*2.0, 5.0);
+    float nuc = smoothstep(5.8, 6.4, L) * (1.0 - u_kb);
+    float nrim = exp(-pow((L - 5.5)*4.0, 2.0)) * (1.0 - u_kb);
+    float grain = 0.07 + 0.1*vnoise(ij*0.45 + tk*1.3);
+    float rk = cov*(grain + 0.46*cv + 0.2*ring*(1.0 - nuc)) + rim*0.62 + nrim*0.5 + nuc*(0.42 + 0.22*vnoise(ij*0.6 - tk*1.6));
+    /* 点どうしが触れると四角い塊に見えるので、大きさに上限。弾けるあいだは少しずつ細らせる。
+       文字の上で小さくするのはヒーローで止まっているあいだだけ（動き出すと、文字の箱の形に抜けて硬く見えた） */
+    rk = min(rk, 0.6) * u_kr.w * mix(1.0, 0.18, z*u_kr.z) * (1.0 - 0.45*u_kb);
     r = max(r, rk);
-    tint = max(tint, cov * u_kr.w * step(hash(ij + 3.7), a2/(F + 1e-4)));
-    warp = max(warp, cov * u_kr.w * (1.0 - z));
+    /* 色：緑の細胞の受け持ち。合わさる所は粒ごとに混ざる */
+    float share = smoothstep(0.3, 0.7, a2/(F + 1e-4));
+    acc = max(acc, step(0.012, rk) * step(hash(ij + 3.7), share) * step(0.0, L + 0.6));
+    warp = max(warp, cov * u_kr.w * (1.0 - z*u_kr.z));
   }
 
   /* ポインタ。点がふくらみ、朱になる */
@@ -189,18 +213,14 @@ uniform vec3 u_g, u_fg, u_acc, u_tint;
 uniform vec4 u_wipe;       // x, y, 進み, 有効
 uniform vec3 u_wc;         // 塗り替える色
 uniform float u_dotA;
-uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2
-uniform vec4 u_kr;         // 半径1, 半径2, なめらかな世界の量（1 = 細胞だけ、0 = 点の世界）, （pass1 用）
-uniform vec4 u_kx;         // 細胞の濃さ, 弾ける進み, 弾ける中心 x, y
-uniform float u_kn;        // 核の見え方
-uniform float u_ko;        // オープニングの進み（線が核から外へ描き込まれる）
+uniform vec3 u_kx;         // キービジュアルの細胞が弾ける進み, 弾ける中心 x, y
 ${NOISE}
 void main(){
   vec2 frag0 = vec2(gl_FragCoord.x, u_view.y*u_dpr - gl_FragCoord.y) / u_dpr;
   float t = u_time;
   /* 弾けるあいだは、点の格子ごと中心から外へ押し広げる（山なりに戻る） */
-  float zb = u_kx.y*(1.0 - u_kx.y)*4.0*0.42;
-  vec2 frag = u_kx.zw + (frag0 - u_kx.zw)*(1.0 - zb);
+  float zb = u_kx.x*(1.0 - u_kx.x)*4.0*0.42;
+  vec2 frag = u_kx.yz + (frag0 - u_kx.yz)*(1.0 - zb);
   vec2 g0 = (frag - u_origin)/u_cell + 2.0;
   float ws = texture2D(u_cells, g0/u_grid).a;
 
@@ -256,88 +276,6 @@ void main(){
     o = mix(o, u_wc, aw);
   }
 
-  /* キービジュアル：なめらかな世界の2つの細胞（メタボール）。**点はひとつも描かない。**
-     粒子の世界に負けない細かさにするため、すべて髪の毛ほどの線で描き込む（2026-10-02 本人指摘）：
-       ・細胞の中の等高線（場の値の対数で等間隔。外へゆっくり流れる）
-       ・2つの細胞から出て、互いに曲がり合う力線（2つの湧き出しの流れ関数）
-       ・二重の膜と、膜に刻んだ目盛り
-       ・核は計器の文字盤のような同心円と放射の目盛り
-     色は墨（ビジネス）と朱（クリエイティブ）。文字の名札は付けない（色で分かる）。
-     線が詰まりすぎる所（間隔 2.5px 未満）は消す（モアレで汚くなる）。
-     オープニングでは核から外へ、線が描き込まれていく（u_ko） */
-  if (u_kr.z > 0.001) {
-    vec2 p = frag0;
-    float px = 1.0/u_dpr;
-    vec2 d1 = p - u_kc.xy, d2 = p - u_kc.zw;
-    float q1 = dot(d1, d1) + 1.0, q2 = dot(d2, d2) + 1.0;
-    /* 場は (r²/d²)²。2乗の場だと裾が長く、離れていてもつながって見える */
-    float b1 = u_kr.x*u_kr.x/q1, b2 = u_kr.y*u_kr.y/q2;
-    float a1 = b1*b1, a2 = b2*b2;
-    float F0 = a1 + a2;
-    float F = F0 * (1.0 + 0.05*(vnoise(p*0.008 + vec2(t*0.21, -t*0.17)) - 0.5));
-    vec2 gF = -4.0*(a1*d1/q1 + a2*d2/q2);
-    float gl = max(length(gF), 1e-6);
-    float sd = (F - 1.0)/gl;                       // 膜からの距離（px、内側が正）
-    float share = a2/(F0 + 1e-6);
-    vec3 cc = mix(u_fg, u_acc, smoothstep(0.38, 0.62, share));
-    float inside = smoothstep(-px, px, sd);
-    float L = log2(max(F, 1e-7));
-    /* オープニング：核から外へ描き込まれる */
-    float grow = smoothstep(-0.8, 0.8, L - mix(34.0, -9.0, u_ko));
-
-    /* 等高線 */
-    float ru = L*3.0 - t*0.22;
-    float rg = gl/(max(F, 1e-7)*0.6931)*3.0;
-    float rd = abs(fract(ru) - 0.5)/max(rg, 1e-6);
-    float rings = (1.0 - smoothstep(0.42, 0.42 + px*1.1, rd)) * (1.0 - smoothstep(0.15, 0.28, rg));
-
-    /* 力線（角度の和。枝の切れ目で整数ずつ跳ぶので、fract は途切れない） */
-    float N = 72.0;
-    float th = atan(d1.y, d1.x) + atan(d2.y, d2.x);
-    float fu = th*N/6.28318 + t*0.35;
-    vec2 gth = vec2(-d1.y, d1.x)/q1 + vec2(-d2.y, d2.x)/q2;
-    float fg = length(gth)*N/6.28318;
-    float fd = abs(fract(fu) - 0.5)/max(fg, 1e-6);
-    float flines = (1.0 - smoothstep(0.32, 0.32 + px*1.1, fd)) * (1.0 - smoothstep(0.24, 0.42, fg));
-    flines *= smoothstep(0.004, 0.25, F) * mix(1.0, 0.3, inside);
-
-    /* 膜：二重線と目盛り（力線4本ごとに、外へ短く） */
-    float rim1 = 1.0 - smoothstep(0.6, 0.6 + px*1.2, abs(sd));
-    float rim2 = 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(sd - 4.5));
-    float tk = abs(fract(fu*0.25 + 0.5) - 0.5)/max(fg*0.25, 1e-6);
-    float tick = (1.0 - smoothstep(0.4, 0.4 + px*1.2, tk)) * step(-9.0, sd) * step(sd, -1.5);
-
-    /* 核：同心円と放射の目盛り（ゆっくり回る） */
-    float nuc1 = 0.0, nuc2 = 0.0;
-    {
-      float rr = sqrt(q1), rn = u_kr.x*0.17;
-      float ang = atan(d1.y, d1.x) + t*0.12;
-      float core = 1.0 - smoothstep(rn*0.16 - px, rn*0.16 + px, rr);
-      float dial = 0.0;
-      for (int k = 1; k <= 4; k++) { float rk = rn*(0.25 + 0.25*float(k)); dial = max(dial, 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(rr - rk))); }
-      float tks = (1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(fract(ang*60.0/6.28318) - 0.5)*6.28318*rr/60.0)) * step(rn*1.05, rr) * step(rr, rn*(1.2 + 0.12*step(0.8, fract(ang*12.0/6.28318 + 0.1))));
-      nuc1 = max(core, max(dial*0.85, tks));
-    }
-    {
-      float rr = sqrt(q2), rn = u_kr.y*0.17;
-      float ang = atan(d2.y, d2.x) - t*0.15;
-      float core = 1.0 - smoothstep(rn*0.16 - px, rn*0.16 + px, rr);
-      float dial = 0.0;
-      for (int k = 1; k <= 4; k++) { float rk = rn*(0.25 + 0.25*float(k)); dial = max(dial, 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(rr - rk))); }
-      float tks = (1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(fract(ang*60.0/6.28318) - 0.5)*6.28318*rr/60.0)) * step(rn*1.05, rr) * step(rr, rn*(1.2 + 0.12*step(0.8, fract(ang*12.0/6.28318 + 0.1))));
-      nuc2 = max(core, max(dial*0.85, tks));
-    }
-
-    float al = u_kx.x;
-    vec3 sm = u_g;
-    sm = mix(sm, cc, inside*0.04*al*grow);
-    sm = mix(sm, cc, flines*0.5*al*grow);
-    sm = mix(sm, cc, rings*inside*0.75*al*grow);
-    sm = mix(sm, cc, max(rim1, max(rim2*0.7, tick*0.85))*al*grow);
-    sm = mix(sm, u_fg, nuc1*al*u_kn*smoothstep(0.0, 0.25, u_ko));
-    sm = mix(sm, u_acc, nuc2*al*u_kn*smoothstep(0.0, 0.25, u_ko));
-    o = mix(o, sm, u_kr.z);
-  }
   gl_FragColor = vec4(o, 1.0);
 }`;
 
