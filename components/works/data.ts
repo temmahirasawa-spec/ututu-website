@@ -9,9 +9,20 @@
    - 写真は Dropbox の YORKYS フォルダ（撮影素材・旧コーポレートサイトの素材）から選んだ候補。
      原本の置き場所は CLAUDE.md §5「実績」。差し替えたら w / h も直すこと
 
-   **確認待ち：**各ブランドで「何を手がけたか（roles）」と、店舗写真をサイトに出してよいか */
+   - 映像（film）は、YORKYS のコーポレートサイトで使っていたブランドの短い映像（音なし・5〜10秒）。
+     原本は Dropbox の `_MIGRATED_2026-08-02/YORKYS/01_ENTERTAINMENT/デザイン/コーポレートサイト/AI_Renewal_2026/site/public/videos/`
+     （BRUNCH＝brands-video-1、Creperie＝brands-video-2、BAKE＝brands-video-3、FROMA＝philosophy-video-2）。
+     置き場所は public/clips/works/。**差し替えたら BrandFilm.tsx の VER を上げること**（clips/ は1年 immutable）
+
+   **確認待ち：**各ブランドで「何を手がけたか（roles）」と、店舗写真・映像をサイトに出してよいか */
 
 export type Photo = { src: string; w: number; h: number; alt: string };
+export type Film = {
+  src: string;
+  poster: string;
+  /** 左右の黒い帯を切り落とす拡大率（FROMA の映像は左右に 42px の帯がある） */
+  zoom?: number;
+};
 export type Brand = {
   id: string;
   name: string;
@@ -21,9 +32,11 @@ export type Brand = {
   since?: string;
   note: string;
   roles: string[];
+  film?: Film;
   photos: Photo[];
 };
 
+const film = (name: string, zoom?: number): Film => ({ src: `/clips/works/${name}.mp4`, poster: `/clips/works/${name}-poster.webp`, zoom });
 const p = (name: string, w: number, h: number, alt: string): Photo => ({ src: `/img/works/${name}.webp`, w, h, alt });
 
 export const BRANDS: Brand[] = [
@@ -35,6 +48,7 @@ export const BRANDS: Brand[] = [
     since: '2014',
     note: '兵庫県西宮市・夙川で立ち上げた、最初のブランド。大きな窓のある、朝から長居できるブランチの店。',
     roles: ['業態開発', '店づくり', 'ブランドデザイン', '運営の仕組み'],
+    film: film('brunch'),
     photos: [
       p('brunch-interior', 1800, 1570, 'YORKYS BRUNCH の店内。大きな窓と長いカウンター'),
       p('brunch-sign', 1400, 933, 'YORKYS BRUNCH のロゴサイン'),
@@ -49,6 +63,7 @@ export const BRANDS: Brand[] = [
     kind: 'クレープ専門店',
     note: '駅前や商業施設の小さな区画に出すクレープ店。ブースの設計から、メニュー表や販促のグラフィックまで。',
     roles: ['業態開発', 'ブース設計', 'メニュー・販促デザイン', '出店'],
+    film: film('creperie'),
     photos: [
       p('creperie-store', 1800, 1200, 'YORKYS Creperie の店舗。紺の外壁にメニューのパネル'),
       p('creperie-three', 1400, 933, '3つのクレープを持つ手'),
@@ -64,6 +79,7 @@ export const BRANDS: Brand[] = [
     kind: '生ドーナツ・フレンチクルーラー専門店',
     note: 'ネオンのサインと、ガラス越しに見える厨房。行列のできた売り場をつくった。',
     roles: ['業態開発', '店舗デザイン', '商品・パッケージ', '出店'],
+    film: film('bake'),
     photos: [
       p('bake-store', 1800, 1201, 'PIECE OF BAKE の店舗。ネオンのサインとガラス張りの厨房'),
       p('bake-tray', 1600, 1066, 'トレイいっぱいのフレンチクルーラー'),
@@ -79,6 +95,7 @@ export const BRANDS: Brand[] = [
     kind: 'チーズ料理専門店',
     note: 'チーズを主役にしたレストラン。チーズが並ぶカウンターと、レンガの壁に光る店名。',
     roles: ['業態開発', '店舗デザイン', 'メニュー開発', 'ブランドデザイン'],
+    film: film('froma', 1.072),
     photos: [
       p('froma-interior', 1800, 1283, 'FROMA の店内。レンガの壁と光る店名'),
       p('froma-cheesebar', 1400, 788, 'チーズが並ぶカウンター'),

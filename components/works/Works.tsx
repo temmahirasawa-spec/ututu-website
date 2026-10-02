@@ -7,11 +7,13 @@
    書き方の決まりは components/works/data.ts の先頭。**立ち上げた事実を過去形で。** */
 
 /* eslint-disable @next/next/no-img-element -- 写真は枠に合わせて object-fit で切る。width / height は必ず付ける */
+/* 各ブランドのパネル：上に文と映像（BrandFilm）、下に写真の札。札を押すと PhotoViewer が開く */
 
 import { Label } from '@/components/home/Sections';
 import { OrderPanel, ReviewPanel } from '@/components/products/Products';
 import { Decode } from '@/components/site/Decode';
 import { Arrow } from '@/components/site/Header';
+import { BrandFilm } from './BrandFilm';
 import { BRANDS, type Brand } from './data';
 
 /* ---------- 入口 ---------- */
@@ -94,7 +96,6 @@ export function BrandPanels() {
 
 function BrandPanel({ b, i }: { b: Brand; i: number }) {
   const ground = i % 2 ? 'ink' : 'paper';
-  const [main, ...rest] = b.photos;
   return (
     <section
       id={b.id} className="pn sec bp" aria-labelledby={`bp-${b.id}`}
@@ -103,7 +104,7 @@ function BrandPanel({ b, i }: { b: Brand; i: number }) {
       data-transit={i === 0 ? '1.0' : '0.95'} data-bulge={i === 0 ? '0.35' : '0.15'} data-hold="0.3"
       data-mood="0.75,0.35,1,0.9,0.5"
     >
-      <div className="bp-grid">
+      <div className="bp-top">
         <div className="bp-txt" data-clear>
           <p className="lbl"><b>(A-{i + 1})</b><i aria-hidden="true" />Branding &amp; Produce</p>
           <Decode className="ttl bp-ttl" lines={b.title} />
@@ -114,12 +115,19 @@ function BrandPanel({ b, i }: { b: Brand; i: number }) {
             <dd>{b.roles.map((r) => <span key={r}>{r}</span>)}</dd>
           </dl>
         </div>
-        <div className="bp-photos" style={{ ['--n' as string]: rest.length }}>
-          <img className="bp-ph bp-ph--main rv" src={main.src} width={main.w} height={main.h} alt={main.alt} loading="lazy" decoding="async" />
-          {rest.map((ph, k) => (
-            <img key={ph.src} className="bp-ph rv" style={{ ['--d' as string]: `${0.08 * (k + 1)}s` }} src={ph.src} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" />
-          ))}
-        </div>
+        {b.film ? <BrandFilm film={b.film} label={b.name} /> : null}
+      </div>
+      {/* 写真は大きめの札に並べ、押すと画面いっぱいで見られる（PhotoViewer） */}
+      <div className="bp-photos" data-n={b.photos.length}>
+        {b.photos.map((ph, k) => (
+          <button
+            key={ph.src} type="button" className="bp-tile rv" data-lb={b.id} data-i={k}
+            style={{ ['--d' as string]: `${0.06 * k}s` }} aria-label={`${ph.alt}（拡大して見る）`}
+          >
+            <img src={ph.src} width={ph.w} height={ph.h} alt="" loading="lazy" decoding="async" />
+            <i className="bp-zoom" aria-hidden="true" />
+          </button>
+        ))}
       </div>
     </section>
   );

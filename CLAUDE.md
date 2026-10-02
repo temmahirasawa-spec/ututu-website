@@ -97,7 +97,7 @@ UTUTU は別会社で事業は続ける。
 |---|---|---|---|
 | `#top` | SELECTED WORKS.／2本立ての目次 | 紙 | 原点 |
 | (A) `#branding` | BRANDS WE BUILT.／立ち上げてきた、飲食ブランド（2014〜／4ブランド／地域） | 墨 | 右下へ |
-| (A-1〜4) `#brunch` `#creperie` `#bake` `#froma` | ブランド1つ＝1枚。写真5枚前後と、何を手がけたか | 紙と墨を交互 | **横へ1枚ずつ** |
+| (A-1〜4) `#brunch` `#creperie` `#bake` `#froma` | ブランド1つ＝1枚。文と映像、その下に大きな写真の札（押すと拡大）。何を手がけたか | 紙と墨を交互 | **横へ1枚ずつ**（背が高いので下ってから渡る） |
 | (B) `#saas` | TOOLS FOR STORES.／店舗のための、自社プロダクト | 紙 | 左下へ、奥へ |
 | (B-1/2) `#order` `#review` | GOOD ORDER / GOOD REVIEW（以前トップにあった2枚） | 黄／緑 | 横へ |
 | (B-3) `#ledger` | MADE IN-HOUSE.（社内でつくった数） | 紙 | 左下へ |
@@ -149,8 +149,10 @@ components/
     Rise.tsx              （第2版では未使用）
     home.css              トップの各パネルの CSS（座標の世界／縦並びの両方）
   works/
-    data.ts               飲食ブランドのデータと写真（トップの概要と /works が共用）。書き方の決まりは先頭
+    data.ts               飲食ブランドのデータと写真・映像（トップの概要と /works が共用）。書き方の決まりは先頭
     Works.tsx             /works の各パネル
+    BrandFilm.tsx         ブランドの短い映像（無音のくり返し）
+    PhotoViewer.tsx       写真を画面いっぱいで見る（世界の外に置く）
     works.css             トップの「実績の概要」と /works の CSS
   products/               プロダクト2節（§5。/works の (B) に置く）
     Products.tsx / ProductVideo.tsx / OrderScreen.tsx / products.css
@@ -161,6 +163,7 @@ components/
     CompanyClient.tsx     会社概要＋お問い合わせ
     company.css
 public/
+  clips/works/            ブランドの映像とポスター（YORKYS のコーポレートサイトの原本から。§5「実績」）
   clips/products/         プロダクト節の映像 {order,review}-{wide,tall}.mp4 とポスター（いまは wide だけ使う）
   img/products/           REVIEW の画面（props/ は第1版の「卓の上の小物」。いまは未使用）
   img/works/              実績の写真（webp。Dropbox の YORKYS から選んだもの。§5「実績」）
@@ -382,6 +385,19 @@ THEMES の `shu`）と、この文書の「朱」は**いまはこの緑のこ�
   - `YORKYS/名古屋店/デザイン/00_ファザードグラフィック/FRONT.jpg` … 名古屋の店舗
   - ほかに未確認の候補：`旧YORKYS/YORKYS_阪急三番街/写真/`（約200枚）、`撮影素材/クレープ撮影_1210/`（約170枚）
 - 写真を差し替えたら `data.ts` の w / h も直すこと（`<img>` の width / height に使う）
+- **ブランドの映像**（2026-10-02 本人指定）：YORKYS のコーポレートサイトで使っていた短い映像（音なし・5〜10秒・1280×720）。
+  公開サイトから直に引かず、Dropbox の原本
+  `_MIGRATED_2026-08-02/YORKYS/01_ENTERTAINMENT/デザイン/コーポレートサイト/AI_Renewal_2026/site/public/videos/` から取った
+  （BRUNCH＝brands-video-1、Creperie＝brands-video-2、BAKE＝brands-video-3、FROMA＝philosophy-video-2）。
+  `public/clips/works/{id}.mp4` とポスター `{id}-poster.webp`。部品は `components/works/BrandFilm.tsx`
+  （半分以上見えているあいだだけ無音でくり返し、右下に一時停止）。**差し替えたら `VER` を上げること**。
+  FROMA の映像は左右に 42px の黒い帯があるので、`zoom: 1.072` で切り落としている。
+  **映像の権利も写真と同じく要確認**（§0）
+- **写真は小さく並べない**（2026-10-02 本人指摘：小さい写真も大きく見えるように）。パネルの幅いっぱいの
+  12列の格子に、1枚目を大きく（6列×2段）、残りを右に。スマホは2列で、1枚目は全幅。
+  札を押すと画面いっぱいで見られる（`components/works/PhotoViewer.tsx`。← → で送る、Esc で閉じる、スマホは払う）。
+  PhotoViewer は**座標の世界の外**（app/works/page.tsx の WorldRoot の隣）に置くこと
+  （パネルは transform の中なので position:fixed が効かない）
 - 各ブランドの「Role（何を手がけたか）」は**確認待ち**。いまは業態の性格から書いた仮
 - 写真には `.rv`（網点で現れる）を付けてある。行列の写真は顔が判別できないものを選ぶこと
 
@@ -599,7 +615,7 @@ npm run build    # 本番ビルド
   AI, WITHOUT SHORTCUTS. ／ LET'S BUILD. ／ BRANDS WE BUILT. ／ TOOLS FOR STORES. ／ MADE IN-HOUSE.）
 - できること5本（Produce / Branding / Web & App / Film / Store DX）の中身
 - 洋輔さんの経歴の事実（2014年・夙川、出店先の施設名、名古屋・東京）と、各ブランドの Role
-- 店舗写真をサイトに出してよいか（権利の所在。§0）
+- 店舗写真・ブランドの映像をサイトに出してよいか（権利の所在。§0）
 
 ### これから作るもの
 

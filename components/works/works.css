@@ -62,8 +62,11 @@
 .bi-next span:last-child{color:var(--acc)}
 
 /* ===================== (A) ブランド1つ＝パネル1枚 ===================== */
-.bp{min-height:100svh;display:flex;align-items:center}
-.bp-grid{flex:1;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,64px);align-items:center}
+/* 上に文と映像、下に写真の札。写真は小さな列に並べず、パネルの幅いっぱいの大きな札にする
+   （2026-10-02 本人指摘：小さい写真も大きく見えるように）。札を押すと画面いっぱいで見られる（PhotoViewer）。
+   パネルは画面より背が高くなる（座標の世界が下ってから次へ渡る） */
+.bp{min-height:100svh}
+.bp-top{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,4vw,64px);align-items:center}
 .bp-ttl{font-size:clamp(46px,6.6vw,118px)}
 .bp-txt .ttl-jp small{display:block;margin-top:6px;font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.1em;color:var(--acc)}
 .bp-note{margin:clamp(16px,2vw,24px) 0 0;max-width:28em;font-size:var(--body);line-height:var(--body-lh);font-weight:500;color:var(--tx)}
@@ -71,15 +74,74 @@
 .bp-roles dt{flex:none;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 .bp-roles dd{margin:0;display:flex;flex-wrap:wrap;gap:6px}
 .bp-roles span{font-size:12.5px;padding:4px 10px;border:1px solid var(--line);border-radius:99px}
-.bp-photos{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:8px}
-.bp-ph{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:color-mix(in srgb,var(--fg) 8%,transparent)}
-.bp-ph--main{grid-column:1/-1;aspect-ratio:16/9.6;border-radius:12px}
-@media (max-width:900px){
- .bp{display:block}
- .bp-grid{grid-template-columns:minmax(0,1fr)}
- .bp-photos{grid-template-columns:repeat(2,minmax(0,1fr))}
- .bp-ph--main{aspect-ratio:4/3}
+
+/* 映像（BrandFilm）。16:9 の枠で切る。FROMA は左右の黒い帯を拡大で落とす（data.ts の zoom） */
+.bf{position:relative;margin:0;aspect-ratio:16/9;overflow:hidden;border-radius:14px;background:#0E0E0D}
+.bf-v{display:block;width:100%;height:100%;object-fit:cover}
+.bf-btn{position:absolute;right:12px;bottom:12px;display:grid;place-items:center;width:38px;height:38px;padding:0;border:0;border-radius:50%;
+ background:rgba(14,14,13,.62);color:#ECE9E1;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.bf-btn svg{width:14px;height:14px;fill:currentColor}
+.bf-btn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+/* 写真の札。12列の格子に、1枚目を大きく（6列×2段）、残りを右に並べる */
+.bp-photos{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(150px,15.5vw,290px);gap:10px;margin-top:clamp(28px,3.4vw,52px)}
+.bp-tile{position:relative;display:block;grid-column:span 3;padding:0;border:0;border-radius:10px;overflow:hidden;cursor:zoom-in;
+ background:color-mix(in srgb,var(--fg) 8%,transparent)}
+.bp-tile img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.bp-tile:nth-child(1){grid-column:span 6;grid-row:span 2;border-radius:14px}
+.bp-photos[data-n="4"] .bp-tile:nth-child(2){grid-column:span 6}
+.bp-photos[data-n="3"] .bp-tile:nth-child(n+2){grid-column:span 6}
+.bp-zoom{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;background:rgba(14,14,13,.55);
+ opacity:0;transform:scale(.8);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.bp-zoom::before,.bp-zoom::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:1.5px;margin:-.75px 0 0 -7px;background:#ECE9E1}
+.bp-zoom::after{transform:rotate(90deg)}
+@media (hover:hover){
+ .bp-tile:hover img{transform:scale(1.045)}
+ .bp-tile:hover .bp-zoom{opacity:1;transform:none}
 }
+.bp-tile:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.bp-tile:focus-visible .bp-zoom{opacity:1;transform:none}
+@media (max-width:900px){
+ .bp-top{grid-template-columns:minmax(0,1fr)}
+ .bf{border-radius:10px}
+ .bp-photos{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;gap:8px}
+ .bp-tile,.bp-photos[data-n] .bp-tile:nth-child(n){grid-column:span 1;grid-row:auto;aspect-ratio:1/1}
+ .bp-photos[data-n] .bp-tile:nth-child(1),.bp-photos[data-n="4"] .bp-tile:nth-child(4){grid-column:1/-1;aspect-ratio:4/3}
+ /* 指では触れたことが分からないので、拡大の印は常に出す */
+ .bp-zoom{opacity:1;transform:none;width:28px;height:28px;right:8px;bottom:8px}
+ .bp-zoom::before,.bp-zoom::after{width:12px;margin-left:-6px}
+}
+
+/* ===================== 写真を大きく見る（PhotoViewer） ===================== */
+/* 色は墨で固定（どの地で開いても写真が主役になるように）。ヘッダー（30）より上、遷移の覆い（60）より下 */
+.pv{position:fixed;inset:0;z-index:50;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .35s var(--ease)}
+.pv.on{opacity:1;pointer-events:auto}
+.pv-veil{position:absolute;inset:0;background:rgba(10,10,9,.94)}
+.pv-fig{position:relative;margin:0;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:calc(100vw - 2 * var(--gut) - 120px)}
+.pv-img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100svh - 150px);border-radius:8px;animation:pvIn .5s var(--ease)}
+@keyframes pvIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.pv-cap{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:6px 16px;color:#ECE9E1;text-align:center}
+.pv-name{font-family:var(--f-disp);font-weight:800;font-size:15px;letter-spacing:.02em;text-transform:uppercase}
+.pv-alt{font-size:14px;color:#C9C6BD}
+.pv-n{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;color:var(--shu)}
+.pv button{position:absolute;display:grid;place-items:center;padding:0;border:1px solid rgba(236,233,225,.24);border-radius:50%;
+ background:rgba(14,14,13,.5);color:#ECE9E1;cursor:pointer;transition:background .25s ease,border-color .25s ease}
+.pv button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6}
+.pv button:hover{border-color:var(--shu);background:rgba(18,214,149,.14)}
+.pv button:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
+.pv-close{top:calc(var(--hd-h) / 2 - 22px);right:var(--gut);width:44px;height:44px}
+.pv-nav{top:50%;width:52px;height:52px;margin-top:-26px}
+.pv-prev{left:var(--gut)}
+.pv-next{right:var(--gut)}
+@media (max-width:760px){
+ .pv-fig{max-width:100vw}
+ .pv-img{border-radius:0;max-height:calc(100svh - 190px)}
+ .pv-nav{top:auto;bottom:24px;margin:0}
+ .pv-prev{left:calc(50% - 64px)}
+ .pv-next{right:calc(50% - 64px)}
+}
+@media (prefers-reduced-motion:reduce){.pv,.pv-img{transition:none;animation:none}}
+
 @media (max-width:760px){
  .bi-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
  .bi-facts>div:last-child{grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--line);margin-top:14px}
