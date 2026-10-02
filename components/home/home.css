@@ -78,26 +78,15 @@ html[data-at=top] .hud-scroll{display:inline-flex}
 .hero-side p{margin:0;font-size:var(--body);line-height:var(--body-lh);font-weight:500}
 .hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
 .hero-cta .btn{font-size:14px}
-/* ロゴの置き場所。点描はこの箱を読む。**縦横比は字の外形（1144:133）に合わせること** */
+/* 大きなロゴ。色は #12D695（本人指定）。点では描かない（キービジュアルは細胞の線の世界なので） */
 .hero-mark{position:relative;margin-top:clamp(24px,5vh,60px);width:100%;aspect-ratio:1144/133}
 .hero-mark svg{position:absolute;left:-.7%;top:-6%;width:101.4%;height:112%;display:block;transition:opacity .4s ease}
-.hero-mark path{fill:var(--fg)}
-html.dots-live:not(.flow) .hero-mark svg{opacity:0}
-/* キービジュアルのなめらかな世界のあいだは、点のロゴは描かれないので SVG を見せる */
-html.dots-live.kv-smooth:not(.flow) .hero-mark svg{opacity:1}
+.hero-mark path{fill:#12D695}
 
 /* キービジュアルの2つの細胞の置き場所（lib/world/kv.ts がこの箱を読む）。
    PC は見出しの右上の空き、スマホは下の空き。文字に少しかかってよい（細胞は線と薄い色だけ） */
 .hero-cells{position:absolute;right:var(--gut);top:calc(var(--hd-h) + 1svh);width:min(54%,820px);height:54svh;pointer-events:none}
-.hero-cells span{display:none}
 @media (max-width:900px){.hero-cells{left:0;right:0;width:auto;top:calc(var(--hd-h) + 1svh);height:24svh}}
-/* 細胞の名札（World が body に複製して、細胞に付いて動かす） */
-.kv-lb{position:fixed;left:0;top:0;z-index:2;pointer-events:none;opacity:0;
- font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
- text-shadow:0 0 3px var(--g),0 0 8px var(--g)}
-.kv-lb--b{color:var(--fg)}
-.kv-lb--c{color:var(--acc)}
-.kv-lb::before{content:"";display:block;width:1px;height:10px;margin:0 auto 4px;background:currentColor;opacity:.6}
 .hero-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
  padding:16px 0 0;margin-top:clamp(14px,2vh,24px);border-top:1px solid var(--line);
  font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}

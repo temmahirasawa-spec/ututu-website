@@ -48,6 +48,7 @@ uniform sampler2D u_atlas;
 uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2（css px）
 uniform vec4 u_kr;         // 半径1, 半径2, （pass2 用）, 細胞を点で描く量
 uniform float u_kb;        // 弾ける進み
+uniform float u_km;        // 膜（うねる網点）の量。キービジュアルが弾け終わるまでは 0（細胞の点だけにする）
 ${NOISE}
 void main(){
   vec2 ij = floor(gl_FragCoord.xy);
@@ -63,7 +64,7 @@ void main(){
   float veins = smoothstep(0.85, 0.99, ridge);
   float blobs = smoothstep(0.66, 0.95, vnoise(q*0.6 - 1.4*w + t*0.035));
   float dust = 0.06 + 0.045*vnoise(ij*0.21 + t*0.7);
-  float r = max(max(veins*u_mood.x*0.56, blobs*u_mood.y*0.5), dust*u_mood.z);
+  float r = max(max(veins*u_mood.x*0.56, blobs*u_mood.y*0.5), dust*u_mood.z) * u_km;
   float acc = 0.0, tint = 0.0, warp = 1.0;
 
   /* 印 */
@@ -192,6 +193,7 @@ uniform vec4 u_kc;         // 細胞の中心：x1, y1, x2, y2
 uniform vec4 u_kr;         // 半径1, 半径2, なめらかな世界の量（1 = 細胞だけ、0 = 点の世界）, （pass1 用）
 uniform vec4 u_kx;         // 細胞の濃さ, 弾ける進み, 弾ける中心 x, y
 uniform float u_kn;        // 核の見え方
+uniform float u_ko;        // オープニングの進み（線が核から外へ描き込まれる）
 ${NOISE}
 void main(){
   vec2 frag0 = vec2(gl_FragCoord.x, u_view.y*u_dpr - gl_FragCoord.y) / u_dpr;
@@ -254,37 +256,86 @@ void main(){
     o = mix(o, u_wc, aw);
   }
 
-  /* キービジュアル：なめらかな世界の2つの細胞（メタボール）。
-     縁は細い線、中は等高線とうっすらした色、真ん中に核。点はひとつも描かない */
+  /* キービジュアル：なめらかな世界の2つの細胞（メタボール）。**点はひとつも描かない。**
+     粒子の世界に負けない細かさにするため、すべて髪の毛ほどの線で描き込む（2026-10-02 本人指摘）：
+       ・細胞の中の等高線（場の値の対数で等間隔。外へゆっくり流れる）
+       ・2つの細胞から出て、互いに曲がり合う力線（2つの湧き出しの流れ関数）
+       ・二重の膜と、膜に刻んだ目盛り
+       ・核は計器の文字盤のような同心円と放射の目盛り
+     色は墨（ビジネス）と朱（クリエイティブ）。文字の名札は付けない（色で分かる）。
+     線が詰まりすぎる所（間隔 2.5px 未満）は消す（モアレで汚くなる）。
+     オープニングでは核から外へ、線が描き込まれていく（u_ko） */
   if (u_kr.z > 0.001) {
     vec2 p = frag0;
-    vec3 sm = u_g;
+    float px = 1.0/u_dpr;
     vec2 d1 = p - u_kc.xy, d2 = p - u_kc.zw;
     float q1 = dot(d1, d1) + 1.0, q2 = dot(d2, d2) + 1.0;
     /* 場は (r²/d²)²。2乗の場だと裾が長く、離れていてもつながって見える */
     float b1 = u_kr.x*u_kr.x/q1, b2 = u_kr.y*u_kr.y/q2;
     float a1 = b1*b1, a2 = b2*b2;
     float F0 = a1 + a2;
-    float F = F0 * (1.0 + 0.08*(vnoise(p*0.009 + vec2(t*0.21, -t*0.17)) - 0.5));
+    float F = F0 * (1.0 + 0.05*(vnoise(p*0.008 + vec2(t*0.21, -t*0.17)) - 0.5));
     vec2 gF = -4.0*(a1*d1/q1 + a2*d2/q2);
-    float gl = max(length(gF), 1e-5);
-    float sd = (F - 1.0)/gl;
-    float share = a2/(F0 + 1e-5);
-    vec3 cc = mix(u_fg, u_acc, smoothstep(0.3, 0.7, share));
-    float inside = smoothstep(-0.8, 0.8, sd);
-    float rim = 1.0 - smoothstep(0.55, 1.5, abs(sd));
-    float lu = log2(max(F, 1e-4))*1.2 - t*0.1;
-    float lg = gl/(max(F, 1e-4)*0.6931)*1.2;
-    float ld = abs(fract(lu) - 0.5)/max(lg, 1e-5);
-    float lines = (1.0 - smoothstep(0.3, 0.95, ld)) * (0.32*inside + 0.1*(1.0 - inside)*smoothstep(0.3, 0.75, F));
-    float n1 = 1.0 - smoothstep(-0.8, 0.8, sqrt(q1) - u_kr.x*0.06);
-    float n2 = 1.0 - smoothstep(-0.8, 0.8, sqrt(q2) - u_kr.y*0.06);
+    float gl = max(length(gF), 1e-6);
+    float sd = (F - 1.0)/gl;                       // 膜からの距離（px、内側が正）
+    float share = a2/(F0 + 1e-6);
+    vec3 cc = mix(u_fg, u_acc, smoothstep(0.38, 0.62, share));
+    float inside = smoothstep(-px, px, sd);
+    float L = log2(max(F, 1e-7));
+    /* オープニング：核から外へ描き込まれる */
+    float grow = smoothstep(-0.8, 0.8, L - mix(34.0, -9.0, u_ko));
+
+    /* 等高線 */
+    float ru = L*3.0 - t*0.22;
+    float rg = gl/(max(F, 1e-7)*0.6931)*3.0;
+    float rd = abs(fract(ru) - 0.5)/max(rg, 1e-6);
+    float rings = (1.0 - smoothstep(0.42, 0.42 + px*1.1, rd)) * (1.0 - smoothstep(0.15, 0.28, rg));
+
+    /* 力線（角度の和。枝の切れ目で整数ずつ跳ぶので、fract は途切れない） */
+    float N = 72.0;
+    float th = atan(d1.y, d1.x) + atan(d2.y, d2.x);
+    float fu = th*N/6.28318 + t*0.35;
+    vec2 gth = vec2(-d1.y, d1.x)/q1 + vec2(-d2.y, d2.x)/q2;
+    float fg = length(gth)*N/6.28318;
+    float fd = abs(fract(fu) - 0.5)/max(fg, 1e-6);
+    float flines = (1.0 - smoothstep(0.32, 0.32 + px*1.1, fd)) * (1.0 - smoothstep(0.24, 0.42, fg));
+    flines *= smoothstep(0.004, 0.25, F) * mix(1.0, 0.3, inside);
+
+    /* 膜：二重線と目盛り（力線4本ごとに、外へ短く） */
+    float rim1 = 1.0 - smoothstep(0.6, 0.6 + px*1.2, abs(sd));
+    float rim2 = 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(sd - 4.5));
+    float tk = abs(fract(fu*0.25 + 0.5) - 0.5)/max(fg*0.25, 1e-6);
+    float tick = (1.0 - smoothstep(0.4, 0.4 + px*1.2, tk)) * step(-9.0, sd) * step(sd, -1.5);
+
+    /* 核：同心円と放射の目盛り（ゆっくり回る） */
+    float nuc1 = 0.0, nuc2 = 0.0;
+    {
+      float rr = sqrt(q1), rn = u_kr.x*0.17;
+      float ang = atan(d1.y, d1.x) + t*0.12;
+      float core = 1.0 - smoothstep(rn*0.16 - px, rn*0.16 + px, rr);
+      float dial = 0.0;
+      for (int k = 1; k <= 4; k++) { float rk = rn*(0.25 + 0.25*float(k)); dial = max(dial, 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(rr - rk))); }
+      float tks = (1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(fract(ang*60.0/6.28318) - 0.5)*6.28318*rr/60.0)) * step(rn*1.05, rr) * step(rr, rn*(1.2 + 0.12*step(0.8, fract(ang*12.0/6.28318 + 0.1))));
+      nuc1 = max(core, max(dial*0.85, tks));
+    }
+    {
+      float rr = sqrt(q2), rn = u_kr.y*0.17;
+      float ang = atan(d2.y, d2.x) - t*0.15;
+      float core = 1.0 - smoothstep(rn*0.16 - px, rn*0.16 + px, rr);
+      float dial = 0.0;
+      for (int k = 1; k <= 4; k++) { float rk = rn*(0.25 + 0.25*float(k)); dial = max(dial, 1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(rr - rk))); }
+      float tks = (1.0 - smoothstep(0.35, 0.35 + px*1.2, abs(fract(ang*60.0/6.28318) - 0.5)*6.28318*rr/60.0)) * step(rn*1.05, rr) * step(rr, rn*(1.2 + 0.12*step(0.8, fract(ang*12.0/6.28318 + 0.1))));
+      nuc2 = max(core, max(dial*0.85, tks));
+    }
+
     float al = u_kx.x;
-    sm = mix(sm, cc, inside*0.07*al);
-    sm = mix(sm, cc, lines*al);
-    sm = mix(sm, cc, rim*0.92*al);
-    sm = mix(sm, u_fg, n1*al*u_kn);
-    sm = mix(sm, u_acc, n2*al*u_kn);
+    vec3 sm = u_g;
+    sm = mix(sm, cc, inside*0.04*al*grow);
+    sm = mix(sm, cc, flines*0.5*al*grow);
+    sm = mix(sm, cc, rings*inside*0.75*al*grow);
+    sm = mix(sm, cc, max(rim1, max(rim2*0.7, tick*0.85))*al*grow);
+    sm = mix(sm, u_fg, nuc1*al*u_kn*smoothstep(0.0, 0.25, u_ko));
+    sm = mix(sm, u_acc, nuc2*al*u_kn*smoothstep(0.0, 0.25, u_ko));
     o = mix(o, sm, u_kr.z);
   }
   gl_FragColor = vec4(o, 1.0);

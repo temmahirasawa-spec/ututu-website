@@ -2,12 +2,14 @@
 
    ファーストビューだけは、点の世界ではなく**なめらかな世界**にしておく。
    墨の細胞＝ビジネス、朱の細胞＝クリエイティブ。離れた2つがゆっくり息をしている。
+   **文字の名札は付けない**（2026-10-02 本人判断：色の違いで伝える）。
    スクロールすると（ヒーローを抜けるあいだに）：
      1) 2つが近づいて、1つになる（メタボール。縁がつながる）
      2) 1つになった細胞が膨らんで、画面を満たす
-     3) 細胞が点に変わって弾け、点がそのまま膜の世界（うねる網点）になる
+     3) 細胞が点に変わって弾ける。**このあいだは細胞の点だけ**（膜の点は出さない）
+     4) 「できること」に着くところで、すでにうねっている膜の世界が現れる
    スクロールに結びつけてあるので、戻れば逆再生される。
-   初めて開いたときだけ、2つが画面の両端から入ってくる（オープニング。約2.4秒）。
+   初めて開いたときだけ、核から外へ線が描き込まれていく（オープニング。約3.2秒）。
 
    描くのは lib/dots/shaders.ts（pass2 のなめらかな層と、pass1 の「細胞を点で描く」）。
    ここは位置と大きさと進みを計算するだけ。 */
@@ -26,19 +28,24 @@ export type KVIn = {
   ptr: { x: number; y: number };
 };
 
-export type KVOut = { kv: KV; labels: { x: number; y: number; a: number }[] };
+export type KVOut = { kv: KV };
 
-const OPEN_DUR = 2.4;
+const OPEN_DUR = 3.2;
 
 export function kvState(i: KVIn): KVOut {
   const { rect: R, W, H, p, time: t } = i;
-  const base = Math.max(40, Math.min(R.w * 0.19, R.h * 0.36));
-
-  /* 休んでいる位置。ゆっくり漂い、息をする（大きさが揺れる） */
-  let x1 = R.x + R.w * 0.22 + Math.sin(t * 0.37) * R.w * 0.035;
-  let y1 = R.y + R.h * 0.56 + Math.cos(t * 0.29) * R.h * 0.05;
-  let x2 = R.x + R.w * 0.8 + Math.sin(t * 0.31 + 2) * R.w * 0.035;
-  let y2 = R.y + R.h * 0.44 + Math.cos(t * 0.41 + 1) * R.h * 0.05;
+  /* 置き場所。横長の画面では、墨の細胞を見出しの下の空き（中央下）、朱の細胞を見出しの右に置く。
+     墨の細胞を黒い大見出しの後ろに置くと、線が文字に埋もれて見えなくなった（実際に起きた）。
+     縦長の画面（スマホ）は .hero-cells の箱（見出しの上の空き）に横並び */
+  const wide = W / H > 1.1;
+  const base = wide ? Math.max(60, Math.min(W * 0.14, H * 0.25)) : Math.max(40, Math.min(R.w * 0.19, R.h * 0.36));
+  const rx1 = wide ? W * 0.52 : R.x + R.w * 0.22, ry1 = wide ? H * 0.63 : R.y + R.h * 0.56;
+  const rx2 = wide ? W * 0.86 : R.x + R.w * 0.8, ry2 = wide ? H * 0.3 : R.y + R.h * 0.44;
+  const dw = wide ? W * 0.02 : R.w * 0.035, dh = wide ? H * 0.03 : R.h * 0.05;
+  let x1 = rx1 + Math.sin(t * 0.37) * dw;
+  let y1 = ry1 + Math.cos(t * 0.29) * dh;
+  let x2 = rx2 + Math.sin(t * 0.31 + 2) * dw;
+  let y2 = ry2 + Math.cos(t * 0.41 + 1) * dh;
   let r1 = base * (1 + 0.035 * Math.sin(t * 1.1));
   let r2 = base * 0.94 * (1 + 0.035 * Math.sin(t * 1.3 + 1));
 
@@ -52,13 +59,13 @@ export function kvState(i: KVIn): KVOut {
   if (Math.hypot(i.ptr.x - x1, i.ptr.y - y1) < Math.hypot(i.ptr.x - x2, i.ptr.y - y2)) [x1, y1] = pull(x1, y1, r1);
   else [x2, y2] = pull(x2, y2, r2);
 
-  /* オープニング：両端から入ってくる */
+  /* オープニング：核から外へ線が描き込まれ、細胞が少しずつ育ちながら、わずかに寄ってくる */
   const o = Math.min(1, Math.max(0, i.tOpen / OPEN_DUR));
   const oe = 1 - Math.pow(1 - o, 3);
-  x1 = lerp(-base * 1.4, x1, oe); y1 = lerp(y1 + H * 0.18, y1, oe);
-  x2 = lerp(W + base * 1.4, x2, oe); y2 = lerp(y2 - H * 0.18, y2, oe);
-  r1 *= lerp(0.3, 1, oe); r2 *= lerp(0.3, 1, oe);
-  const alpha = sm(0, 0.3, o);
+  x1 -= (1 - oe) * base * 0.6; x2 += (1 - oe) * base * 0.6;
+  r1 *= lerp(0.72, 1, oe); r2 *= lerp(0.72, 1, oe);
+  const alpha = sm(0, 0.08, o);
+  const open = 1 - Math.pow(1 - o, 2.2);
 
   /* 1) 近づいて1つに */
   const m = sm(0.02, 0.4, p);
@@ -78,13 +85,13 @@ export function kvState(i: KVIn): KVOut {
   const dots = sm(0.48, 0.66, p) * (1 - sm(0.74, 1, p));
   const burst = sm(0.64, 1, p);
 
-  const la = alpha * (1 - sm(0.08, 0.3, p));
   return {
-    kv: { c: [x1, y1, x2, y2], r: [r1, r2], smooth, dots, burst, bx: cx, by: cy, alpha, nucleus: 1 - sm(0.28, 0.46, p) },
-    labels: [
-      { x: x1, y: y1 + r1 * 0.1 + 14, a: la },
-      { x: x2, y: y2 + r2 * 0.1 + 14, a: la },
-    ],
+    kv: {
+      c: [x1, y1, x2, y2], r: [r1, r2], smooth, dots, burst, bx: cx, by: cy, alpha,
+      nucleus: 1 - sm(0.28, 0.46, p), open,
+      /* 膜の世界は、弾けた点の輪が抜けきってから（＝「できること」に着くところで）現れる */
+      membrane: sm(0.88, 1, p),
+    },
   };
 }
 

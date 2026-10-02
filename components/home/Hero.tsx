@@ -5,8 +5,7 @@
    打ち出しは「ビジネス×クリエイティブの掛け算」（2026-10-02 本人判断：「2人で」を押し出しすぎない）。
    脇の文で**何をする会社か**を最初に言い切る（抽象的な「AIで何でも」に見せない）。
    ここだけは点の世界ではなく、なめらかな世界（2つの細胞）。抜けるときに点の世界へ切り替わる（lib/world/kv.ts）。
-   ロゴは点で描く（.hero-mark が点描の印の置き場所。最初は粒が飛んできて組み上がる）。
-   WebGL が無ければ、.hero-mark の SVG がそのまま見える。 */
+   大きなロゴは SVG のまま、色は #12D695（2026-10-02 本人指定。旧サイトのミント #5FD0A8 を明るく強くしたもの）。 */
 
 import { useEffect, useState } from 'react';
 import { Decode } from '@/components/site/Decode';
@@ -37,10 +36,9 @@ export function Hero() {
           </div>
         </div>
       </div>
-      {/* キービジュアルの細胞の置き場所（lib/world/kv.ts）。細胞そのものは点描のキャンバスが描く。
-          名札は World が画面の上に複製して、細胞に付いて動かす */}
-      <div className="hero-cells" aria-hidden="true"><span data-kv="b">Business</span><span data-kv="c">Creative</span></div>
-      <div className="hero-mark" data-stamp="mark" data-fit="fill"><Mark title="UTUTU" /></div>
+      {/* キービジュアルの細胞の置き場所（lib/world/kv.ts）。細胞そのものは点描のキャンバスが描く */}
+      <div className="hero-cells" aria-hidden="true" />
+      <div className="hero-mark"><Mark title="UTUTU" /></div>
       <div className="hero-bar" aria-hidden="true">
         <span>Kobe 34.69°N 135.19°E</span>
         <Clock />

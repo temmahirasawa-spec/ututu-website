@@ -68,6 +68,10 @@ export type KV = {
   alpha: number;
   /** 核の見え方 */
   nucleus: number;
+  /** オープニングの進み（線が核から外へ描き込まれる） */
+  open: number;
+  /** 膜（うねる網点）の量。弾け終わるまでは 0 */
+  membrane: number;
 };
 type SceneFn = (now: number) => Scene;
 
@@ -477,6 +481,7 @@ class Field {
     gl.uniform4f(uC.u_kc, kv?.c[0] ?? 0, kv?.c[1] ?? 0, kv?.c[2] ?? 0, kv?.c[3] ?? 0);
     gl.uniform4f(uC.u_kr, kv?.r[0] ?? 0, kv?.r[1] ?? 0, kv?.smooth ?? 0, kv?.dots ?? 0);
     gl.uniform1f(uC.u_kb, kv?.burst ?? 0);
+    gl.uniform1f(uC.u_km, kv ? kv.membrane : 1);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     /* ---- 塗り替えの進み ---- */
@@ -527,6 +532,7 @@ class Field {
     gl.uniform4f(uD.u_kr, kv?.r[0] ?? 0, kv?.r[1] ?? 0, kv?.smooth ?? 0, kv?.dots ?? 0);
     gl.uniform4f(uD.u_kx, kv?.alpha ?? 0, kv?.burst ?? 0, kv?.bx ?? this.W / 2, kv?.by ?? this.H / 2);
     gl.uniform1f(uD.u_kn, kv?.nucleus ?? 0);
+    gl.uniform1f(uD.u_ko, kv?.open ?? 1);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     return !!this.wipe || this.dotA < 1 || intro < 1 || !!kv;
@@ -631,10 +637,10 @@ function bindTri(gl: WebGLRenderingContext, p: WebGLProgram, b: WebGLBuffer) {
 }
 
 function uniformsCells(gl: WebGLRenderingContext, p: WebGLProgram) {
-  return uniforms(gl, p, ['u_origin', 'u_cell', 'u_time', 'u_mood', 'u_intro', 'u_ptr', 'u_lensR', 'u_rip[0]', 'u_sr[0]', 'u_su[0]', 'u_sp[0]', 'u_se[0]', 'u_zone[0]', 'u_zsoft', 'u_atlas', 'u_kc', 'u_kr', 'u_kb'] as const);
+  return uniforms(gl, p, ['u_origin', 'u_cell', 'u_time', 'u_mood', 'u_intro', 'u_ptr', 'u_lensR', 'u_rip[0]', 'u_sr[0]', 'u_su[0]', 'u_sp[0]', 'u_se[0]', 'u_zone[0]', 'u_zsoft', 'u_atlas', 'u_kc', 'u_kr', 'u_kb', 'u_km'] as const);
 }
 function uniformsDots(gl: WebGLRenderingContext, p: WebGLProgram) {
-  return uniforms(gl, p, ['u_cells', 'u_grid', 'u_cell', 'u_origin', 'u_view', 'u_dpr', 'u_time', 'u_warp', 'u_ptr', 'u_pull', 'u_lensR', 'u_rip[0]', 'u_g', 'u_fg', 'u_acc', 'u_tint', 'u_wipe', 'u_wc', 'u_dotA', 'u_kc', 'u_kr', 'u_kx', 'u_kn'] as const);
+  return uniforms(gl, p, ['u_cells', 'u_grid', 'u_cell', 'u_origin', 'u_view', 'u_dpr', 'u_time', 'u_warp', 'u_ptr', 'u_pull', 'u_lensR', 'u_rip[0]', 'u_g', 'u_fg', 'u_acc', 'u_tint', 'u_wipe', 'u_wc', 'u_dotA', 'u_kc', 'u_kr', 'u_kx', 'u_kn', 'u_ko'] as const);
 }
 function uniformsCover(gl: WebGLRenderingContext, p: WebGLProgram) {
   return uniforms(gl, p, ['u_view', 'u_dpr', 'u_time', 'u_size', 'u_cov', 'u_col'] as const);

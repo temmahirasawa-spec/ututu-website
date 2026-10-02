@@ -98,7 +98,6 @@ export class World {
   /** キービジュアルの細胞（トップだけ。lib/world/kv.ts）。置き場所は .hero-cells、オープニングの起点 */
   private kvLocal: Rect | null = null;
   private kvRect: Rect | null = null;
-  private kvLabels: HTMLElement[] = [];
   private kvSmooth = false;
   kvT0 = -1e9;
 
@@ -140,8 +139,6 @@ export class World {
     cancelAnimationFrame(this.ownRaf);
     if (dots.ok) dots.setScene(null);
     document.documentElement.classList.remove('world', 'kv-smooth');
-    this.kvLabels.forEach((l) => l.remove());
-    this.kvLabels = [];
     this.panels.forEach((p) => {
       p.el.style.transform = '';
       p.el.style.opacity = '';
@@ -235,16 +232,6 @@ export class World {
     if (kvEl && dots.ok) {
       const pr = this.panels[0].el.getBoundingClientRect(), r = kvEl.getBoundingClientRect();
       this.kvLocal = { x: r.left - pr.left, y: r.top - pr.top, w: r.width, h: r.height };
-      if (!this.kvLabels.length) {
-        this.kvLabels = Array.from(kvEl.querySelectorAll<HTMLElement>('[data-kv]')).map((src) => {
-          const l = document.createElement('span');
-          l.className = `kv-lb kv-lb--${src.dataset.kv}`;
-          l.textContent = src.textContent;
-          l.setAttribute('aria-hidden', 'true');
-          document.body.appendChild(l);
-          return l;
-        });
-      }
     } else this.kvLocal = null;
 
     /* 世界の外接（地図のため） */
@@ -629,7 +616,6 @@ export class World {
     const p = Math.min(1, Math.max(0, this.sSmooth / Math.max(1, next.sStart)));
     if (p >= 0.999) {
       if (this.kvSmooth) { this.kvSmooth = false; html.classList.remove('kv-smooth'); }
-      this.kvLabels.forEach((l) => { l.style.opacity = '0'; });
       return undefined;
     }
     if (hero.vis || !this.kvRect) this.kvRect = this.screenRect(hero, this.kvLocal);
@@ -637,12 +623,6 @@ export class World {
     const out = kvState({
       rect: this.kvRect, W: this.W, H: this.H, p,
       tOpen: (now - this.kvT0) / 1000, time: now / 1000, ptr: this.ptr,
-    });
-    out.labels.forEach((q, i) => {
-      const l = this.kvLabels[i];
-      if (!l) return;
-      l.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translateX(-50%)`;
-      l.style.opacity = q.a.toFixed(3);
     });
     const smooth = out.kv.smooth > 0.5;
     if (smooth !== this.kvSmooth) { this.kvSmooth = smooth; html.classList.toggle('kv-smooth', smooth); }
