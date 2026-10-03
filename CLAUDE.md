@@ -661,6 +661,9 @@ ututu-design.co.jp は Vercel の `ututu-website` プロジェクトの本番ド
    このブランチのプレビュー（ブランチの固定URL `ututu-website-git-claude-re-452d4f-temmahirasawa-1946s-projects.vercel.app/v2/...`。名前が長いので Vercel が短くしたもの）へ中継する。
    **このブランチに push すれば /v2 も更新される**（main を触る必要はない）
 3. noindex のまま（layout.tsx）。プレビューの応答にも Vercel が `x-robots-tag: noindex` を付ける
+4. **映像（public/clips/）だけは中継を通さない。**中継を通すと /v2 で映像が再生されなかった（2026-10-03 本人報告。
+   映像は Range で部分取得されるので中継と相性が悪い）。本番ビルドでは `media()`（lib/base.ts）が
+   ブランチの固定URLを直に指す。写真・アバター（fetch で読むので別オリジンだと CORS が要る）は中継のまま
 
-**新サイトを / に移す日**：`BASE` を `''` にし、vercel.json の source から `/v2` を外して、このブランチを main に入れ、
+**新サイトを / に移す日**：`BASE` と `MEDIA_ORIGIN` を `''` にし、vercel.json の source から `/v2` を外して、このブランチを main に入れ、
 main の rewrites を消す（旧サイトは 38caf2a に残る）。そのあと「公開の日にやること」（§7）

@@ -19,7 +19,7 @@
    上げないと端末が古い映像を掴み続ける */
 
 import { useEffect, useRef, useState } from 'react';
-import { asset } from '@/lib/base';
+import { media } from '@/lib/base';
 
 const VER = '20261001';
 
@@ -38,7 +38,7 @@ export function ProductVideo({ slug, name, shape }: { slug: 'order' | 'review'; 
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [full, setFull] = useState(false);
-  const base = asset(`/clips/products/${slug}-${shape}`);
+  const base = media(`/clips/products/${slug}-${shape}`);
   const { w, h } = SIZE[shape];
 
   useEffect(() => {

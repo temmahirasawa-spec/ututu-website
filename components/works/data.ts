@@ -16,7 +16,7 @@
 
    **確認待ち：**各ブランドで「何を手がけたか（roles）」と、店舗写真・映像をサイトに出してよいか */
 
-import { asset } from '@/lib/base';
+import { asset, media } from '@/lib/base';
 
 export type Photo = { src: string; w: number; h: number; alt: string };
 export type Film = {
@@ -38,7 +38,7 @@ export type Brand = {
   photos: Photo[];
 };
 
-const film = (name: string, zoom?: number): Film => ({ src: asset(`/clips/works/${name}.mp4`), poster: asset(`/clips/works/${name}-poster.webp`), zoom });
+const film = (name: string, zoom?: number): Film => ({ src: media(`/clips/works/${name}.mp4`), poster: media(`/clips/works/${name}-poster.webp`), zoom });
 const p = (name: string, w: number, h: number, alt: string): Photo => ({ src: asset(`/img/works/${name}.webp`), w, h, alt });
 
 export const BRANDS: Brand[] = [
