@@ -1,9 +1,10 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element --
+/* 2026-10-01 に写真の帯（私たちがつくった店）を外したので、このファイルにはもう <img> が無い。
+   帯を戻すときは、ここに「eslint-disable @next/next/no-img-element」の指定も戻すこと。
    この節の画像は next/image に載せない。
    ・写真の帯は「高さ固定・幅auto」で流すので、next/image の枠に合わない
-   ・プロダクトの画面は端末の枠にぴったり収める必要がある
+   ・プロダクトの画面は端末の枠にぴったり収める必要がある（Products.tsx 側で同じ指定をしている）
    **どの img にも width / height 属性を必ず付けること。** 無いと読み込み前に
    幅が0になり、行ごと潰れて何も見えず、読み込んだ瞬間に突然現れる
    （モバイルで実際に起きた） */
@@ -38,35 +39,21 @@ export function After() {
         <p className="lead rv">私たちは、店をつくる会社であり、店のための道具をつくる会社です。ふたつは別の仕事ではありません。自分たちの店で毎日使うために道具をつくり、その道具が、また店を強くしています。</p>
       </div>
 
-      {/* B 私たちがつくった店：当事者性の証拠。業態の表記は要確認 */}
-      <div className="af-sec">
-        <p className="sec-eyebrow rv">Our Stores</p>
-        <h3 className="rv">私たちがつくった店。</h3>
-        <p className="lead rv">企画から内装、メニュー、日々の運営まで。ここに並ぶのは、私たちが立ち上げて、いまも動かしている店。写真には、いま仕込んでいる次の店も混ざっています。</p>
-    <div className="band rv">
-          <div className="band-row"><div className="set"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="YORKYS BRUNCH の店内" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="FROMA のサイン" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="YORKYS CREPERIE の店舗" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="PIECE OF BAKE の内装" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="FROMA の内装" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="YORKYS BRUNCH のカップ" loading="lazy" decoding="async" /></div><div className="set" aria-hidden="true"><img src="/img/brands/brunch-hero.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-signage.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/creperie-store.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/mc-02.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-interior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/brunch-cup.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /></div></div>
-          <div className="band-row rev"><div className="set"><img src="/img/brands/creperie-products.webp" width="480" height="480" alt="YORKYS CREPERIE のクレープ" loading="lazy" decoding="async" /><img src="/img/brands/bake-glass.webp" width="480" height="480" alt="PIECE OF BAKE のガラス面" loading="lazy" decoding="async" /><img src="/img/brands/froma-kitchen.webp" width="818" height="480" alt="FROMA のキッチン" loading="lazy" decoding="async" /><img src="/img/brands/mc-04.webp" width="861" height="480" alt="準備中の店のブランディング" loading="lazy" decoding="async" /><img src="/img/brands/brunch-exterior.webp" width="480" height="480" alt="YORKYS BRUNCH の外観" loading="lazy" decoding="async" /><img src="/img/brands/creperie-counter.webp" width="975" height="480" alt="YORKYS CREPERIE のカウンター" loading="lazy" decoding="async" /><img src="/img/brands/bake-donuts.webp" width="480" height="480" alt="PIECE OF BAKE のドーナツ" loading="lazy" decoding="async" /></div><div className="set" aria-hidden="true"><img src="/img/brands/creperie-products.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-glass.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/froma-kitchen.webp" width="818" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/mc-04.webp" width="861" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/brunch-exterior.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/creperie-counter.webp" width="975" height="480" alt="" loading="lazy" decoding="async" /><img src="/img/brands/bake-donuts.webp" width="480" height="480" alt="" loading="lazy" decoding="async" /></div></div>
-        </div>
-        <ul className="stores">
-          <li className="rv"><p className="nm">YORKYS BRUNCH</p><p className="tp">ブランチレストラン</p></li>
-          <li className="rv"><p className="nm">YORKYS CREPERIE</p><p className="tp">クレープリー</p></li>
-          <li className="rv"><p className="nm">FROMA</p><p className="tp">チーズブランド</p></li>
-          <li className="rv"><p className="nm">PIECE OF BAKE</p><p className="tp">ドーナツブランド</p></li>
-          <li className="rv soon"><p className="nm">AND NEXT</p><p className="tp">準備中の店がひとつ</p></li>
-        </ul>
-      </div>
+      {/* B 私たちがつくった店（Our Stores）は 2026-10-01 に一旦外した。
+          天真「公開中のページにある YORKYS・FROMA のロゴや名称は一旦削除で大丈夫」（YORKYS が破産手続きに入り、
+          店名やブランドを使えなくなる可能性があるため。UTUTU と YORKYS は別会社）。並んでいた4ブランド
+          （YORKYS BRUNCH / YORKYS CREPERIE / FROMA / PIECE OF BAKE）はどれも YORKYS ENTERTAINMENT の店で
+          （bios.ts の洋輔さんの経歴）、外すと「準備中の店」しか残らないので節ごと外した。
+          写真（public/img/brands/）と CSS（globals.css の .band / .stores）は戻すときのために残してある。
+          マークアップはこのコメントを入れたコミットの親から拾える */}
 
       {/* 橋：店から道具へ */}
       <div className="af-sec af-bridge af-stmt" data-ink>
         <h3 className="rv">既製品は、現場に合いませんでした。</h3>
         <p className="lead rv">だから自分たちでつくり、自分たちの店で毎日使っています。ピークタイムに耐えられなかった機能は、直すか、捨てる。ここから先に並ぶのは、その繰り返しを生き残ったものだけです。</p>
-        {/* 数字はすべてサンプル。実測値が来たら差し替える */}
-        <div className="stats rv">
-          <div className="stat"><b className="stat-n">4</b><span className="stat-l">直営ブランド</span></div>
-          <div className="stat"><b className="stat-n">3</b><span className="stat-l">導入店舗</span></div>
-          <div className="stat"><b className="stat-n">3.9<i>倍</i></b><span className="stat-l">月のクチコミ件数</span></div>
-          <div className="stat"><b className="stat-n">+18<i>%</i></b><span className="stat-l">注文点数</span></div>
-        </div>
+        {/* 数字の帯（直営ブランド 4／導入店舗 3／月のクチコミ件数 3.9倍／注文点数 +18%）は 2026-10-01 に一旦外した。
+            どれも YORKYS・FROMA の店の数字で（しかもサンプルのまま）、上の「私たちがつくった店」と同じ理由。
+            CSS（globals.css の .stats）は残してある */}
       </div>
       <Products />
 
