@@ -34,7 +34,8 @@ UTUTU は別会社で事業は続ける。
 リアルな実績で払拭したい」と判断し、**飲食ブランドを立ち上げた実績として戻した**。いまの決まりは次のとおり。
 
 - **出してよいもの**：ブランド名（YORKYS BRUNCH / YORKYS Creperie / PIECE OF BAKE / FROMA）、
-  店舗・商品の写真（/works）、洋輔さんがそれらを立ち上げてきた経歴（bios.ts）、出店先の地域・商業施設名
+  洋輔さんがそれらを立ち上げてきた経歴（bios.ts・チームの一言）、出店先の地域・商業施設名。
+  （店舗・商品の写真と映像は 2026-10-07 にサイトから外した。戻すなら権利の確認が先）
 - **書き方**：**立ち上げた事実を過去形で**。「立ち上げた」「手がけてきた」「出店してきた」
 - **言わないこと**：「自分たちの店」「直営」「いまも営業中」「導入店舗」「稼働中」など、
   店を**いま**営んでいる前提で書く言い方。運営会社の社名（株式会社YORKYS ENTERTAINMENT）と役職、
@@ -604,7 +605,7 @@ npm run build    # 本番ビルド
 - 英語の見出し（BUSINESS × CREATIVE. ／ WHAT WE DO. ／ SELECTED WORKS. ／ THE PRODUCER & THE DESIGNER. ／
   AI, WITHOUT SHORTCUTS. ／ LET'S BUILD. ／ BRANDS WE BUILT. ／ TOOLS FOR STORES. ／ MADE IN-HOUSE.）
 - できること5本（Produce / Branding / Web & App / Film / Store DX）の中身
-- 洋輔さんの経歴の事実（2014年・夙川、出店先の施設名、名古屋・東京）と、各ブランドの Role
+- 洋輔さんの経歴の事実（2014年・夙川、出店先の施設名、名古屋・東京）
 
 
 ### これから作るもの
