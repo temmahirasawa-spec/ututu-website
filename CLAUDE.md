@@ -11,10 +11,11 @@
 同日、**アクセント色を朱 #FF4D1F から緑 #12D695 に差し替えた**（本人指定。§3「色と地」）。
 
 ```
-新サイト: https://ututu-design.co.jp/v2 （2026-10-02 から。このブランチのプレビューを main が中継している。§8）
-本番  : https://ututu-design.co.jp ／ https://ututu-website.vercel.app （main。旧サイトのまま。push すると自動デプロイ）
+本番  : https://ututu-design.co.jp （main。2026-10-07 に新サイトへ入れ替えた。push すると自動デプロイ）
+         いまは**サイト全体にパスワード**（proxy.ts。Vercel の SITE_PASSWORD）と noindex が掛かっている。§8
+         旧 /v2 の URL は / へ転送（next.config.ts）
 GitHub: temmahirasawa-spec/ututu-website （Public ← 非公開にすることを推奨。§0）
-作業中: ブランチ claude/resume-8910ks（push すると /v2 にそのまま出る。プレビューURLは …vercel.app/v2）
+作業中: ブランチ claude/resume-8910ks（**push しただけでは本番に出ない**。main に入れて初めて出る）
 旧版  : コミット 38caf2a 以前（KVの連番・ホモグラフィ・reference/ の原本もそこにある）
 第1版 : コミット 12339cf（紙の節を縦に積む版。点描はヒーローだけだった）
 ```
@@ -588,8 +589,6 @@ npm run build    # 本番ビルド
 
 ### 人の手を待っているもの
 
-- **本番（main）への反映**。YORKYS を外す外科的修正（9256df6・cf8e72c）は、リニューアルと
-  切り離して先に main に入れられる
 - **実機での確認**。点描の膜は重いので、古めのスマホ（とくに Android の中位機）でのなめらかさと発熱、
   iOS Safari でのスクロールの手触りを確かめる。重ければ升目を大きくする（field.ts の `cell`）
 - **各LP（good-order-lp / good-review-website）の同じ修正**。REVIEW の映像の字幕と冒頭の実測、
@@ -631,6 +630,8 @@ npm run build    # 本番ビルド
 
 ### 公開の日にやること（この順で）
 
+0. **Vercel の環境変数 `SITE_PASSWORD` を消して再デプロイ**（サイト全体のパスワードが外れる。§8）。
+   **YORKYS の写真・映像も誰でも見られるようになる**ので、権利の確認（§0）はこの前に
 1. `app/layout.tsx` の `robots: { index: false, follow: false }` の行を**削除**
 2. 独自ドメインが決まっていたら、Vercel の環境変数 `NEXT_PUBLIC_SITE_URL` に入れる
 3. Vercel のダッシュボードで `/api/contact` に WAF のレートリミットを掛ける
@@ -649,21 +650,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ---
 
-## 8. ututu-design.co.jp/v2 での公開（2026-10-02 本人依頼）
+## 8. 本番への入れ替え（2026-10-07）とパスワード
 
-ututu-design.co.jp は Vercel の `ututu-website` プロジェクトの本番ドメインで、本番（main）はまだ**旧サイト**。
-新サイトは **main を入れ替えずに** /v2 に出している：
-
-1. このブランチは `basePath: '/v2'`（`lib/base.ts` の `BASE`。next.config.ts もここを読む）。
-   **public/ の素材の URL は必ず `asset()` を通すこと**（`<img src>`・`<video>`・`fetch`・GLTFLoader には basePath が付かない）。
-   vercel.json のキャッシュの source も `/v2/...`
-2. main の `vercel.json` の `rewrites` が、`/v2` と `/v2/:path*` を
-   このブランチのプレビュー（ブランチの固定URL `ututu-website-git-claude-re-452d4f-temmahirasawa-1946s-projects.vercel.app/v2/...`。名前が長いので Vercel が短くしたもの）へ中継する。
-   **このブランチに push すれば /v2 も更新される**（main を触る必要はない）
-3. noindex のまま（layout.tsx）。プレビューの応答にも Vercel が `x-robots-tag: noindex` を付ける
-4. **映像（public/clips/）だけは中継を通さない。**中継を通すと /v2 で映像が再生されなかった（2026-10-03 本人報告。
-   映像は Range で部分取得されるので中継と相性が悪い）。本番ビルドでは `media()`（lib/base.ts）が
-   ブランチの固定URLを直に指す。写真・アバター（fetch で読むので別オリジンだと CORS が要る）は中継のまま
-
-**新サイトを / に移す日**：`BASE` と `MEDIA_ORIGIN` を `''` にし、vercel.json の source から `/v2` を外して、このブランチを main に入れ、
-main の rewrites を消す（旧サイトは 38caf2a に残る）。そのあと「公開の日にやること」（§7）
+- 2026-10-02〜07 は、main（旧サイト）の rewrites で新サイトを /v2 に中継して見せていた。
+  **2026-10-07 に本人依頼でルート（/）へ入れ替えた**（このブランチを main に早送りで入れた）。旧サイトは 38caf2a に残る
+- `lib/base.ts` の `BASE` は `''`。/v2 と /v2/* は next.config.ts の redirects で / へ 308 で送る（共有済みのリンクのため）
+- **サイト全体のパスワード**：main で 2026-10-07 に入れた Basic 認証（`proxy.ts` ＋ `lib/site-lock.ts`。
+  本人指示「アプリと LP を非公開に」）を、そのまま引き継いでいる。Vercel の環境変数 `SITE_PASSWORD` があれば掛かり、
+  消して再デプロイすれば外れる。ユーザー名は空でよい
+  - 映像・写真・3D・お問い合わせの送信も同じオリジンなので、ブラウザが認証を付けて送る（確認済み）。
+    **素材を別オリジンから読まないこと**（別オリジンには認証が付かず 401 になる。`media()` は `asset()` と同じ）
+- noindex もそのまま（layout.tsx）。外すのは「公開の日にやること」（§7）

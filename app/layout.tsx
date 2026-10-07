@@ -53,7 +53,7 @@ const DESC =
 
 export const metadata: Metadata = {
   /* 独自ドメインが決まったら NEXT_PUBLIC_SITE_URL で差し替える（相対URLの解決先になる） */
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ututu-website.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ututu-design.co.jp'),
   title: TITLE,
   description: DESC,
   /* OGP。**画像はまだ無い。**public/ に og.png（1200×630）を置いたら
