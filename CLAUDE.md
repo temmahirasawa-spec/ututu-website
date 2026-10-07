@@ -9,6 +9,8 @@
 （「2人で」→「ビジネス×クリエイティブ」、できることを2番目に、思いは最後に、飲食ブランドの実績を戻す）。
 同日の次の指摘で、**キービジュアルだけ別の世界（粒子で描いた2つの細胞）**にして、抜けるときに膜の世界へ切り替わるようにした（§3）。
 同日、**アクセント色を朱 #FF4D1F から緑 #12D695 に差し替えた**（本人指定。§3「色と地」）。
+2026-10-07：**飲食ブランドの紹介を PC・スマホとも外した**（実績は自社プロダクト GOOD SERIES だけ。§5）。
+同日、**スマホ（幅900px以下）はカメラで飛ばない「flat」**にした（ふつうの縦スクロールに点描を重ねる。§3）。
 
 ```
 本番  : https://ututu-design.co.jp （main。2026-10-07 に新サイトへ入れ替えた。push すると自動デプロイ）
@@ -81,7 +83,7 @@ UTUTU は別会社で事業は続ける。
 |---|---|---|---|---|---|
 | 01 | ヒーロー `#top` | BUSINESS × CREATIVE.／事業をつくる力と、デザインの力を、掛け合わせる。 | 誰が・何を | 紙（**粒子で描いた2つの細胞**。膜は出さない） | 原点 |
 | 02 | できること `#services` | WHAT WE DO.／事業の設計から、店づくり、デジタルまで。 | 何を頼めるか | 紙 | **右へ** |
-| 03 | 実績の概要 `#work` | SELECTED WORKS.／立ち上げてきた店と、つくってきたプロダクト。 | 証拠 | 紙 | 左下へ、少し奥 |
+| 03 | 実績の概要 `#work` | SELECTED WORKS.／店舗のためにつくってきた、自社プロダクト。 | 証拠 | 紙 | 左下へ、少し奥 |
 | 04 | チーム `#team` | THE PRODUCER & THE DESIGNER.／事業のプロと、クリエイティブのプロ。 | 誰がやるのか | 墨 | 右下へ、手前へ |
 | 05 | 宣言 `#why` | （文が一語ずつ灯る。「×」の印） | 何を大事にしているか | 墨 | 左下へ |
 | 06 | 原則 `#how` | AI, WITHOUT SHORTCUTS.／AIで、手を抜かない。 | 何が違うのか | 紙 | 右上へ、少し奥 |
@@ -91,18 +93,16 @@ UTUTU は別会社で事業は続ける。
 
 - **思い・コンセプト（宣言と原則の3枚）は最後、締めの直前に置く**（2026-10-02 本人判断：最初に訴えても
   訪問者は困るし、独りよがりになる。メッセージとして最後に伝える）
-- トップの実績は**概要だけ**（写真のモザイクとロゴ）。詳しくは `/works`
+- トップの実績は**概要だけ**（GOOD SERIES のカード1枚）。詳しくは `/works`
 
-**実績**（`app/works/page.tsx`。同じ座標の世界）
+**実績**（`app/works/page.tsx`。同じ座標の世界）。**自社プロダクトだけ**（2026-10-07 本人判断で飲食ブランドの紹介は外した）
 
 | パネル | 中身 | 地 | 動き |
 |---|---|---|---|
-| `#top` | SELECTED WORKS.／2本立ての目次 | 紙 | 原点 |
-| (A) `#branding` | BRANDS WE BUILT.／立ち上げてきた、飲食ブランド（2014〜／4ブランド／地域） | 墨 | 右下へ |
-| (A-1〜4) `#brunch` `#creperie` `#bake` `#froma` | ブランド1つ＝1枚。文と映像、その下に大きな写真の札（押すと拡大）。何を手がけたか | 紙と墨を交互 | **横へ1枚ずつ**（背が高いので下ってから渡る） |
-| (B) `#saas` | TOOLS FOR STORES.／店舗のための、自社プロダクト | 紙 | 左下へ、奥へ |
-| (B-1/2) `#order` `#review` | GOOD ORDER / GOOD REVIEW（以前トップにあった2枚） | 黄／緑 | 横へ |
-| (B-3) `#ledger` | MADE IN-HOUSE.（社内でつくった数） | 紙 | 左下へ |
+| `#top` | SELECTED WORKS.／店舗のための、自社プロダクト。目次（ORDER / REVIEW / 社内でつくった数） | 紙 | 原点 |
+| (01) `#order` | GOOD ORDER | 黄 | 右下へ、奥へ |
+| (02) `#review` | GOOD REVIEW | 緑 | 横へ |
+| (03) `#ledger` | MADE IN-HOUSE.（社内でつくった数） | 紙 | 左下へ |
 | `#contact-cta` → フッター | トップと同じ部品 | 緑 → 墨 | 地図 |
 
 - 実績は**自社プロダクト（GOOD SERIES）を作品として見せる**。企画からブランド・UI・開発・LP・映像まで
@@ -151,11 +151,8 @@ components/
     Rise.tsx              （第2版では未使用）
     home.css              トップの各パネルの CSS（座標の世界／縦並びの両方）
   works/
-    data.ts               飲食ブランドのデータと写真・映像（トップの概要と /works が共用）。書き方の決まりは先頭
-    Works.tsx             /works の各パネル
-    BrandFilm.tsx         ブランドの短い映像（無音のくり返し）
-    PhotoViewer.tsx       写真を画面いっぱいで見る（世界の外に置く）
-    works.css             トップの「実績の概要」と /works の CSS
+    Works.tsx             /works の各パネル（入口・GOOD SERIES・社内でつくった数）
+    works.css             トップの「実績の概要」と /works の入口の CSS
   products/               プロダクト2節（§5。/works の (B) に置く）
     Products.tsx / ProductVideo.tsx / OrderScreen.tsx / products.css
   team/
@@ -165,10 +162,8 @@ components/
     CompanyClient.tsx     会社概要＋お問い合わせ
     company.css
 public/
-  clips/works/            ブランドの映像とポスター（YORKYS のコーポレートサイトの原本から。§5「実績」）
   clips/products/         プロダクト節の映像 {order,review}-{wide,tall}.mp4 とポスター（いまは wide だけ使う）
   img/products/           REVIEW の画面（props/ は第1版の「卓の上の小物」。いまは未使用）
-  img/works/              実績の写真（webp。Dropbox の YORKYS から選んだもの。§5「実績」）
   img/logos/              GOOD ORDER / GOOD REVIEW の正式ロゴ
   models/                 2人のアバター（GLB）
 scripts/        エッジ温め（warm.sh）と GLB まわりの道具
@@ -323,6 +318,26 @@ THEMES の `shu`）と、この文書の「朱」は**いまはこの緑のこ�
   点描のキャンバスは隠れるので描かない（`dots.setBack(false)`）。代わりに止まった網点の地紋を敷く。
   JS が無いときも縦並び
 
+### スマホ（flat。2026-10-07 本人判断）
+
+本人の指摘：「スマホはやりすぎ。上下に行き来すると動きが不自然、行き過ぎて読むところに着かない、
+アドレスバーの出入りでおかしな動きをする。PC は完璧なのでそのまま」。そこで**幅 900px 以下**
+（と横向きのスマホ。`WorldRoot.tsx` の `FLAT_MQ`）では、座標の世界の**カメラを使わない**。
+
+- 節は**ふつうに縦に流れる**（`html.world.flat`。`world.ts` の `layoutFlat` / `updateFlat`）。スクロールは奪わない
+- 点描の膜・印（QR・星・×・床…）・触れたときの反応・文字の避け場所・段落が灯る・地の網点の塗り替えは、PC と**同じしくみ**
+  （節の画面の位置をスクロールから計算して、同じ `scene()` に渡している）
+- **XYZ の移動の代わりに**、節が画面に入ってくるあいだだけ、`data-at` の向き（右から／奥から…）から少し寄ってくる。
+  時間ではなくスクロールに結びつけてあるので、戻れば戻る
+- **キービジュアルの細胞**はそのまま。ヒーローのあとに何もない区間（`.hero` の margin-bottom 85svh）を置き、
+  そこをスクロールするあいだに1つになって弾け、「できること」で膜が現れる
+- `scroll-snap-type: y proximity`：近くで止まったときだけ節の頭にそっと合わせる（強制しない）
+- 座標の表示（X/Y/Z）は出さない。右下の地図は**押せる目次**（節1つ＝点1つを縦に。節が変わると名前が少し出る）。
+  「次へ」ボタンは置かない（本人判断）
+- 確認用：スマホで `?world` を付けると座標の世界のまま
+- アドレスバーの出入りで resize が来ても、**寸法が変わっていなければ何もしない**（`relayout()`。以前は毎回並べ直して、
+  指で動かしている途中のスクロールを引き戻していた）。点描のキャンバスも、大きさが同じなら作り直さない
+
 ### 動きの語彙（globals.css の「現れ方」）
 
 1. **解像** … 点がノイズから形に揃う。欧文の見出しは1文字ずつ点から文字になる（Decode）
@@ -373,35 +388,12 @@ THEMES の `shu`）と、この文書の「朱」は**いまはこの緑のこ�
 
 ## 5. 各部の詳細
 
-### 実績（/works と、トップの「実績の概要」。2026-10-02）
+### 実績（/works と、トップの「実績の概要」）
 
-2本立て：**(A) ブランディング・店舗プロデュース**（立ち上げてきた飲食ブランド）と **(B) SaaS**（GOOD SERIES）。
-データは `components/works/data.ts`、パネルは `components/works/Works.tsx`。
-
-- **写真は Dropbox の `YORKYS/` から選んだ候補**（本人：あとで選別するので、まずは緩めに広く）。
-  `public/img/works/*.webp`（長辺1200〜1800px、q76）。いま使っているのは22枚。出どころ：
-  - `YORKYS/01_ENTERTAINMENT/デザイン/コーポレートサイト/生成用画像/` … 旧コーポレートサイトの素材（店舗の内外観・商品）
-  - `YORKYS/_アーカイブ/過去デザインデータ/撮影素材/Yorkys_Entertainment_2025.05/` … PIECE OF BAKE と FROMA の撮影（80枚）
-  - `YORKYS/_アーカイブ/過去デザインデータ/撮影素材/Yorkys_Entertainment_2025.09/` … 季節商品の撮影（45枚。いまは未使用）
-  - `YORKYS/01_ENTERTAINMENT/デザイン/FC/Piece of Bake/images/gyouretsu*.jpg` … 行列の写真
-  - `YORKYS/名古屋店/デザイン/00_ファザードグラフィック/FRONT.jpg` … 名古屋の店舗
-  - ほかに未確認の候補：`旧YORKYS/YORKYS_阪急三番街/写真/`（約200枚）、`撮影素材/クレープ撮影_1210/`（約170枚）
-- 写真を差し替えたら `data.ts` の w / h も直すこと（`<img>` の width / height に使う）
-- **ブランドの映像**（2026-10-02 本人指定）：YORKYS のコーポレートサイトで使っていた短い映像（音なし・5〜10秒・1280×720）。
-  公開サイトから直に引かず、Dropbox の原本
-  `_MIGRATED_2026-08-02/YORKYS/01_ENTERTAINMENT/デザイン/コーポレートサイト/AI_Renewal_2026/site/public/videos/` から取った
-  （BRUNCH＝brands-video-1、Creperie＝brands-video-2、BAKE＝brands-video-3、FROMA＝philosophy-video-2）。
-  `public/clips/works/{id}.mp4` とポスター `{id}-poster.webp`。部品は `components/works/BrandFilm.tsx`
-  （半分以上見えているあいだだけ無音でくり返し、右下に一時停止）。**差し替えたら `VER` を上げること**。
-  FROMA の映像は左右に 42px の黒い帯があるので、`zoom: 1.072` で切り落としている。
-  **映像の権利も写真と同じく要確認**（§0）
-- **写真は小さく並べない**（2026-10-02 本人指摘：小さい写真も大きく見えるように）。パネルの幅いっぱいの
-  12列の格子に、1枚目を大きく（6列×2段）、残りを右に。スマホは2列で、1枚目は全幅。
-  札を押すと画面いっぱいで見られる（`components/works/PhotoViewer.tsx`。← → で送る、Esc で閉じる、スマホは払う）。
-  PhotoViewer は**座標の世界の外**（app/works/page.tsx の WorldRoot の隣）に置くこと
-  （パネルは transform の中なので position:fixed が効かない）
-- 各ブランドの「Role（何を手がけたか）」は**確認待ち**。いまは業態の性格から書いた仮
-- 写真には `.rv`（網点で現れる）を付けてある。行列の写真は顔が判別できないものを選ぶこと
+- **2026-10-07 本人判断で、飲食ブランド（YORKYS BRUNCH / Creperie / PIECE OF BAKE / FROMA）の紹介を PC・スマホとも外した。**
+  写真（`public/img/works/`）・映像（`public/clips/works/`）・`data.ts`・`BrandFilm`・`PhotoViewer` も消した（過去のコミットには残る）
+- いまの実績は**自社プロダクト GOOD SERIES だけ**。トップはカード1枚、/works は入口 → ORDER → REVIEW → 社内でつくった数
+- 洋輔さんの経歴（bios.ts）と、ヒーロー・チームの「飲食ブランドを立ち上げてきた」という一言はそのまま
 
 ### プロダクト節（components/products/。2026-10 にサイトの文法へ組み直し。いまは /works の (B)）
 
@@ -613,7 +605,7 @@ npm run build    # 本番ビルド
   AI, WITHOUT SHORTCUTS. ／ LET'S BUILD. ／ BRANDS WE BUILT. ／ TOOLS FOR STORES. ／ MADE IN-HOUSE.）
 - できること5本（Produce / Branding / Web & App / Film / Store DX）の中身
 - 洋輔さんの経歴の事実（2014年・夙川、出店先の施設名、名古屋・東京）と、各ブランドの Role
-- 店舗写真・ブランドの映像をサイトに出してよいか（権利の所在。§0）
+
 
 ### これから作るもの
 
@@ -630,8 +622,7 @@ npm run build    # 本番ビルド
 
 ### 公開の日にやること（この順で）
 
-0. **Vercel の環境変数 `SITE_PASSWORD` を消して再デプロイ**（サイト全体のパスワードが外れる。§8）。
-   **YORKYS の写真・映像も誰でも見られるようになる**ので、権利の確認（§0）はこの前に
+0. **Vercel の環境変数 `SITE_PASSWORD` を消して再デプロイ**（サイト全体のパスワードが外れる。§8）
 1. `app/layout.tsx` の `robots: { index: false, follow: false }` の行を**削除**
 2. 独自ドメインが決まっていたら、Vercel の環境変数 `NEXT_PUBLIC_SITE_URL` に入れる
 3. Vercel のダッシュボードで `/api/contact` に WAF のレートリミットを掛ける

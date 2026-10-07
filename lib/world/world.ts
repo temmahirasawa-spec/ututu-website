@@ -12,7 +12,11 @@
      **点描の描画ループの中から update() を呼んでもらう**（別々の rAF だと1フレームずれる）
 
    ネイティブのスクロールはそのまま（奪わない）。ホイールの段差だけ少しなめらかにする。
-   動きを止める設定では使わない（ふつうの縦並びのまま。World.tsx が判断する） */
+   動きを止める設定では使わない（ふつうの縦並びのまま。World.tsx が判断する）
+
+   **スマホ（flat）**：2026-10-07 本人判断で、スマホではカメラで飛ばない。節はふつうに縦に流れ
+   （html.flat）、点描・細胞・印・地の塗り替えだけを同じしくみで重ねる。節は画面に入ってくるとき、
+   data-at の向き（右から／奥から…）から少しだけ寄ってくる。上下に行き来してもスクロールの手触りはふつうのまま */
 
 import { kvState } from './kv';
 import { dots, MODE, type KV, type Mood, type Scene, type Stamp, type ThemeName, type Zone } from '@/lib/dots/field';
@@ -64,6 +68,8 @@ type Panel = {
   o: number;
   vis: boolean;
   css: string;
+  /** flat：ページの頭からの節の上端（素の位置） */
+  top: number;
 };
 
 type Seg = { kind: 'transit' | 'dwell' | 'hold'; s0: number; s1: number; a: V3; b: V3; bulge: number; map: boolean; panel: number };
@@ -98,12 +104,17 @@ export class World {
   /** キービジュアルの細胞（トップだけ。ヒーローに .hero-cells があるとき。lib/world/kv.ts）と、オープニングの起点 */
   private kvOn = false;
   kvT0 = -1e9;
+  /** スマホ：カメラで飛ばず、節はふつうに縦に流れる（start() の前に決める） */
+  flat = false;
+  private idx = -1;
+  private atTimer = 0;
 
   constructor(private root: HTMLElement, private spacer: HTMLElement, private probe: HTMLElement) {}
 
   start() {
     this.coarse = matchMedia('(pointer: coarse)').matches;
     document.documentElement.classList.add('world');
+    document.documentElement.classList.toggle('flat', this.flat);
     this.read();
     this.layout();
     this.sSmooth = window.scrollY;
@@ -136,7 +147,7 @@ export class World {
     this.offs = [];
     cancelAnimationFrame(this.ownRaf);
     if (dots.ok) dots.setScene(null);
-    document.documentElement.classList.remove('world');
+    document.documentElement.classList.remove('world', 'flat');
     this.panels.forEach((p) => {
       p.el.style.transform = '';
       p.el.style.opacity = '';
@@ -174,22 +185,32 @@ export class World {
         mood,
         h: 0, pos: { x: 0, y: 0, z: 0 }, start: { x: 0, y: 0, z: 0 }, end: { x: 0, y: 0, z: 0 },
         sIn: 0, sStart: 0, sEnd: 0, stamps: [], zones: [], lights: [],
-        sc: 1, tx: 0, ty: 0, o: 1, vis: false, css: '',
+        sc: 1, tx: 0, ty: 0, o: 1, vis: false, css: '', top: 0,
       };
     });
   }
 
   private relayout() {
-    /* いまいる節と、その中の位置を覚えておき、並べ直したあとも同じ場所に戻す */
-    const i = this.panelAt(this.sSmooth);
+    /* スマホではアドレスバーが出入りするたびに resize が来る。でも高さは 100svh の probe で測っているので
+       並びは変わらない。**何も変わっていなければ何もしない**（以前は毎回並べ直してスクロール位置を戻し、
+       指で動かしている途中に引き戻していた。2026-10-07 本人報告） */
+    const W = this.root.clientWidth || window.innerWidth;
+    const H = this.probe.offsetHeight || window.innerHeight;
+    if (W === this.W && H === this.H && this.panels.every((p) => p.el.offsetHeight === p.h)) return;
+    if (this.flat) { this.layout(); return; }   // ふつうに流れているので、スクロール位置はブラウザが保つ
+    /* いまいる節と、その中の位置を覚えておき、並べ直したあとも同じ場所に戻す。
+       **カメラ（sSmooth）ではなく実際のスクロール位置から測ること**（カメラは遅れて追いかけているので、
+       カメラから測ると指の位置より手前へ引き戻す） */
+    const y = window.scrollY;
+    const i = this.panelAt(y);
     const p = this.panels[i];
-    const frac = p ? (this.sSmooth - p.sIn) / Math.max(1, p.sEnd - p.sIn) : 0;
+    const frac = p ? (y - p.sIn) / Math.max(1, p.sEnd - p.sIn) : 0;
     this.layout();
     const q = this.panels[i];
     if (q) {
       const s = q.sIn + frac * (q.sEnd - q.sIn);
-      this.sSmooth = s;
-      window.scrollTo({ top: s, behavior: 'instant' as ScrollBehavior });
+      if (Math.abs(s - y) > 1) window.scrollTo({ top: s, behavior: 'instant' as ScrollBehavior });
+      this.sSmooth += s - y;
     }
     this.dirty = true;
   }
@@ -204,6 +225,8 @@ export class World {
        **覚えている変形（css）も消すこと。**消さないと、次のフレームで「変わっていない」と見なされ、
        素の位置のまま全部の節が重なる（実際に起きた） */
     this.panels.forEach((p) => { p.el.style.transform = 'none'; p.el.style.visibility = 'visible'; p.css = ''; });
+
+    if (this.flat) { this.layoutFlat(); return; }
 
     let prev: Panel | null = null;
     for (const p of this.panels) {
@@ -265,6 +288,28 @@ export class World {
     this.dirty = true;
   }
 
+  /** flat：節はふつうに縦に並んでいる。素の位置を測るだけ。道のり（s）はページのスクロール位置そのもの */
+  private layoutFlat() {
+    const sy = window.scrollY;
+    this.panels.forEach((p, i) => {
+      p.h = p.el.offsetHeight;
+      p.top = p.el.getBoundingClientRect().top + sy;
+      p.pos = { x: 0, y: p.top, z: 0 };
+      p.start = { ...p.pos };
+      p.end = { x: 0, y: p.top + Math.max(0, p.h - this.H), z: 0 };
+      p.sIn = i ? this.panels[i - 1].top : 0;
+      p.sStart = p.top;
+      p.sEnd = p.top + p.h;
+      this.measure(p);
+    });
+    this.kvOn = dots.ok && !!this.panels[0]?.el.querySelector('.hero-cells');
+    this.segs = [];
+    this.S = Math.max(0, document.documentElement.scrollHeight - this.H);
+    this.spacer.style.height = '';
+    this.buildMap();
+    this.dirty = true;
+  }
+
   /** 節の中の、印・文字の避け場所・灯る段落を、節の左上からの位置で測る */
   private measure(p: Panel) {
     const pr = p.el.getBoundingClientRect();
@@ -312,6 +357,12 @@ export class World {
   }
 
   private panelAt(s: number) {
+    if (this.flat) {
+      /* 画面のまんなかにある節 */
+      let i = 0;
+      for (let k = 0; k < this.panels.length; k++) if (this.panels[k].top <= s + this.H * 0.5) i = k;
+      return i;
+    }
     const g = this.segAt(s);
     if (!g) return 0;
     if (g.kind !== 'transit') return g.panel;
@@ -360,6 +411,11 @@ export class World {
   travelTo(i: number, instant = false, dy = 0) {
     const p = this.panels[Math.max(0, Math.min(this.panels.length - 1, i))];
     if (!p) return;
+    if (this.flat) {
+      window.scrollTo({ top: p.top, behavior: (instant ? 'instant' : 'smooth') as ScrollBehavior });
+      this.dirty = true;
+      return;
+    }
     const to = p.sStart + Math.max(0, Math.min(p.end.y - p.start.y, dy));
     if (instant) { this.tween = null; this.sSmooth = to; }
     else {
@@ -402,6 +458,7 @@ export class World {
   /** キーボードで画面の外の要素に移ったら、そこが見えるところまで運ぶ。
       背の高い節（ふたり など）では、節の頭ではなく要素の高さまで下る */
   private onFocus = (e: FocusEvent) => {
+    if (this.flat) return;   // ふつうに流れているので、ブラウザが見えるところまで運ぶ
     const el = e.target as HTMLElement;
     const i = this.panels.findIndex((p) => p.el.contains(el));
     if (i < 0) return;
@@ -468,6 +525,7 @@ export class World {
   update(now: number): Scene {
     const dt = Math.min(0.05, Math.max(0.001, (now - (this.last || now)) / 1000));
     this.last = now;
+    if (this.flat) return this.updateFlat(dt);
     const target = Math.max(0, Math.min(this.S, window.scrollY));
     if (this.tween) {
       const t = Math.min(1, (now - this.tween.t0) / this.tween.dur);
@@ -530,6 +588,69 @@ export class World {
 
     this.hud(cam);
     return this.scene(dt);
+  }
+
+  /** flat の毎フレーム。カメラは無い。節の画面の位置はスクロールで決まり、入ってくるときだけ少し寄ってくる */
+  private updateFlat(dt: number): Scene {
+    const y = window.scrollY;
+    this.sSmooth = y;
+    const { W, H } = this;
+    this.panels.forEach((p, i) => {
+      const base = p.top - y;
+      /* 入ってくる：節の上端が画面の下端 → 画面の 55% まで来るあいだに、data-at の向きから寄ってくる。
+         時間ではなくスクロールに結びつけるので、戻れば戻る（上下に行き来しても不自然にならない） */
+      let tx = 0, sc = 1, o = 1;
+      if (i > 0) {
+        const t = Math.min(1, Math.max(0, (H - base) / (H * 0.45)));
+        const u = 1 - Math.pow(1 - t, 3);
+        const ax = Math.max(-1, Math.min(1, p.at[0])), az = Math.max(-1, Math.min(1, p.at[2]));
+        sc = 1 + az * 0.14 * (1 - u);
+        tx = (W - W * sc) / 2 + ax * W * 0.16 * (1 - u);
+        o = 0.25 + 0.75 * u;
+      }
+      const vis = base < H + 40 && base + p.h > -40;
+      this.applyFlat(p, vis, tx, base, sc, o);
+    });
+
+    /* 地の色：画面のまんなかに来た節の地へ、その節の上端から塗り替える */
+    const gi = this.panelAt(y);
+    const gp = this.panels[gi];
+    if (gp && gp.ground !== this.ground) {
+      const first = this.ground === null;
+      this.ground = gp.ground;
+      dots.setTheme(gp.ground, { wipe: !first, x: W / 2, y: Math.min(H, Math.max(0, gp.ty)) });
+    }
+    if (gp && gi !== this.idx) {
+      this.idx = gi;
+      document.documentElement.dataset.at = gp.id;
+      this.markMap(gi);
+    }
+
+    /* 段落が灯る（画面の下から上へ） */
+    for (const p of this.panels) {
+      if (!p.vis || !p.lights.length) continue;
+      for (const l of p.lights) {
+        const ly = p.ty + (l.y + l.h * 0.5) * p.sc;
+        l.el.style.setProperty('--lp', Math.min(1, Math.max(0, (H * 0.86 - ly) / (H * 0.5))).toFixed(3));
+      }
+    }
+    return this.scene(dt);
+  }
+
+  private applyFlat(p: Panel, vis: boolean, tx: number, ty: number, sc: number, o: number) {
+    if (vis && !p.vis) p.el.dispatchEvent(new CustomEvent('panelshow'));
+    p.tx = tx; p.ty = ty; p.sc = sc; p.o = o; p.vis = vis;
+    /* 節はふつうに流れているので、当てるのは「寄ってくる」ぶんだけ（ty は当てない） */
+    const css = vis ? `${tx.toFixed(1)}|${sc.toFixed(4)}|${o.toFixed(3)}` : 'hidden';
+    if (css === p.css) return;
+    p.css = css;
+    const st = p.el.style;
+    if (!vis) { st.visibility = 'hidden'; st.willChange = ''; return; }
+    st.visibility = 'visible';
+    const still = Math.abs(tx) < 0.05 && Math.abs(sc - 1) < 0.0005;
+    st.willChange = still ? '' : 'transform';
+    st.transform = still ? '' : `translate3d(${tx.toFixed(1)}px,0,0) scale(${sc.toFixed(4)})`;
+    st.opacity = o >= 0.999 ? '' : o.toFixed(3);
   }
 
   private apply(p: Panel, vis: boolean, tx: number, ty: number, sc: number, o: number, z = 0) {
@@ -598,7 +719,9 @@ export class World {
       stamps,
       zones: zones.slice(0, 12).map((x) => x.z),
       mood,
-      lattice: { x: -this.cam.x * 0.32, y: -this.cam.y * 0.32, scale: 1 / (1 + this.bulgeNow * 0.45) },
+      lattice: this.flat
+        ? { x: 0, y: -this.sSmooth * 0.32, scale: 1 }
+        : { x: -this.cam.x * 0.32, y: -this.cam.y * 0.32, scale: 1 / (1 + this.bulgeNow * 0.45) },
     };
   }
 
@@ -635,6 +758,7 @@ export class World {
   private buildMap() {
     const svg = this.hudEls.map;
     if (!svg || !this.panels.length) return;
+    if (this.flat) { this.buildIndex(svg); return; }
     const box = svg.getBoundingClientRect();
     const bw = box.width || 96, bh = box.height || 64;
     const pts = this.panels.map((p) => this.mapPoint(p));
@@ -658,6 +782,45 @@ export class World {
       c.addEventListener('click', () => this.travelTo(i));
       svg.appendChild(c);
     });
+  }
+
+  /** flat：右下の地図を「押せる目次」にする。節1つ＝点1つを縦に並べ、いまの節に朱の点と名前 */
+  private static IDX = 16;
+  private buildIndex(svg: SVGSVGElement) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const n = this.panels.length, step = World.IDX;
+    svg.replaceChildren();
+    svg.setAttribute('viewBox', `0 0 20 ${n * step}`);
+    svg.style.height = `${n * step}px`;
+    this.panels.forEach((p, i) => {
+      const g = document.createElementNS(ns, 'g');
+      const hit = document.createElementNS(ns, 'rect');           // 指で押せる大きさ
+      hit.setAttribute('x', '0'); hit.setAttribute('y', String(i * step));
+      hit.setAttribute('width', '20'); hit.setAttribute('height', String(step));
+      hit.setAttribute('fill', 'transparent');
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', '10'); c.setAttribute('cy', String(i * step + step / 2)); c.setAttribute('r', '2');
+      const t = document.createElementNS(ns, 'title');
+      t.textContent = p.label;
+      g.append(hit, c, t);
+      g.addEventListener('click', () => this.travelTo(i));
+      svg.appendChild(g);
+    });
+    this.markMap(this.panelAt(window.scrollY));
+  }
+
+  private markMap(i: number) {
+    if (!this.flat) return;
+    const { cam, at } = this.hudEls;
+    if (cam) cam.style.transform = `translate(10px,${(i + 0.5) * World.IDX}px)`;
+    if (at) {
+      /* 名前は、いまの点の高さに添えて、節が変わったときだけ少し出す（出しっぱなしだと本文にかかる） */
+      at.textContent = this.panels[i]?.label ?? '';
+      at.style.setProperty('--at-y', `${(i + 0.5) * World.IDX}px`);
+      at.classList.add('on');
+      clearTimeout(this.atTimer);
+      this.atTimer = window.setTimeout(() => at.classList.remove('on'), 1600);
+    }
   }
 
   /** 地図の上の点の位置（世界の座標。奥にあるものほど、少し中心へ寄せて奥行きを残す） */

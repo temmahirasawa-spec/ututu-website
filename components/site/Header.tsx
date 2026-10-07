@@ -30,10 +30,7 @@ const NAV: { href: string; path: string; en: string; jp: string; subs: Sub[] }[]
   },
   {
     href: '/works', path: '/works', en: 'Works', jp: '実績',
-    subs: [
-      { href: '/works#branding', en: 'Branding & Produce', jp: '飲食ブランド' },
-      { href: '/works#saas', en: 'SaaS', jp: 'GOOD SERIES' },
-    ],
+    subs: [],
   },
   { href: '/company', path: '/company', en: 'Company', jp: '会社概要', subs: [] },
   { href: '/company#contact', path: '', en: 'Contact', jp: 'お問い合わせ', subs: [] },

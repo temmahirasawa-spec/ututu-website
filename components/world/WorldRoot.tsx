@@ -6,12 +6,16 @@
    - 3Dアバターは #team が近づいてから読む（three.js は重い）
    - 初回だけ、キービジュアルの2つの細胞が両端から入ってくる（lib/world/kv.ts） */
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { BioModal } from '@/components/team/BioModal';
 import { transit } from '@/components/site/TLink';
 import { dots, THEMES, type ThemeName } from '@/lib/dots/field';
 import { World } from '@/lib/world/world';
 import { startReveal } from '@/components/home/reveal';
+
+/* スマホはカメラで飛ばない（lib/world の flat。2026-10-07 本人判断）。幅 900px 以下、または横向きのスマホ。
+   確認用に ?world を付けるとスマホでも座標の世界のまま */
+const FLAT_MQ = '(max-width: 900px), (pointer: coarse) and (max-height: 600px)';
 
 export function WorldRoot({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
@@ -23,8 +27,18 @@ export function WorldRoot({ children }: { children: ReactNode }) {
   const hat = useRef<HTMLParagraphElement>(null);
   const hcam = useRef<HTMLElement>(null);
   const hmap = useRef<SVGSVGElement>(null);
+  const [flat, setFlat] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const mq = matchMedia(FLAT_MQ);
+    const f = () => setFlat(mq.matches && !location.search.includes('world'));
+    f();
+    mq.addEventListener('change', f);
+    return () => mq.removeEventListener('change', f);
+  }, []);
+
+  useEffect(() => {
+    if (flat === null) return;
     const r = root.current, sp = spacer.current, pr = probe.current;
     if (!r || !sp || !pr) return;
     const offs: Array<() => void> = [startReveal(r)];
@@ -50,6 +64,7 @@ export function WorldRoot({ children }: { children: ReactNode }) {
     } else {
       /* ---- 座標の世界 ---- */
       const w = new World(r, sp, pr);
+      w.flat = flat;
       w.attachHud({ x: hx.current, y: hy.current, z: hz.current, at: hat.current, cam: hcam.current, map: hmap.current });
       /* 初回（ページ遷移で来たのではなく、いちばん上から開いたとき）だけ、細胞が両端から入ってくる */
       const first = !transit.used;
@@ -117,7 +132,7 @@ export function WorldRoot({ children }: { children: ReactNode }) {
       offs.forEach((f) => f());
       stopViewer?.();
     };
-  }, []);
+  }, [flat]);
 
   return (
     <>

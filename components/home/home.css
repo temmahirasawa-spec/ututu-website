@@ -14,6 +14,17 @@
 html.world .wv{position:fixed;inset:0;overflow:clip;z-index:1;pointer-events:none}
 html.world .wv>.pn{position:absolute;left:0;top:0;width:100%;transform-origin:0 0;pointer-events:auto}
 html.world .w-spacer{display:block}
+/* スマホ（html.flat。lib/world の flat）：カメラで飛ばず、節はふつうに縦に流れる。地は点描のキャンバスが塗るので、
+   節に背景は塗らない（html.world なので下の html:not(.world) の規則は効かない）。
+   入ってくる節は JS が横へずらしたり縮めたりするので、横にはみ出した分は切る（横スクロールを出さない） */
+html.world.flat .wv{position:relative;inset:auto;overflow-x:clip;overflow-y:visible;pointer-events:auto}
+html.world.flat .wv>.pn{position:relative;left:auto;top:auto;transform-origin:0 0}
+html.world.flat .w-spacer{display:none}
+/* 読むところで止まりやすく（近くで止まったときだけ節の頭にそっと合わせる。強制はしない） */
+html.world.flat{scroll-snap-type:y proximity}
+html.world.flat .wv>.pn{scroll-snap-align:start}
+/* ヒーローのあとに、細胞が1つになって弾けるための何もない区間（PC の「できること」までの道のりにあたる） */
+html.world.flat .hero{margin-bottom:85svh}
 
 /* ふつうの縦並び：パネルが自分の地を塗る（値は globals.css の html[data-ground] と同じ） */
 html:not(.world) .pn{background:var(--g);color:var(--fg)}
@@ -57,6 +68,15 @@ html[data-at=top] .hud-scroll{display:inline-flex}
  html.world .hud{bottom:10px;font-size:9.5px}
  .hud-pos{gap:9px}
 }
+/* スマホ：座標の表示はなし。右下の地図は「押せる目次」（節1つ＝点1つを縦に。いまの節に朱の点と名前） */
+html.world.flat .hud{left:auto;right:6px;bottom:12px;justify-content:flex-end}
+html.world.flat .hud-pos,html.world.flat .hud-scroll{display:none}
+html.world.flat .hud-map{display:block;width:20px;height:auto;opacity:.9}
+html.world.flat .hud-map svg{position:relative;inset:auto;width:20px}
+html.world.flat .hud-map circle{fill:var(--fg);opacity:.45}
+html.world.flat .hud-at{left:auto;right:24px;bottom:auto;top:var(--at-y,0);transform:translateY(-50%);white-space:nowrap;
+ font-size:9.5px;padding:2px 5px;margin:0;pointer-events:none;opacity:0;transition:opacity .35s ease}
+html.world.flat .hud-at.on{opacity:1}
 
 /* ===================== パネル共通 ===================== */
 .pn{position:relative}

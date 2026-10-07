@@ -80,7 +80,7 @@ function Product(p: Props) {
 export function OrderPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
-      slug="order" n="B-1" name="GOOD ORDER"
+      slug="order" n="01" name="GOOD ORDER"
       logo={{ src: asset('/img/logos/good-order.svg'), w: 584.2, h: 56.6 }}
       kind="モバイルオーダー"
       sub="いいデザインは、" main="売上に効く。"
@@ -103,7 +103,7 @@ export function OrderPanel({ panel }: { panel: PanelAttrs }) {
 export function ReviewPanel({ panel }: { panel: PanelAttrs }) {
   return (
     <Product
-      slug="review" n="B-2" name="GOOD REVIEW"
+      slug="review" n="02" name="GOOD REVIEW"
       logo={{ src: asset('/img/logos/good-review.svg'), w: 631.2, h: 66.7 }}
       kind="クチコミ獲得ツール"
       sub="黙って帰っていた人の、" main="クチコミが増える。"

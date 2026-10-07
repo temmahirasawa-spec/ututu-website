@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Contact, Footer } from '@/components/home/Sections';
-import { PhotoViewer } from '@/components/works/PhotoViewer';
-import { BrandPanels, BrandingIntro, Ledger, SaasIntro, SaasProducts, WorksHero } from '@/components/works/Works';
+import { Ledger, SaasProducts, WorksHero } from '@/components/works/Works';
 import { WorldRoot } from '@/components/world/WorldRoot';
 import '@/components/home/home.css';
 import '@/components/works/works.css';
@@ -9,27 +8,19 @@ import '@/components/works/works.css';
 export const metadata: Metadata = {
   title: '実績 — UTUTU',
   description:
-    '株式会社UTUTUの実績。立ち上げてきた飲食ブランド（YORKYS BRUNCH、YORKYS Creperie、PIECE OF BAKE、FROMA）と、店舗のための自社プロダクト GOOD SERIES（GOOD ORDER、GOOD REVIEW）。',
+    '株式会社UTUTUの実績。店舗のための自社プロダクト GOOD SERIES（モバイルオーダーの GOOD ORDER、クチコミを増やす GOOD REVIEW）。企画からブランド、UI、開発、映像まで社内でつくっています。',
 };
 
-/* 実績。トップと同じ座標の世界に、(A) ブランディング → (B) SaaS の順で並べる。
-   写真の拡大（PhotoViewer）は世界の外に置く。
+/* 実績。トップと同じ座標の世界に、自社プロダクト（GOOD SERIES）を並べる（飲食ブランドは 2026-10-07 に外した）。
    締めの at の z は、手前（0）へ戻る量。前のパネルの奥行きを変えたら合わせ直すこと */
 export default function WorksPage() {
   return (
-    <>
     <WorldRoot>
       <WorksHero />
-      <BrandingIntro />
-      <BrandPanels />
-      <SaasIntro />
       <SaasProducts />
       <Ledger />
-      <Contact n="C" at="0.45,0.45,0.95" />
+      <Contact n="C" at="0.45,0.45,0.6" />
       <Footer panel />
     </WorldRoot>
-    {/* 写真を大きく見る。パネルは transform の中にあって fixed が効かないので、世界の外に置く */}
-    <PhotoViewer />
-    </>
   );
 }

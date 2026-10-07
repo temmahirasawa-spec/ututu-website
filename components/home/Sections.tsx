@@ -26,7 +26,6 @@ import { Arrow, ExtIcon } from '@/components/site/Header';
 import { Mark } from '@/components/site/Mark';
 import { PRODUCT_URL } from '@/components/site/productLinks';
 import { TLink } from '@/components/site/TLink';
-import { BRANDS, BRAND_PICKS } from '@/components/works/data';
 import { asset } from '@/lib/base';
 
 export function Label({ n, children }: { n: string; children: string }) {
@@ -95,7 +94,8 @@ export function Services() {
 }
 
 /* ---------- (03) 実績の概要 ----------
-   ここは「パッと見てわかる」だけ。詳しくは /works（ブランディング／SaaS の2本立て） */
+   ここは「パッと見てわかる」だけ。詳しくは /works。
+   **自社プロダクト（GOOD SERIES）だけ**（2026-10-07 本人判断で、飲食ブランドの紹介は外した） */
 export function WorksOverview() {
   return (
     <section
@@ -107,36 +107,21 @@ export function WorksOverview() {
       <div className="wo-head">
         <div data-clear>
           <Decode className="ttl" lines={['SELECTED', 'WORKS.']} />
-          <p className="ttl-jp" id="wo-h">立ち上げてきた店と、つくってきたプロダクト。</p>
+          <p className="ttl-jp" id="wo-h">店舗のためにつくってきた、自社プロダクト。</p>
         </div>
-        <TLink className="btn btn--line wo-all" href="/works">実績をすべて見る<Arrow /></TLink>
+        <TLink className="btn btn--line wo-all" href="/works">実績を見る<Arrow /></TLink>
       </div>
-      <div className="wo-grid">
-        <TLink className="wo-card wo-card--brand" href="/works#branding">
-          <p className="wo-k" data-clear><b>(A)</b>Branding &amp; Produce</p>
-          <div className="wo-mosaic">
-            {BRAND_PICKS.map((ph, i) => (
-              <img key={ph.src} className={`wo-ph wo-ph--${i}`} src={ph.src} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" />
-            ))}
-          </div>
-          <div className="wo-txt" data-clear>
-            <h3>飲食ブランドの立ち上げ</h3>
-            <p>業態の企画から、店づくり、ブランドデザイン、出店まで。神戸・大阪から、名古屋、東京へ。</p>
-            <p className="wo-names">{BRANDS.map((b) => <span key={b.id}>{b.name}</span>)}</p>
-          </div>
-        </TLink>
-        <TLink className="wo-card wo-card--saas" href="/works#saas">
-          <p className="wo-k" data-clear><b>(B)</b>SaaS</p>
-          <div className="wo-saas">
-            <span className="wo-logo"><img src={asset('/img/logos/good-order.svg')} width={584} height={57} alt="GOOD ORDER" /></span>
-            <span className="wo-logo"><img src={asset('/img/logos/good-review.svg')} width={631} height={67} alt="GOOD REVIEW" /></span>
-          </div>
-          <div className="wo-txt" data-clear>
-            <h3>店舗のための自社プロダクト</h3>
-            <p>モバイルオーダーの GOOD ORDER と、クチコミ獲得の GOOD REVIEW。企画からブランド、UI、開発、映像まで社内でつくっています。</p>
-          </div>
-        </TLink>
-      </div>
+      <TLink className="wo-card wo-card--saas" href="/works">
+        <div className="wo-saas">
+          <span className="wo-logo"><img src={asset('/img/logos/good-order.svg')} width={584} height={57} alt="GOOD ORDER" /></span>
+          <span className="wo-logo"><img src={asset('/img/logos/good-review.svg')} width={631} height={67} alt="GOOD REVIEW" /></span>
+        </div>
+        <div className="wo-txt" data-clear>
+          <p className="wo-k"><b>GOOD SERIES</b>SaaS</p>
+          <h3>店舗のための自社プロダクト</h3>
+          <p>モバイルオーダーの GOOD ORDER と、クチコミを増やす GOOD REVIEW。企画からブランド、UI、開発、映像まで社内でつくっています。</p>
+        </div>
+      </TLink>
     </section>
   );
 }
@@ -345,8 +330,7 @@ export function Footer({ panel = false }: { panel?: boolean }) {
         <div>
           <p className="ft-h"><TLink href="/works">Works</TLink></p>
           <ul>
-            <li><TLink href="/works#branding">飲食ブランド</TLink></li>
-            <li><TLink href="/works#saas">SaaS</TLink></li>
+            <li><TLink href="/works">自社プロダクト</TLink></li>
           </ul>
         </div>
         <div>

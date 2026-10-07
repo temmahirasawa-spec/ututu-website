@@ -212,9 +212,13 @@ class Field {
   private resize = () => {
     if (!this.back || !this.front) return;
     const r = this.back.getBoundingClientRect();
-    this.W = Math.max(1, r.width);
-    this.H = Math.max(1, r.height);
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.max(1, r.width), H = Math.max(1, r.height), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    /* 大きさが変わっていなければ作り直さない（canvas の width を代入すると、同じ値でも中身が消えて作り直される。
+       スマホではアドレスバーの出入りのたびに resize が来て、点が一瞬消えていた） */
+    if (W === this.W && H === this.H && dpr === this.dpr && this.back.width === Math.round(W * dpr)) return;
+    this.W = W;
+    this.H = H;
+    this.dpr = dpr;
     for (const c of [this.back, this.front]) {
       c.width = Math.round(this.W * this.dpr);
       c.height = Math.round(this.H * this.dpr);
